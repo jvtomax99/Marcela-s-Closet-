@@ -18,9 +18,9 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   removing it.
 - `public/`: copied as is into `dist/`.
   - `sw.js`: the offline worker.
-  - `intro/`: the intro's wardrobe stills (`closed-phone.webp`,
-    `closed-desk.webp`), the doors-open clips once made (`open-*.mp4`)
-    and the music (`music.m4a` for Safari, `music.webm`).
+  - `intro/`: the intro's waiting picture (`closed.webp`, the clip's
+    first frame), the doors-open clip (`open.mp4`, 4 s, H.264, no sound)
+    and the music (`music.m4a` for Safari, `music.webm`, 12 s).
   - `manifest.webmanifest`, `icon-192.png`, `icon-512.png`,
     `icon-maskable-512.png`, `apple-touch-icon.png`: install info and
     icons.

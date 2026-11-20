@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { introFiles, introMode, introSize, shouldShowIntro } from './intro'
+import { INTRO_FILES, introLayout, introMode, shouldShowIntro } from './intro'
 
 describe('intro screen', () => {
   it('shows on every launch unless ?intro=0', () => {
@@ -15,12 +15,12 @@ describe('intro screen', () => {
     expect(introMode({ reducedMotion: false, saveData: true })).toBe('still')
   })
 
-  it('picks wide pictures for landscape screens', () => {
-    expect(introSize(390, 844)).toBe('phone')
-    expect(introSize(1440, 900)).toBe('desk')
+  it('shows a photo print on landscape screens', () => {
+    expect(introLayout(390, 844)).toBe('full')
+    expect(introLayout(1440, 900)).toBe('print')
   })
 
   it('uses relative paths only', () => {
-    for (const path of Object.values(introFiles('phone'))) expect(path.startsWith('/')).toBe(false)
+    for (const path of Object.values(INTRO_FILES)) expect(path.startsWith('/')).toBe(false)
   })
 })

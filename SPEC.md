@@ -90,8 +90,9 @@ calmer motion when the phone asks for reduced motion. Values in
 Before the app, on every launch: her wardrobe with the doors closed,
 "Marce's Closet" in the magazine serif, and two buttons, "Open with
 sound" and "Open quietly", plus Skip. A tap opens the doors in a short
-clip (Marce in front of her open wardrobe), with an original music loop
-if she chose sound, then fades into the app. A tap or Escape skips ahead.
+clip (4 s: the doors open and Marce steps out, arms open), with original
+music if she chose sound, then fades into the app. Phones show it
+full-screen; wide screens show it as a photo print beside the words. A tap or Escape skips ahead.
 It never waits on a slow connection: if the clip isn't ready 1.5 s after
 the tap, it goes straight in. Reduced motion or data saver: the still
 and a fade, no clip. `?intro=0` skips it. Pictures and clip made with
@@ -176,6 +177,8 @@ Runway, music with ElevenLabs (`CREDITS.md`).
     timeout, reduced motion and offline handling.
   - [x] Jose picked still B and music take A; desktop still made.
   - [x] Marce agreed to her likeness (2026-11-20).
-  - [ ] The scenes with her and the doors-open clip (phone and desktop).
+  - [x] The scene with her and the doors-open clip (one clip; wide
+    screens show it as a print, 2026-11-20).
+  - [ ] Jose's OK on the preview, then the pull request.
   - Done when: see "Intro screen" above.
 - [ ] Phase next: to decide with Jose.

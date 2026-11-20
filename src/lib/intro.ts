@@ -14,18 +14,20 @@ export function introMode(options: { reducedMotion: boolean; saveData: boolean }
   return options.reducedMotion || options.saveData ? 'still' : 'clip'
 }
 
-/** Landscape screens get the wide pictures, portrait screens the tall ones. */
-export function introSize(width: number, height: number): 'phone' | 'desk' {
-  return width > height ? 'desk' : 'phone'
+/**
+ * Portrait screens show the scene full-screen; landscape screens show it as a photo print on
+ * the paper board, with the words beside it.
+ */
+export function introLayout(width: number, height: number): 'full' | 'print' {
+  return width > height ? 'print' : 'full'
 }
 
-/** Where each intro file lives, relative so it works in GitHub Pages' sub-folder. */
-export function introFiles(size: 'phone' | 'desk') {
-  return {
-    still: `intro/closed-${size}.webp`,
-    clip: `intro/open-${size}.mp4`,
-  }
-}
+/** Where the intro files live, relative so they work in GitHub Pages' sub-folder. */
+export const INTRO_FILES = {
+  /** The clip's first frame, so the switch from picture to clip can't be seen. */
+  still: 'intro/closed.webp',
+  clip: 'intro/open.mp4',
+} as const
 
 /** How long after the tap the clip may take to be ready before the intro skips it. */
 export const CLIP_WAIT_MS = 1500
