@@ -1,0 +1,97 @@
+# CLAUDE.md: Marcela's Closet
+
+**Closet**, "Outfits from the clothes you already own." A phone-first
+installable web app that suggests outfits using only the pieces in Marce's
+own closet, styled like a fashion magazine lookbook. Jose builds and runs it
+for Marce (Marcela), who is the real user.
+
+Read first: `SPEC.md` (what, who, phases and what's next; gaps marked TO
+FILL for Jose), `docs/ARCHITECTURE.md` (map of files and how data moves),
+`DESIGN.md` (look). The rules shared by all of Jose's projects are in
+`.claude/rules/general.md`; where this file differs, this file wins.
+
+## Status (2026-11-20)
+
+The repo holds only these docs. The app itself came as a zip (`Closet
+App/`, built on Marce's Windows PC: React, TypeScript, Vite) and is not
+committed yet. Bringing it in is Phase 1 in `SPEC.md`. Until then, the
+code facts below describe the zip.
+
+## Rules for this repo
+
+- **Shop her own closet.** Every look is built only from pieces in her
+  catalog. Never invent, suggest buying, or fill a gap with a piece she
+  doesn't own.
+- **This one has a build step.** Unlike Jose's plain-HTML sites, the app is
+  React + TypeScript + Vite with Tailwind 4, Framer Motion, Dexie and
+  Vitest. Edit `src/`, never the built `dist/`. The stack was chosen on
+  purpose: ask Jose before swapping any part of it.
+- **The suggestion engine stays pure.** `src/engine/` is plain TypeScript
+  with no React, so it can be tested. Every rule or score change adds or
+  updates a test in `src/engine/engine.test.ts`. Rule-based and explainable
+  first; an AI styling layer may come later, only on top of the rules,
+  never instead of them.
+- **Data types live once,** in `src/types/index.ts`.
+- **The closet never leaves her device.** Pieces, photos and looks are in
+  the browser's own database (IndexedDB, through Dexie, database name
+  `closet`). No accounts, no server, no analytics. Any change to what is
+  stored must still open her existing closet (a new Dexie `version()` with
+  an upgrade, never an edit to version 1) and still restore old backup
+  files (`src/db/backup.ts`, backup `version: 1`).
+- **Her closet is per address.** Each web address, each browser, and on
+  iPhone the home-screen app all keep separate closets. Moving the site to
+  a new address, or changing the hosting, gives her an empty app there:
+  warn Jose first, and plan the Back up / Restore step with her.
+- **Offline worker.** `public/sw.js` keeps a copy of the app (internet
+  first, the copy when there's none) in the cache `closet-app`. It never
+  holds the closet itself.
+- **Public repo.** Never commit her clothing photos, a closet backup
+  (`closet-backup-*.json`, photos inside; `.gitignore` blocks it) or
+  anything personal of hers. Paid raw files
+  (fonts, models) can't be committed either (`docs/assets.md`, section 9).
+  The fonts are free and bundled from npm (`@fontsource-variable/...`).
+- **Design tokens.** Every color, font, shadow and display size is defined
+  once in `src/index.css`. Don't add one without adding it to `DESIGN.md`
+  in the same commit.
+- **Words in the app** are in English for now; Spanish comes later
+  (`src/lib/labels.ts` and the components hold all of it). Don't hard-code
+  new text where a later dictionary can't reach it.
+- **Windows extras.** `scripts/` (desktop shortcut) and
+  `.claude/launch.json` (`npm.cmd`) are for Marce's PC. They don't run in a
+  cloud session; leave them alone unless Jose says otherwise.
+- **Who signs off.** TO FILL: whether plans and the look are Jose's call
+  or need Marce's OK.
+
+## Commands
+
+- `npm install`, then `npm test` (46 tests), `npm run typecheck`,
+  `npm run build` (into `dist/`).
+- `npm run dev` for working, `npm run preview` (port 4173) to see the built
+  app; offline support only runs in `preview`.
+
+## Preview, checks and going live
+
+- **Checks.** `npm test`, `npm run typecheck` and `npm run build` must all
+  pass before asking Jose to push. A GitHub check that runs them on every
+  pull request is part of Phase 1.
+- **Preview.** Build, run `npm run preview`, and send Playwright
+  screenshots at 390 px, then 1440 px, plus a "try this" list. The app
+  starts empty: add a top, a bottom and shoes with photos (stand-in
+  pictures made for the test, never hers) to see looks.
+- **Hosting.** TO DECIDE in Phase 1, with Jose. The zip is set up for
+  Cloudflare (`wrangler.jsonc`) and expects to live at the root of an
+  address (`/sw.js`, `/manifest.webmanifest`, `start_url: "/"`). GitHub
+  Pages would serve it at `/Marcela-s-Closet-/`, which needs those paths
+  changed, and shares one address (and its storage) with Jose's other
+  apps. The options are in `SPEC.md`, "Open decisions".
+- **Going live.** Into `main` by pull request, phone notification that it
+  needs Jose's "push", wait for his OK, then one line on how to undo it.
+
+## Tools
+
+- **Taste skill** (`.claude/skills/taste/`): it asks for the Playwright MCP
+  server. In a cloud session use the installed Playwright instead and run
+  its `references/extract.js` with `page.evaluate`.
+- **Refactor.** `docs/refactor.md`, run when Jose asks for "Refactor:
+  CLEANUP.md items ...". The list is `docs/CLEANUP.md` (made by the first
+  `docs/cleanup-audit.md`).

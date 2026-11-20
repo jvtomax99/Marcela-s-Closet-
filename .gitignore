@@ -1,0 +1,11 @@
+node_modules
+dist
+.wrangler
+*.local
+*.log
+.DS_Store
+*.zip
+.env
+.env.*
+# Marce's closet backups hold her photos: never commit them.
+closet-backup-*.json
