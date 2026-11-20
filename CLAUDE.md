@@ -46,7 +46,9 @@ is live and her closet is moved over.
   `closet-app:/Marcela-s-Closet-/`. It never holds the closet itself.
 - **Public repo.** Never commit her clothing photos, a closet backup
   (`closet-backup-*.json`, photos inside; `.gitignore` blocks it) or
-  anything personal of hers. Paid raw files
+  anything personal of hers. One exception: the intro's AI-made scenes
+  of her (`public/intro/`), which Marce approved on 2026-11-20; her
+  original photos still never go in. Paid raw files
   (fonts, models) can't be committed either (`docs/assets.md`, section 9).
   The fonts are free and bundled from npm (`@fontsource-variable/...`).
 - **Design tokens.** Every color, font, shadow and display size is defined

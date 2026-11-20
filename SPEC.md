@@ -96,9 +96,10 @@ It never waits on a slow connection: if the clip isn't ready 1.5 s after
 the tap, it goes straight in. Reduced motion or data saver: the still
 and a fade, no clip. `?intro=0` skips it. Pictures and clip made with
 Runway, music with ElevenLabs (`CREDITS.md`).
-- Her likeness: Jose chose to show Marce's real face. Nothing using her
-  face is made until Marce says yes. TO FILL: the date she agreed. Until
-  then the intro runs with the empty wardrobe and no clip.
+- Her likeness: Jose chose to show Marce's real face, and Marce agreed on
+  2026-11-20 (through Jose). Three of her photos (a selfie, the green
+  dress, a full-length shot) were uploaded to Runway as references; they
+  are not in this repo. Runway may train on uploads under standard plans.
 - Done when: in the iPhone home-screen app, every launch shows the closed
   wardrobe within a second; "Open with sound" plays the clip with music
   and lands on the Closet page; "Open quietly" does the same silently;
@@ -173,8 +174,8 @@ Runway, music with ElevenLabs (`CREDITS.md`).
 - [ ] Intro screen (Jose, 2026-11-20), next to Phase 1.
   - [x] Music and the empty wardrobe still; the screen, with skip,
     timeout, reduced motion and offline handling.
-  - [ ] Jose picks the still and the music take.
-  - [ ] Marce agrees to her likeness; then the scenes with her and the
-    doors-open clip (phone and desktop).
+  - [x] Jose picked still B and music take A; desktop still made.
+  - [x] Marce agreed to her likeness (2026-11-20).
+  - [ ] The scenes with her and the doors-open clip (phone and desktop).
   - Done when: see "Intro screen" above.
 - [ ] Phase next: to decide with Jose.
