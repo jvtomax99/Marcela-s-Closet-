@@ -1,5 +1,8 @@
-import type { Garment, Occasion, Pattern, Season, SuggestionFilters } from '../types'
+import type { Category, Garment, Occasion, Pattern, Season, SuggestionFilters } from '../types'
 import { colorsClash } from './color'
+
+/** The pieces that make an outfit; the rest (outerwear, bag, accessories) finish it. */
+export const CORE_CATEGORIES: readonly Category[] = ['top', 'bottom', 'dress', 'shoes']
 
 /** Patterns that compete for attention. Stripes and dots are quiet enough to mix. */
 const BOLD_PATTERNS: ReadonlySet<Pattern> = new Set<Pattern>(['plaid', 'floral', 'animal', 'graphic'])

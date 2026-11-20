@@ -1,4 +1,4 @@
-import type { ClothingItem, Outfit } from '../types'
+import type { ClothingItem, Outfit, Wear } from '../types'
 import { db } from './index'
 
 /** Everything in the closet, photos included, as one file that can be saved anywhere. */
@@ -8,6 +8,8 @@ interface BackupFile {
   exportedAt: number
   items: (Omit<ClothingItem, 'photo'> & { photo: { type: string; base64: string } })[]
   outfits: Outfit[]
+  /** Added with wear tracking. Older files have none, and older app versions ignore it. */
+  wears?: Wear[]
 }
 
 async function toBase64(blob: Blob): Promise<string> {
@@ -28,7 +30,11 @@ function fromBase64(base64: string, type: string): Blob {
 }
 
 export async function exportCloset(): Promise<File> {
-  const [items, outfits] = await Promise.all([db.items.toArray(), db.outfits.toArray()])
+  const [items, outfits, wears] = await Promise.all([
+    db.items.toArray(),
+    db.outfits.toArray(),
+    db.wears.toArray(),
+  ])
   const backup: BackupFile = {
     app: 'closet',
     version: 1,
@@ -40,6 +46,7 @@ export async function exportCloset(): Promise<File> {
       })),
     ),
     outfits,
+    wears,
   }
   const date = new Date().toISOString().slice(0, 10)
   return new File([JSON.stringify(backup)], `closet-backup-${date}.json`, { type: 'application/json' })
@@ -54,7 +61,7 @@ function isBackup(value: unknown): value is BackupFile {
  * Adds a backup's pieces and looks to this closet. Nothing already here is removed;
  * a piece or look that exists in both is replaced by the backup's version.
  */
-export async function importCloset(file: Blob): Promise<{ items: number; outfits: number }> {
+export async function importCloset(file: Blob): Promise<{ items: number; outfits: number; wears: number }> {
   let data: unknown
   try {
     data = JSON.parse(await file.text())
@@ -69,13 +76,16 @@ export async function importCloset(file: Blob): Promise<{ items: number; outfits
     photo: fromBase64(item.photo.base64, item.photo.type),
   }))
 
-  await db.transaction('rw', db.items, db.outfits, async () => {
+  const wears = Array.isArray(backup.wears) ? backup.wears : []
+
+  await db.transaction('rw', [db.items, db.outfits, db.wears], async () => {
     await db.items.bulkPut(items)
     for (const outfit of backup.outfits) {
       // The same look may already exist here under another id; keep one copy.
       const existing = await db.outfits.where('signature').equals(outfit.signature).first()
       await db.outfits.put({ ...outfit, id: existing?.id ?? outfit.id })
     }
+    await db.wears.bulkPut(wears)
   })
-  return { items: items.length, outfits: backup.outfits.length }
+  return { items: items.length, outfits: backup.outfits.length, wears: wears.length }
 }

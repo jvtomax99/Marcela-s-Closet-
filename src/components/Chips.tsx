@@ -21,7 +21,7 @@ function Chip({ selected, onClick, children }: ChipProps) {
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className={`rounded-full border px-3.5 py-2 text-sm transition-colors ${
+      className={`min-h-11 rounded-full border px-3.5 py-2 text-sm transition-colors ${
         selected ? 'border-ink bg-ink text-canvas' : 'border-line bg-surface/60 text-ink hover:border-muted'
       }`}
     >

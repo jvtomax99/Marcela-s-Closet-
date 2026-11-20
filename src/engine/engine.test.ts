@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import type { Garment, Outfit } from '../types'
+import type { Garment, Outfit, Wear } from '../types'
 import { colorsClash, harmonyOf } from './color'
 import { outfitAllowed } from './rules'
-import { outfitSignature, suggestOutfits } from './index'
+import { forgottenPieces, wearStats, outfitSignature, suggestOutfits, toDay } from './index'
+import { daysBetween } from './wear'
 
 let nextId = 0
 
@@ -332,5 +333,129 @@ describe('results', () => {
     const start = performance.now()
     suggestOutfits(closet)
     expect(performance.now() - start).toBeLessThan(1000)
+  })
+})
+
+describe('what she wore', () => {
+  const TODAY = '2026-11-20'
+  let wearId = 0
+  const wore = (date: string, items: Garment[]): Wear => {
+    wearId += 1
+    return { id: `w-${wearId}`, date, itemIds: items.map((item) => item.id), createdAt: 0 }
+  }
+  const at = (wears: Wear[]) => ({ wears, today: TODAY })
+  /** A piece added long before logging started. */
+  const old = (overrides: Partial<Garment> & Pick<Garment, 'category'>) =>
+    piece({ createdAt: new Date(2025, 0, 1).getTime(), ...overrides })
+
+  const dress = old({ category: 'dress' })
+  const flats = old({ category: 'shoes' })
+  const heels = old({ category: 'shoes' })
+
+  it('counts days across months', () => {
+    expect(daysBetween('2026-10-31', '2026-11-02')).toBe(2)
+    expect(toDay(new Date(2026, 10, 20, 23, 30).getTime())).toBe('2026-11-20')
+  })
+
+  it('changes nothing until she has logged something', () => {
+    const closet = [dress, flats, heels]
+    expect(suggestOutfits(closet, {}, [], 12, at([]))).toEqual(suggestOutfits(closet))
+  })
+
+  it('pushes down a piece worn yesterday', () => {
+    const favoriteHeels = old({ category: 'shoes', favorite: true })
+    const closet = [dress, flats, favoriteHeels]
+    expect(suggestOutfits(closet)[0].items).toContain(favoriteHeels)
+    const [first] = suggestOutfits(closet, {}, [], 12, at([wore('2026-11-19', [favoriteHeels])]))
+    expect(first.items).toContain(flats)
+  })
+
+  it('pushes down a piece worn yesterday even if it is a favorite in a strong pairing', () => {
+    const coral = old({ category: 'top', colors: ['coral'], favorite: true })
+    const white = old({ category: 'top', colors: ['white'] })
+    const denim = old({ category: 'bottom', colors: ['denim'] })
+    const [first] = suggestOutfits([coral, white, denim, flats], {}, [], 12, at([wore('2026-11-19', [coral])]))
+    expect(first.items).toContain(white)
+  })
+
+  it('forgets a piece worn more than three days ago, for this rule', () => {
+    const favoriteHeels = old({ category: 'shoes', favorite: true })
+    const [first] = suggestOutfits([dress, flats, favoriteHeels], {}, [], 12, at([
+      wore('2026-11-10', [favoriteHeels]),
+      wore('2026-11-10', [flats]),
+    ]))
+    expect(first.items).toContain(favoriteHeels)
+  })
+
+  it('pushes the same look far down for two weeks, even with a different bag', () => {
+    const top = old({ category: 'top', favorite: true })
+    const skirt = old({ category: 'bottom', favorite: true })
+    const trousers = old({ category: 'bottom' })
+    const bag = old({ category: 'bag' })
+    const closet = [top, skirt, trousers, flats, bag]
+    const wears = [wore('2026-11-12', [top, skirt, flats])]
+    const [first] = suggestOutfits(closet, {}, [], 12, at(wears))
+    expect(first.items).toContain(trousers)
+    // Three weeks later it is fair game again.
+    const later = suggestOutfits(closet, {}, [], 12, { wears, today: '2026-12-03' })
+    expect(later[0].items).toContain(skirt)
+  })
+
+  it('counts the two-week window up to and including 14 days ago', () => {
+    const top = old({ category: 'top', favorite: true })
+    const skirt = old({ category: 'bottom', favorite: true })
+    const trousers = old({ category: 'bottom' })
+    const closet = [top, skirt, trousers, flats]
+    const worn = (today: string) =>
+      suggestOutfits(closet, {}, [], 12, { wears: [wore('2026-11-06', [top, skirt, flats])], today })[0]
+    expect(worn('2026-11-20').items).toContain(trousers)
+    expect(worn('2026-11-21').items).toContain(skirt)
+  })
+
+  it('counts a backdated entry from the day it was logged', () => {
+    // Logged today, but dated last year by mistake: nothing becomes "forgotten" yet.
+    const slip: Wear = { id: 'slip', date: '2025-11-20', itemIds: [flats.id], createdAt: new Date(2026, 10, 20).getTime() }
+    expect(forgottenPieces([dress, flats], [slip], TODAY)).toEqual([])
+  })
+
+  it('treats pieces logged one by one on a day as that day\'s outfit', () => {
+    const top = old({ category: 'top' })
+    const skirt = old({ category: 'bottom' })
+    const wears = [wore('2026-11-18', [top]), wore('2026-11-18', [skirt, flats])]
+    expect(wearStats([top.id, skirt.id, flats.id], wears, TODAY)).toEqual({ times: 1, last: '2026-11-18' })
+  })
+
+  it('brings back a forgotten piece and says so', () => {
+    const coat = old({ category: 'outerwear', name: 'Camel coat', seasons: ['winter'] })
+    const top = old({ category: 'top', seasons: ['winter'] })
+    const skirt = old({ category: 'bottom', seasons: ['winter'] })
+    const boots = old({ category: 'shoes', seasons: ['winter'] })
+    const wears = [wore('2026-10-01', [top]), wore('2026-11-15', [skirt, boots])]
+    const [look] = suggestOutfits([coat, top, skirt, boots], {}, [], 12, at(wears))
+    expect(look.items).toContain(coat)
+    expect(look.why.startsWith('Brings back your camel coat, not worn in 7 weeks.')).toBe(true)
+  })
+
+  it('does not call a new piece forgotten', () => {
+    const fresh = piece({ category: 'top', createdAt: new Date(2026, 10, 10).getTime() })
+    const wears = [wore('2026-09-01', [flats])]
+    expect(forgottenPieces([fresh, dress, flats], wears, TODAY)).toEqual([dress, flats])
+  })
+
+  it('never pushes down the piece she builds around', () => {
+    const otherDress = old({ category: 'dress' })
+    const closet = [dress, otherDress, flats, heels]
+    const wears = [wore('2026-11-19', [heels]), wore('2026-11-19', [dress, flats])]
+    const around = suggestOutfits(closet, { anchorId: heels.id }, [], 12, at(wears))
+    const plain = suggestOutfits(closet, { anchorId: heels.id })
+    expect(around.every((look) => look.items.includes(heels))).toBe(true)
+    // Heels cost nothing; only the dress worn yesterday drops.
+    expect(around[0].items).toContain(otherDress)
+    const sameLook = around.find((look) => look.items.includes(otherDress))!
+    expect(sameLook.score).toBe(plain.find((look) => look.items.includes(otherDress))!.score)
+  })
+
+  it('ignores entries dated after today', () => {
+    expect(forgottenPieces([dress], [wore('2026-12-25', [dress])], TODAY)).toEqual([])
   })
 })

@@ -1,7 +1,18 @@
 import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { ClothingItem } from '../types'
-import { db, deleteItem, hideLook, rateLook, restoreHiddenLooks, saveItem, saveLook } from './index'
+import {
+  db,
+  deleteItem,
+  hideLook,
+  logWear,
+  rateLook,
+  restoreHiddenLooks,
+  saveItem,
+  saveLook,
+  unwearPiece,
+  wearPiece,
+} from './index'
 
 const piece = (id: string): ClothingItem => ({
   id,
@@ -22,6 +33,7 @@ const piece = (id: string): ClothingItem => ({
 beforeEach(async () => {
   await db.items.clear()
   await db.outfits.clear()
+  await db.wears.clear()
 })
 
 describe('looks', () => {
@@ -65,5 +77,36 @@ describe('deleting a piece', () => {
     await deleteItem('a')
     expect(await db.items.count()).toBe(1)
     expect((await db.outfits.toArray()).map((look) => look.name)).toEqual(['Keeps going'])
+  })
+})
+
+describe('what she wore', () => {
+  it('joins pieces logged one by one into the same day', async () => {
+    await wearPiece('a', '2026-11-20')
+    await wearPiece('b', '2026-11-20')
+    await wearPiece('b', '2026-11-20')
+    const wears = await db.wears.toArray()
+    expect(wears).toHaveLength(1)
+    expect(wears[0].itemIds).toEqual(['a', 'b'])
+  })
+
+  it('takes a piece back out, and drops a day left empty', async () => {
+    await wearPiece('a', '2026-11-20')
+    await wearPiece('b', '2026-11-20')
+    await unwearPiece('a', '2026-11-20')
+    expect((await db.wears.toArray())[0].itemIds).toEqual(['b'])
+    await unwearPiece('b', '2026-11-20')
+    expect(await db.wears.count()).toBe(0)
+  })
+
+  it('keeps the rest of a day when a piece is deleted', async () => {
+    await saveItem(piece('a'))
+    await saveItem(piece('b'))
+    await logWear(['a', 'b'], '2026-11-19')
+    await logWear(['a'], '2026-11-18')
+    await deleteItem('a')
+    const wears = await db.wears.toArray()
+    expect(wears).toHaveLength(1)
+    expect(wears[0].itemIds).toEqual(['b'])
   })
 })
