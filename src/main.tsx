@@ -18,12 +18,13 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
       .getEntriesByType('resource')
       .map((entry) => entry.name)
       .filter((url) => new URL(url).origin === location.origin)
-    for (const url of ['/', ...files]) void fetch(url).catch(() => undefined)
+    for (const url of ['./', ...files]) void fetch(url).catch(() => undefined)
   }
   if (!navigator.serviceWorker.controller) {
     navigator.serviceWorker.addEventListener('controllerchange', keepOfflineCopy, { once: true })
   }
-  void navigator.serviceWorker.register('/sw.js')
+  // Relative, so the app works in a sub-folder (GitHub Pages serves it at /Marcela-s-Closet-/).
+  void navigator.serviceWorker.register('./sw.js')
 }
 
 createRoot(document.getElementById('root')!).render(
