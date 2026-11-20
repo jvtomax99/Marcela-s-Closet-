@@ -83,11 +83,14 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
     () => (anchor || !filters.anchorId ? filters : { ...filters, anchorId: undefined }),
     [anchor, filters],
   )
-  const { logLook, toast } = useWornLog()
+  const { logLook, toast, pendingId } = useWornLog()
   const today = toDay(Date.now())
+  // While the "Worn" bar shows, the list stays still: no card jumps under her finger, and Undo
+  // is next to the look she just logged. It re-sorts when the bar closes.
+  const settled = useMemo(() => wears.filter((wear) => wear.id !== pendingId), [wears, pendingId])
   const looks = useMemo(
-    () => suggestOutfits(items, active, outfits, limit, { wears, today }),
-    [items, active, outfits, limit, wears, today],
+    () => suggestOutfits(items, active, outfits, limit, { wears: settled, today }),
+    [items, active, outfits, limit, settled, today],
   )
 
   const update = (change: SuggestionFilters) => {

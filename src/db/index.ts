@@ -47,8 +47,7 @@ async function removeFromWears(id: string, entries: Promise<Wear[]>) {
 }
 
 /** Logs a whole look as worn on a day. Returns the entry's id, for undo. */
-export async function logWear(itemIds: string[], date: Day): Promise<string> {
-  const id = newId()
+export async function logWear(itemIds: string[], date: Day, id = newId()): Promise<string> {
   await db.wears.put({ id, date, itemIds, createdAt: Date.now() })
   return id
 }

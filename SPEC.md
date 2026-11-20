@@ -86,7 +86,11 @@ days costs 30, whatever bag or accessory goes with it; a forgotten piece
 adds 6 points (8 for two or more) and leads the "why" line ("Brings back
 your camel coat, not worn in 7 weeks"). Nothing changes until she logs
 for the first time, and "build around" never pushes down the piece she
-picked. Backups carry what she wore; older backups still restore.
+picked. While the "Worn" bar shows, Looks holds still (no card moves
+under her finger); it re-sorts when the bar closes. A day picked by
+mistake far in the past doesn't make pieces "forgotten": logging counts
+from the day she actually logged. Backups carry what she wore; older
+backups still restore.
 - Done when: on her iPhone, she taps "Wore it" on a look and it drops
   out of the top of Looks; a piece she hasn't worn in a month shows under
   "Forgotten" and comes back in a look with the "Brings back" reason; a
@@ -169,7 +173,7 @@ calmer motion when the phone asks for reduced motion. Values in
   - Done when: the check is green, the app is live at its address, and
     Marce's closet opens in the iPhone home-screen app.
 - [ ] Phase 2: wear tracking ("What she wore" above).
-  - [x] Built and checked on a test closet (63 tests; preview at 390 and
+  - [x] Built and checked on a test closet (65 tests; preview at 390 and
     1440 px, light and dark; backup round trip; version-1 closet opens).
   - [ ] Live, and Marce has used it on her iPhone.
 - [ ] Phase next: to decide with Jose.

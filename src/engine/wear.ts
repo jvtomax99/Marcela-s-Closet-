@@ -13,7 +13,10 @@ export interface WearHistory {
   lastWorn: Map<string, number>
   /** Each logged day: how long ago, and every piece worn that day. */
   days: { date: Day; daysAgo: number; ids: Set<string> }[]
-  /** Days since the first entry, or null if she has never logged anything. */
+  /**
+   * Days since she started logging, or null if she never has. A backdated entry counts from when
+   * it was logged, so picking last year by mistake doesn't make every piece "forgotten" at once.
+   */
   loggingFor: number | null
 }
 
@@ -45,10 +48,15 @@ export function buildWearHistory(wears: Wear[], today: Day): WearHistory {
   const lastWorn = new Map<string, number>()
   const days: WearHistory['days'] = []
   let loggingFor: number | null = null
+  for (const wear of wears) {
+    if (wear.date > today) continue
+    const logged = toDay(wear.createdAt)
+    const since = daysBetween(logged > wear.date ? logged : wear.date, today)
+    if (loggingFor === null || since > loggingFor) loggingFor = since
+  }
   for (const [date, ids] of byDay) {
     const daysAgo = daysBetween(date, today)
     days.push({ date, daysAgo, ids })
-    if (loggingFor === null || daysAgo > loggingFor) loggingFor = daysAgo
     for (const id of ids) {
       const known = lastWorn.get(id)
       if (known === undefined || daysAgo < known) lastWorn.set(id, daysAgo)
@@ -65,7 +73,7 @@ export function buildWearHistory(wears: Wear[], today: Day): WearHistory {
 export function daysUnworn(item: Garment, history: WearHistory, today: Day): number | null {
   if (history.loggingFor === null) return null
   const worn = history.lastWorn.get(item.id)
-  if (worn !== undefined) return worn
+  if (worn !== undefined) return Math.min(worn, history.loggingFor)
   const added = item.createdAt === undefined ? Infinity : daysBetween(toDay(item.createdAt), today)
   return Math.min(history.loggingFor, added)
 }

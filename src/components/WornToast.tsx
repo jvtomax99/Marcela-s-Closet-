@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { logWear, moveWear, undoWear } from '../db'
 import { toDay } from '../engine'
+import { newId } from '../lib/id'
 import type { Day } from '../types'
 
 const SHOWN_FOR_MS = 8000
@@ -27,16 +28,27 @@ interface Logged {
 export function useWornLog() {
   const [logged, setLogged] = useState<Logged | null>(null)
   const [touched, setTouched] = useState(0)
+  /** True while the date picker is open: the bar stays until she is done. */
+  const [picking, setPicking] = useState(false)
+  const last = useRef<{ key: string; at: number } | null>(null)
 
   useEffect(() => {
-    if (!logged) return
+    if (!logged || picking) return
     const timer = setTimeout(() => setLogged(null), SHOWN_FOR_MS)
     return () => clearTimeout(timer)
-  }, [logged, touched])
+  }, [logged, touched, picking])
 
   const logLook = useCallback(async (itemIds: string[]) => {
+    // A double tap logs once, so one Undo really undoes it.
+    const key = [...itemIds].sort().join('+')
+    if (last.current?.key === key && Date.now() - last.current.at < 2000) return
+    last.current = { key, at: Date.now() }
     const date = toDay(Date.now())
-    setLogged({ id: await logWear(itemIds, date), date })
+    // The bar (and its id) comes first, so the page knows to hold still before the entry lands.
+    const id = newId()
+    setPicking(false)
+    setLogged({ id, date })
+    await logWear(itemIds, date, id)
   }, [])
 
   const today = toDay(Date.now())
@@ -60,7 +72,11 @@ export function useWornLog() {
                 aria-label="Day worn"
                 value={logged.date}
                 max={today}
-                onFocus={() => setTouched((n) => n + 1)}
+                onFocus={() => setPicking(true)}
+                onBlur={() => {
+                  setPicking(false)
+                  setTouched((n) => n + 1)
+                }}
                 onChange={(event) => {
                   const date = event.target.value
                   if (!date || date > today) return
@@ -76,6 +92,7 @@ export function useWornLog() {
             type="button"
             onClick={() => {
               undoWear(logged.id)
+              last.current = null
               setLogged(null)
             }}
             className="py-1 text-eyebrow uppercase text-canvas/80 hover:text-canvas"
@@ -87,5 +104,6 @@ export function useWornLog() {
     </AnimatePresence>
   )
 
-  return { logLook, toast }
+  /** The entry the bar is showing, so a page can wait to re-sort until the bar closes. */
+  return { logLook, toast, pendingId: logged?.id ?? null }
 }

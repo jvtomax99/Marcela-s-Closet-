@@ -36,7 +36,7 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
     pieces, `toDay` (her phone's local date).
   - `suggest.ts`: building, finishing (outerwear, bag, accessories) and
     picking outfits.
-  - `index.ts`: what the rest of the app may use; `engine.test.ts`: 49
+  - `index.ts`: what the rest of the app may use; `engine.test.ts`: 51
     tests.
 - `src/db/`: storage.
   - `index.ts`: the Dexie database and every read and write.
