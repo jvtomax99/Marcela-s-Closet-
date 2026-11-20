@@ -154,7 +154,8 @@ export function Intro({ onDone }: { onDone: () => void }) {
   }, [clipSrc, leave])
 
   // Keyboard and screen-reader users start on the main button, not in the app underneath.
-  useEffect(() => openButton.current?.focus({ preventScroll: true }), [])
+  // focusVisible: false keeps the ring hidden until she actually uses a keyboard.
+  useEffect(() => openButton.current?.focus({ preventScroll: true, focusVisible: false } as FocusOptions), [])
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {

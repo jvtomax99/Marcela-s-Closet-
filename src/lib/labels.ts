@@ -93,6 +93,27 @@ export const COLOR_SWATCHES: Record<ColorName, string> = {
   blush: '#efc5bb',
 }
 
+/** Who the app greets. */
+export const OWNER_NAME = 'Marce'
+
+/**
+ * Sayings from Cali for the greeting, one a day. Real local sayings and nicknames, not song
+ * lyrics. Marce can change or add to these.
+ */
+export const DICHOS: { text: string; source: string }[] = [
+  { text: 'Cali es Cali, lo demás es loma.', source: 'Dicho caleño' },
+  { text: 'Cali, la sucursal del cielo.', source: 'Así le dicen a Cali' },
+  { text: 'Oiga, mire, vea.', source: 'El saludo de Cali' },
+  { text: 'Cali, capital mundial de la salsa.', source: 'Cali, Valle del Cauca' },
+]
+
+/** The same saying all day, a new one tomorrow. */
+export function dichoOfTheDay(now = new Date()) {
+  const start = new Date(now.getFullYear(), 0, 0)
+  const day = Math.floor((now.getTime() - start.getTime()) / 86_400_000)
+  return DICHOS[day % DICHOS.length]
+}
+
 /** Words on the intro screen (the wardrobe that opens before the app). */
 export const INTRO_LABELS = {
   kicker: 'Marce’s',

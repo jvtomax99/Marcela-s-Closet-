@@ -39,6 +39,8 @@ export interface Garment {
   /** Empty means "works for any occasion". */
   occasions: Occasion[]
   favorite: boolean
+  /** When the piece was added (ms). Lets wear tracking tell a new piece from a forgotten one. */
+  createdAt?: number
 }
 
 export interface ClothingItem extends Garment {
@@ -76,4 +78,15 @@ export interface Suggestion {
   items: Garment[]
   score: number
   why: string
+}
+
+/** A day's date on her phone, as YYYY-MM-DD (local time, not UTC). */
+export type Day = string
+
+/** One "I wore this" entry. Several entries on the same day add up to that day's outfit. */
+export interface Wear {
+  id: string
+  date: Day
+  itemIds: string[]
+  createdAt: number
 }

@@ -5,9 +5,10 @@ import { Icon } from '../components/Icon'
 import { ItemPhoto } from '../components/ItemPhoto'
 import { LookCard } from '../components/LookCard'
 import { Sheet } from '../components/Sheet'
+import { useWornLog } from '../components/WornToast'
 import { hideLook, removeLook, saveLook } from '../db'
-import { suggestOutfits } from '../engine'
-import { FORMALITY_LABELS, OCCASION_PHRASES, SEASON_LABELS } from '../lib/labels'
+import { suggestOutfits, toDay } from '../engine'
+import { dichoOfTheDay, FORMALITY_LABELS, OCCASION_PHRASES, OWNER_NAME, SEASON_LABELS } from '../lib/labels'
 import { goTo } from '../lib/useRoute'
 import {
   OCCASIONS,
@@ -18,6 +19,7 @@ import {
   type Outfit,
   type Season,
   type SuggestionFilters,
+  type Wear,
 } from '../types'
 
 const PAGE_SIZE = 12
@@ -26,6 +28,7 @@ const FORMALITIES: Formality[] = [1, 2, 3, 4, 5]
 interface LooksViewProps {
   items: ClothingItem[]
   outfits: Outfit[]
+  wears: Wear[]
   filters: SuggestionFilters
   onFilters: (filters: SuggestionFilters) => void
 }
@@ -68,7 +71,7 @@ function missingPieces(items: ClothingItem[]): string | null {
   return missing.length === 1 ? missing[0] : `${missing.slice(0, -1).join(', ')} and ${missing.at(-1)}`
 }
 
-export function LooksView({ items, outfits, filters, onFilters }: LooksViewProps) {
+export function LooksView({ items, outfits, wears, filters, onFilters }: LooksViewProps) {
   const [limit, setLimit] = useState(PAGE_SIZE)
   const [picking, setPicking] = useState(false)
   const closePicker = useCallback(() => setPicking(false), [])
@@ -80,7 +83,15 @@ export function LooksView({ items, outfits, filters, onFilters }: LooksViewProps
     () => (anchor || !filters.anchorId ? filters : { ...filters, anchorId: undefined }),
     [anchor, filters],
   )
-  const looks = useMemo(() => suggestOutfits(items, active, outfits, limit), [items, active, outfits, limit])
+  const { logLook, toast, pendingId } = useWornLog()
+  const today = toDay(Date.now())
+  // While the "Worn" bar shows, the list stays still: no card jumps under her finger, and Undo
+  // is next to the look she just logged. It re-sorts when the bar closes.
+  const settled = useMemo(() => wears.filter((wear) => wear.id !== pendingId), [wears, pendingId])
+  const looks = useMemo(
+    () => suggestOutfits(items, active, outfits, limit, { wears: settled, today }),
+    [items, active, outfits, limit, settled, today],
+  )
 
   const update = (change: SuggestionFilters) => {
     setLimit(PAGE_SIZE)
@@ -94,14 +105,22 @@ export function LooksView({ items, outfits, filters, onFilters }: LooksViewProps
   const missing = missingPieces(items)
   const filtered = Boolean(active.occasion || active.season || active.formality || active.anchorId)
 
+  const dicho = dichoOfTheDay()
+
   return (
     <>
-      <div className="pt-9 pb-12 sm:pt-14 sm:pb-16">
-        <p className="flex items-center gap-3 text-eyebrow text-muted uppercase">
-          <span aria-hidden="true" className="h-px w-8 bg-accent" />
-          From your own closet
+      <div className="pt-8 pb-10 sm:pt-12 sm:pb-14">
+        <p lang="es" className="font-script text-greeting text-accent">
+          Hola, {OWNER_NAME}
         </p>
-        <h1 className="mt-5 max-w-4xl font-serif text-headline font-light">
+        <figure lang="es" className="mt-2">
+          <blockquote className="font-serif text-quote italic">“{dicho.text}”</blockquote>
+          <figcaption className="mt-2 flex items-center gap-2.5 text-eyebrow text-ink/80 uppercase">
+            <span aria-hidden="true" className="h-px w-6 bg-ink/60" />
+            {dicho.source}
+          </figcaption>
+        </figure>
+        <h1 className="mt-9 max-w-4xl font-serif text-headline font-light">
           A look for{' '}
           <SentenceSelect
             label="Occasion"
@@ -205,7 +224,22 @@ export function LooksView({ items, outfits, filters, onFilters }: LooksViewProps
         </EmptyState>
       ) : (
         <>
-          <div className="mx-auto grid max-w-5xl gap-y-16 md:grid-cols-2 md:gap-x-16 md:gap-y-20">
+          <p className="mx-auto mb-5 flex max-w-5xl items-center gap-2.5 rounded-full bg-glass px-4 py-2.5 text-button font-medium shadow-card backdrop-blur-xl sm:w-fit sm:pr-6">
+            <span aria-hidden="true" className="flex h-3.5 items-end gap-0.5">
+              {[0.6, 1, 0.75, 0.9].map((height, index) => (
+                <span
+                  key={index}
+                  className="eq-bar w-[3px] rounded-full bg-accent"
+                  style={{ height: `${height * 100}%`, animationDelay: `${index * 0.17}s` }}
+                />
+              ))}
+            </span>
+            Now playing · {filtered ? 'your picks' : "today's looks"}
+            <span className="ml-auto pl-4 text-xs text-muted">
+              {looks.length} {looks.length === 1 ? 'track' : 'tracks'}
+            </span>
+          </p>
+          <div className="mx-auto grid max-w-5xl gap-y-10 md:grid-cols-2 md:gap-x-10 md:gap-y-14">
             <AnimatePresence mode="popLayout" initial={false}>
               {looks.map((look, index) => {
                 const saved = savedBySignature.get(look.signature)
@@ -221,6 +255,7 @@ export function LooksView({ items, outfits, filters, onFilters }: LooksViewProps
                       saved ? removeLook(saved.id) : saveLook(itemIds, `Look Nº ${savedCount + 1}`)
                     }
                     onHide={() => hideLook(itemIds)}
+                    onWore={() => logLook(itemIds)}
                   />
                 )
               })}
@@ -239,6 +274,8 @@ export function LooksView({ items, outfits, filters, onFilters }: LooksViewProps
           )}
         </>
       )}
+
+      {toast}
 
       <Sheet open={picking} onClose={closePicker} title="Build around…">
         <div className="grid grid-cols-3 gap-2.5">

@@ -13,8 +13,9 @@ FILL for Jose), `docs/ARCHITECTURE.md` (map of files and how data moves),
 ## Status (2026-11-20)
 
 The app's code is in (from Marce's zip, built on her Windows PC) and set
-up for GitHub Pages. Not published yet: Phase 1 in `SPEC.md` ends when it
-is live and her closet is moved over.
+live on GitHub Pages. Phase 1 is done: Marce moved her closet to the
+iPhone home-screen app with Back up and Restore. Next phase: to pick with
+Jose (`SPEC.md`, Later).
 
 ## Rules for this repo
 
@@ -55,17 +56,20 @@ is live and her closet is moved over.
   once in `src/index.css`. Don't add one without adding it to `DESIGN.md`
   in the same commit.
 - **Words in the app** are in English for now; Spanish comes later
-  (`src/lib/labels.ts` and the components hold all of it). Don't hard-code
+  (`src/lib/labels.ts` and the components hold all of it). The greeting
+  "Hola, Marce" and the daily Cali sayings (`DICHOS` in `labels.ts`) are
+  Spanish on purpose (Jose, 2026-11-20). Don't hard-code
   new text where a later dictionary can't reach it.
 - **Windows extras.** `scripts/` (desktop shortcut) and
   `.claude/launch.json` (`npm.cmd`) are for Marce's PC. They don't run in a
   cloud session; leave them alone unless Jose says otherwise.
-- **Who signs off.** TO FILL: whether plans and the look are Jose's call
-  or need Marce's OK.
+- **Who signs off.** Jose alone, for plans, the look and the wording.
+  Marce doesn't edit the repo herself any more; her ideas come through
+  Jose.
 
 ## Commands
 
-- `npm install`, then `npm test` (50 tests), `npm run typecheck`,
+- `npm install`, then `npm test` (73 tests), `npm run typecheck`,
   `npm run build` (into `dist/`).
 - `npm run dev` for working, `npm run preview` (port 4173) to see the built
   app; offline support only runs in `preview`.
@@ -87,8 +91,9 @@ is live and her closet is moved over.
   `public/sw.js`, `public/manifest.webmanifest`): a link starting with `/`
   breaks. Pages can't build the app itself, so
   `.github/workflows/pages.yml` tests, builds and publishes `dist/` on
-  every push to `main`. `npm run deploy` (Cloudflare) would publish to a
-  different address with an empty closet: don't use it.
+  every push to `main`. Cloudflare and Vercel would each give a different
+  address with an empty closet; the Cloudflare setup from the zip was
+  removed on purpose.
 - **Shared address.** Jose's other Pages sites live on the same
   `jvtomax99.github.io`, so they share storage with her closet. The worker
   only ever opens, matches or deletes its own cache (named with the

@@ -23,19 +23,32 @@ const PATHS = {
     <path d="M12 19.5s-7.5-4.4-7.5-10A4.2 4.2 0 0 1 12 7a4.2 4.2 0 0 1 7.5 2.5c0 5.6-7.5 10-7.5 10Z" />
   ),
   close: <path d="M6 6l12 12M18 6 6 18" />,
+  /** A record, for the Lookbook (her looks as a playlist). */
+  vinyl: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <circle cx="12" cy="12" r="2.2" />
+      <path d="M12 5.8a6.2 6.2 0 0 1 6.2 6.2" />
+    </>
+  ),
   arrow: <path d="M5 12h14m-5-5 5 5-5 5" />,
 }
 
 export type IconName = keyof typeof PATHS
+
+/** The colored blob behind a two-tone icon (after Interpreter Hub's duotone icons). */
+export type IconTone = 'accent' | 'mango' | 'palm'
 
 interface IconProps {
   name: IconName
   className?: string
   /** Fill the shape (used for a chosen heart). */
   filled?: boolean
+  /** Adds a soft color blob spilling out to the lower right, behind the line drawing. */
+  tone?: IconTone
 }
 
-export function Icon({ name, className = 'size-5', filled = false }: IconProps) {
+export function Icon({ name, className = 'size-5', filled = false, tone }: IconProps) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -47,6 +60,9 @@ export function Icon({ name, className = 'size-5', filled = false }: IconProps) 
       aria-hidden="true"
       className={className}
     >
+      {tone && (
+        <circle cx="14.5" cy="14.5" r="7.5" stroke="none" fill={`var(--${tone})`} opacity={tone === 'accent' ? 0.3 : 0.5} />
+      )}
       {PATHS[name]}
     </svg>
   )

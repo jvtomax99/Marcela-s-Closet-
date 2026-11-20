@@ -1,14 +1,27 @@
-import type { ColorName, Garment, Outfit, Pattern } from '../types'
+import type { ColorName, Day, Garment, Outfit, Pattern } from '../types'
 import { harmonyOf, isNeutral, type Harmony } from './color'
-import { isBold, sharedOccasions, sharedSeasons } from './rules'
+import { CORE_CATEGORIES, isBold, sharedOccasions, sharedSeasons } from './rules'
+import { daysUnworn, FORGOTTEN_DAYS, RECENT_DAYS, REPEAT_LOOK_DAYS, spanOfDays, type WearHistory } from './wear'
 
 const BASE_SCORE = 50
 
 export interface Scored {
   score: number
   /** Strongest reason first. Each is a short clause, ready to show to the person. */
-  reasons: { weight: number; text: string }[]
+  reasons: { weight: number; text: string; lead?: boolean }[]
 }
+
+/** What she wore, as the scoring sees it. */
+export interface WearContext {
+  history: WearHistory
+  today: Day
+  /** The piece she asked to build around: never pushed down for being worn recently. */
+  exemptId?: string
+}
+
+/** Points off for a piece worn 0 (today), 1, 2 or 3 days ago. */
+const RECENT_PENALTY = [20, 20, 12, 6]
+const REPEAT_LOOK_PENALTY = 30
 
 /** What the app has learned from the lookbook. */
 export interface Taste {
@@ -180,11 +193,46 @@ function scoreTaste(items: Garment[], taste: Taste): Scored['reasons'] {
   return reasons
 }
 
+function scoreWear(items: Garment[], wear: WearContext | undefined): Scored['reasons'] {
+  if (!wear || wear.history.loggingFor === null) return []
+  const { history, today, exemptId } = wear
+  const reasons: Scored['reasons'] = []
+
+  let recent = 0
+  for (const item of items) {
+    if (item.id === exemptId) continue
+    const daysAgo = history.lastWorn.get(item.id)
+    if (daysAgo !== undefined && daysAgo <= RECENT_DAYS) recent += RECENT_PENALTY[daysAgo]
+  }
+  if (recent > 0) reasons.push({ weight: -recent, text: '' })
+
+  // The same base (a different bag or necklace doesn't make it a new outfit).
+  const core = items.filter((item) => CORE_CATEGORIES.includes(item.category))
+  const repeated = history.days.some(
+    (day) => day.daysAgo <= REPEAT_LOOK_DAYS && core.every((item) => day.ids.has(item.id)),
+  )
+  if (repeated) reasons.push({ weight: -REPEAT_LOOK_PENALTY, text: '' })
+
+  const forgotten = items
+    .map((item) => ({ item, unworn: daysUnworn(item, history, today) ?? 0 }))
+    .filter(({ unworn }) => unworn >= FORGOTTEN_DAYS)
+    .sort((a, b) => b.unworn - a.unworn || (a.item.id < b.item.id ? -1 : 1))
+  if (forgotten.length > 0) {
+    const { item, unworn } = forgotten[0]
+    reasons.push({
+      weight: forgotten.length === 1 ? 6 : 8,
+      text: `Brings back your ${lowerFirst(item.name)}, not worn in ${spanOfDays(unworn)}`,
+      lead: true,
+    })
+  }
+  return reasons
+}
+
 const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 const lowerFirst = (text: string) => text.charAt(0).toLowerCase() + text.slice(1)
 
 /** Scores an outfit that already passed the hard rules. */
-export function scoreOutfit(items: Garment[], taste: Taste): Scored {
+export function scoreOutfit(items: Garment[], taste: Taste, wear?: WearContext): Scored {
   const reasons = [
     ...scoreColor(items),
     ...scorePattern(items),
@@ -192,6 +240,7 @@ export function scoreOutfit(items: Garment[], taste: Taste): Scored {
     ...scoreOverlap(items),
     ...scoreFavorites(items),
     ...scoreTaste(items, taste),
+    ...scoreWear(items, wear),
   ]
   const score = reasons.reduce((total, reason) => total + reason.weight, BASE_SCORE)
   return { score, reasons }
@@ -201,7 +250,7 @@ export function scoreOutfit(items: Garment[], taste: Taste): Scored {
 export function whyItWorks(scored: Scored): string {
   const lines = scored.reasons
     .filter((reason) => reason.text)
-    .sort((a, b) => b.weight - a.weight)
+    .sort((a, b) => Number(Boolean(b.lead)) - Number(Boolean(a.lead)) || b.weight - a.weight)
     .slice(0, 2)
     .map((reason) => reason.text)
   return lines.length > 0 ? `${lines.join('. ')}.` : 'A clean, easy combination.'

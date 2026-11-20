@@ -8,7 +8,8 @@ Runway and ElevenLabs plans.
 |---|---|---|---|---|---|
 | Cormorant Garamond (variable) | Christian Thalmann, via Fontsource (`@fontsource-variable/cormorant-garamond` 5.3.x, npm) | SIL Open Font License 1.1 | No | $0 | None |
 | Inter (variable) | Rasmus Andersson, via Fontsource (`@fontsource-variable/inter` 5.3.x, npm) | SIL Open Font License 1.1 | No | $0 | None |
-| App icons `public/icon-*.png`, `public/apple-touch-icon.png`, `scripts/closet.ico` | TO FILL: made on Marce's PC; ask how | TO FILL | TO FILL | TO FILL | TO FILL |
+| Parisienne | Astigmatic, via Fontsource (`@fontsource/parisienne` 5.3.x, npm) | SIL Open Font License 1.1 | No | $0 | None |
+| App icons `public/icon-*.png`, `public/apple-touch-icon.png`, `scripts/closet.ico` | Drawn in code for this project (`assets/icons/make-icons.mjs`, 2026-11-20), letter set in Cormorant Garamond | Project's own (font under SIL OFL 1.1, which allows this) | No | $0 | None |
 | Tab icon (italic "C", inline SVG in `index.html`) | Drawn in code for this project | Project's own | No | $0 | None |
 | Paper grain (`--grain` in `src/index.css`) | Drawn in code for this project | Project's own | No | $0 | None |
 | Intro clip `public/intro/open.mp4` and its first frame `closed.webp` (Marce in front of her wardrobe) | Generated for this project with Runway (image, then video from a start and end frame), Jose's Pro plan, 2026-11-20, from three of Marce's photos with her consent (photos not in the repo) | Runway Terms of Use: the user owns what they generate, commercial use allowed on paid plans | No (plan credits) | 280 credits for every picture and clip tried | Jose's Runway |

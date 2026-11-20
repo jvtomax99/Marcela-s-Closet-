@@ -16,8 +16,8 @@ photos as tilted prints on a board.
 It runs in the browser, installs on an iPhone home screen, works offline,
 and keeps everything on her device. No accounts, no server.
 
-Live: not published yet. It will be at
-https://jvtomax99.github.io/Marcela-s-Closet-/ (GitHub Pages, from `main`).
+Live: https://jvtomax99.github.io/Marcela-s-Closet-/ (GitHub Pages, from
+`main`, published by `.github/workflows/pages.yml`).
 
 ## Who it's for
 
@@ -26,13 +26,12 @@ https://jvtomax99.github.io/Marcela-s-Closet-/ (GitHub Pages, from `main`).
   and also on her Windows PC. She is not a developer and built the first
   version with an AI assistant on her PC.
 - Jose builds and runs it for her from here.
-- TO FILL: who approves plans, the look and the app's wording: Jose alone,
-  or Marce too?
-- TO FILL: will Marce keep changing the app herself on her PC? If yes, two
-  people (and two AI tools) write to this repo, and every session must
-  fetch before writing, as in Jose's Interp and Vibe-coding-guide repos.
+- Jose alone approves plans, the look and the app's wording (Jose,
+  2026-11-20).
+- Marce no longer changes the app herself on her PC: her ideas come to
+  Jose, and only his sessions write to this repo (Jose, 2026-11-20).
 
-## Features (all built; not published yet)
+## Features (all built and live)
 
 ### Closet (catalog)
 Add a piece with a photo and its details: category (top, bottom, dress,
@@ -42,6 +41,20 @@ tags, favorite. Edit or delete a piece; deleting one warns first and also
 deletes the looks that used it. Photos are shrunk to at most 1200 px.
 - Done when: on an iPhone, Marce adds a piece with a photo from her camera
   roll, sees it in her closet, edits it, and deletes it after a warning.
+
+### Easy adding (Phase 3)
+Adding a piece is photo, category, done. Taking or picking the photo
+reads its main color on the phone (`src/lib/photoColor.ts`: the middle of
+the photo, matched to the nearest closet color) and pre-selects it with
+"Picked from your photo. Tap another color if it's off." The name fills
+itself ("Navy top") unless she types one. Pattern, fabric, dressiness,
+seasons, occasions and tags fold under "More details (optional)".
+"Add and take another" saves and opens a fresh form for the next photo,
+counting how many she added. The photo never leaves her phone; the
+category is not guessed (that needs cloud AI or a large model).
+- Done when: on her iPhone, she photographs a piece, taps a category and
+  saves, with the right main color most of the time, and adds three
+  pieces in a row without closing the form.
 
 ### Looks (suggestions)
 The app builds outfits from her pieces only: (top and bottom) or a dress,
@@ -59,7 +72,10 @@ the zip's HANDOFF.md, section 7, and in `src/engine/score.ts`.
 
 ### Lookbook
 Save a look, name it and rate it 1 to 5 stars; hide looks she doesn't
-like. Saved and rated looks raise similar suggestions, hidden ones lower
+like. Favorite pieces (Phase 3): a heart on every piece in the Closet
+grid, one tap; the Lookbook has two tabs, Looks and Pieces, and tapping
+a favorite piece opens Looks built around it. Favorites rank higher in
+suggestions. Saved and rated looks raise similar suggestions, hidden ones lower
 them, and a hidden look never comes back unless she restores it here.
 - Done when: a look Marce hides disappears from Looks and stays gone after
   a reload; restoring it in the Lookbook brings it back.
@@ -71,6 +87,33 @@ with every piece, photo and look; "Restore a backup" reads one back
 - Done when: a backup made on her PC, restored in the iPhone home-screen
   app, shows the same pieces, photos and saved looks.
 
+### What she wore (Phase 2)
+"Wore it" on every look in Looks and the Lookbook logs it for today; a bar
+at the bottom lets her change the day (yesterday or earlier) or undo. On a
+piece, "Wore it today" logs that one piece, so outfits she put together
+herself count too: pieces logged on the same day make that day's outfit.
+A piece shows "Worn 4 times, last Nov 12" or "Not worn yet"; a saved look
+shows how often she wore it. The Closet gets a "Forgotten" shelf: pieces
+not worn in 30 days or more (a piece added less than 30 days ago, or
+before she started logging, is counted from then).
+Looks use it, by rule (`src/engine/wear.ts`, `score.ts`): a piece worn
+today or yesterday costs 20 points, 2 days ago 12, 3 days ago 6, added up
+per piece; the same base (top, bottom or dress, shoes) worn in the last 14
+days costs 30, whatever bag or accessory goes with it; a forgotten piece
+adds 6 points (8 for two or more) and leads the "why" line ("Brings back
+your camel coat, not worn in 7 weeks"). Nothing changes until she logs
+for the first time, and "build around" never pushes down the piece she
+picked. While the "Worn" bar shows, Looks holds still (no card moves
+under her finger); it re-sorts when the bar closes. A day picked by
+mistake far in the past doesn't make pieces "forgotten": logging counts
+from the day she actually logged. Backups carry what she wore; older
+backups still restore.
+- Done when: on her iPhone, she taps "Wore it" on a look and it drops
+  out of the top of Looks; a piece she hasn't worn in a month shows under
+  "Forgotten" and comes back in a look with the "Brings back" reason; a
+  backup made after logging restores what she wore in another browser;
+  her existing closet opens after the update with nothing lost.
+
 ### Install and offline
 Installable from Safari (Share, Add to Home Screen) with the Closet icon;
 opens full screen; after one visit with signal it opens with none (say, in
@@ -79,8 +122,12 @@ a fitting room).
   shows her closet and looks.
 
 ### Look and feel
-Magazine design, dark mode that follows the phone, bottom tab bar on
-phones (Closet, Looks, Lookbook), a masthead on laptops, forms in sheets,
+Magazine design with a Cali, Colombia and music flavor ("Salsa caleña",
+Phase 4): hibiscus pink, mango and palm green on warm cream; "Hola, Marce"
+in script with a daily Cali saying; looks numbered as tracks, a "Now
+playing" pill and a record for the Lookbook. Structure after Jose's
+Interpreter Hub: floating capsule tab bar, white lifted cards, two-tone
+icons. Dark mode that follows the phone, a masthead on laptops, forms in sheets,
 calmer motion when the phone asks for reduced motion. Values in
 `DESIGN.md`.
 - Done when: every screen looks right at 390 px and 1440 px, light and
@@ -127,54 +174,64 @@ Runway, music with ElevenLabs (`CREDITS.md`).
    would remove this risk if it ever matters. Wherever it's published, her closet starts empty there: she
    backs up on the PC and restores on the phone. Vercel and Cloudflare
    were the other options; both give the app its own address.
-2. **Asset budget.** TO FILL (`docs/assets.md` asks for one up front).
-   Background removal for photos may need a paid service or a large
-   library.
-3. **Windows extras.** Keep `scripts/` (Marce's desktop shortcut) and
-   `.claude/launch.json` in the repo, or leave them on her PC only? TO
-   FILL.
+2. **Asset budget.** $0, free assets only (Jose, 2026-11-20). Background
+   removal, when it comes, uses a free library on her device; a paid
+   service would also send her photos off the phone.
+3. **Windows extras.** `scripts/` (Marce's desktop shortcut) and
+   `.claude/launch.json` stay in the repo; the Cloudflare leftovers are
+   removed (Jose, 2026-11-20).
 
 ## Not in v1
 
 - Background removal on clothing photos (would make the board a true
   flat-lay).
 - Spanish version of the app.
-- Wear tracking: log what she wore, avoid repeats, surface forgotten
-  pieces.
+- For wear tracking: a calendar page, cost per wear (no prices are
+  stored), outfit selfies, planning outfits ahead, a stats dashboard,
+  reminders.
 - AI styling (an AI describing or ranking looks), and only ever on top of
   the rules.
 - Syncing a closet between devices automatically (Back up and Restore do
   it by hand today).
-- TO FILL: Jose's own list.
 
 ## Later
 
 - Offline on a weak signal: the app waits for the internet before using
   its saved copy, with no time limit, so in a fitting room with one bar it
   can hang. A time limit (Phillis's site uses 4 s) would fix it.
-- Remove the Cloudflare leftovers (`wrangler.jsonc`, `npm run deploy`,
-  the `wrangler` package) once Jose agrees.
-
-- Background removal, Spanish, wear tracking and AI styling, in an order
-  to decide with Jose and Marce.
+- Background removal, Spanish and AI styling, in an order to decide with
+  Jose and Marce.
 
 ## Phases
 
 - [x] Phase 0: project docs. CLAUDE.md, SPEC.md, DESIGN.md, the docs
   folder and Jose's shared rules (2026-11-20).
-- [ ] Phase 1: bring in the app and publish it.
+- [x] Phase 1: bring in the app and publish it (2026-11-20).
   - [x] Code in, from the zip (no `node_modules`, `dist`, backups or
     photos); its CLAUDE.md, AGENTS.md and HANDOFF.md folded into these
     docs.
   - [x] Works in GitHub Pages' sub-folder; the offline copy stays in its
     own folder and cache; "App checks" on every pull request; a workflow
     publishes `main`.
-  - [ ] Jose turns on Pages (Source: GitHub Actions), the first publish
-    runs, and the app opens at its address on his phone.
-  - [ ] Marce backs up on her PC and restores in the iPhone home-screen
-    app.
+  - [x] Pages on (Source: GitHub Actions); published and checked live on
+    2026-11-20 (restore, looks and offline all work at the address).
+  - [x] Marce backed up on her PC and restored in the iPhone home-screen
+    app (Jose confirmed, 2026-11-20).
   - Done when: the check is green, the app is live at its address, and
     Marce's closet opens in the iPhone home-screen app.
+- [ ] Phase 2: wear tracking ("What she wore" above).
+  - [x] Built and checked on a test closet (65 tests; preview at 390 and
+    1440 px, light and dark; backup round trip; version-1 closet opens).
+  - [ ] Live, and Marce has used it on her iPhone.
+- [ ] Phase 3: easy adding and favorite pieces (Jose, 2026-11-20).
+  - [x] Built and checked on stand-in photos (69 tests; preview at 390
+    px: color picked from the photo, add three in a row, hearts, Pieces
+    tab).
+  - [ ] Live, and Marce has added pieces with it on her iPhone.
+- [ ] Phase 4: "Salsa caleña" look (Jose picked A of two mockups,
+  2026-11-20).
+  - [x] Built and checked at 390 px light and dark and 1440 px.
+  - [ ] Marce has seen it and likes the sayings (she can change them).
 - [ ] Intro screen (Jose, 2026-11-20), next to Phase 1.
   - [x] Music and the empty wardrobe still; the screen, with skip,
     timeout, reduced motion and offline handling.
@@ -182,6 +239,7 @@ Runway, music with ElevenLabs (`CREDITS.md`).
   - [x] Marce agreed to her likeness (2026-11-20).
   - [x] The scene with her and the doors-open clip (one clip; wide
     screens show it as a print, 2026-11-20).
-  - [ ] Jose's OK on the preview, then the pull request.
+  - [x] Jose's OK: "Merge for me" (2026-11-20), PR #3.
+  - [ ] Marce has opened it on her iPhone.
   - Done when: see "Intro screen" above.
 - [ ] Phase next: to decide with Jose.
