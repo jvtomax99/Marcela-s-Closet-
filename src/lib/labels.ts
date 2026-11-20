@@ -1,0 +1,94 @@
+import type { Category, ColorName, Formality, Occasion, Pattern, Season } from '../types'
+
+export const CATEGORY_LABELS: Record<Category, string> = {
+  top: 'Top',
+  bottom: 'Bottom',
+  dress: 'Dress',
+  outerwear: 'Outerwear',
+  shoes: 'Shoes',
+  bag: 'Bag',
+  accessory: 'Accessory',
+}
+
+export const CATEGORY_PLURALS: Record<Category, string> = {
+  top: 'Tops',
+  bottom: 'Bottoms',
+  dress: 'Dresses',
+  outerwear: 'Outerwear',
+  shoes: 'Shoes',
+  bag: 'Bags',
+  accessory: 'Accessories',
+}
+
+export const FORMALITY_LABELS: Record<Formality, string> = {
+  1: 'Casual',
+  2: 'Relaxed',
+  3: 'Polished',
+  4: 'Dressy',
+  5: 'Formal',
+}
+
+export const OCCASION_LABELS: Record<Occasion, string> = {
+  everyday: 'Everyday',
+  work: 'Work',
+  date: 'Date',
+  party: 'Party',
+  event: 'Formal event',
+  travel: 'Travel',
+  weekend: 'Weekend',
+}
+
+/** How each occasion reads inside the sentence "A look for ___". */
+export const OCCASION_PHRASES: Record<Occasion, string> = {
+  everyday: 'every day',
+  work: 'work',
+  date: 'a date',
+  party: 'a party',
+  event: 'a formal event',
+  travel: 'travel',
+  weekend: 'the weekend',
+}
+
+export const SEASON_LABELS: Record<Season, string> = {
+  spring: 'Spring',
+  summer: 'Summer',
+  fall: 'Fall',
+  winter: 'Winter',
+}
+
+export const PATTERN_LABELS: Record<Pattern, string> = {
+  solid: 'Solid',
+  stripes: 'Stripes',
+  dots: 'Dots',
+  plaid: 'Plaid',
+  floral: 'Floral',
+  animal: 'Animal',
+  graphic: 'Graphic',
+}
+
+export const COLOR_SWATCHES: Record<ColorName, string> = {
+  black: '#1b1a19',
+  charcoal: '#45433f',
+  grey: '#9b9a96',
+  white: '#ffffff',
+  ivory: '#f4eddd',
+  beige: '#dccdb4',
+  camel: '#b98e5c',
+  brown: '#6a4a33',
+  navy: '#1f2c4d',
+  denim: '#54749b',
+  red: '#b5221f',
+  burgundy: '#6d1a2b',
+  coral: '#ec7763',
+  orange: '#e0802b',
+  mustard: '#c99a2b',
+  yellow: '#ecd056',
+  olive: '#6f7038',
+  green: '#3b7a4e',
+  teal: '#1e7a7a',
+  blue: '#2f64c0',
+  lavender: '#b7a6dc',
+  purple: '#65388f',
+  pink: '#e784ab',
+  blush: '#efc5bb',
+}
