@@ -94,7 +94,11 @@ calmer motion when the phone asks for reduced motion. Values in
    (the app expected the root of an address), a GitHub Action to build and
    publish, and a shared address with his other apps, so clearing that
    site's data in Safari would also wipe her closet (she keeps a recent
-   backup). Wherever it's published, her closet starts empty there: she
+   backup). The shared address also means code on any of Jose's other
+   Pages apps could read her closet, photos included, when she uses it in
+   Safari or on a computer (the iPhone home-screen app keeps its own
+   storage). Keep those apps free of outside scripts; Vercel or Cloudflare
+   would remove this risk if it ever matters. Wherever it's published, her closet starts empty there: she
    backs up on the PC and restores on the phone. Vercel and Cloudflare
    were the other options; both give the app its own address.
 2. **Asset budget.** TO FILL (`docs/assets.md` asks for one up front).
@@ -118,6 +122,12 @@ calmer motion when the phone asks for reduced motion. Values in
 - TO FILL: Jose's own list.
 
 ## Later
+
+- Offline on a weak signal: the app waits for the internet before using
+  its saved copy, with no time limit, so in a fitting room with one bar it
+  can hang. A time limit (Phillis's site uses 4 s) would fix it.
+- Remove the Cloudflare leftovers (`wrangler.jsonc`, `npm run deploy`,
+  the `wrangler` package) once Jose agrees.
 
 - Background removal, Spanish, wear tracking and AI styling, in an order
   to decide with Jose and Marce.

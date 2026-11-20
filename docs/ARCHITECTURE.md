@@ -92,9 +92,8 @@ analytics.
   first and the answer is saved in the cache `closet-app:<folder path>`
   (`closet-app:/Marcela-s-Closet-/` on Pages); with no internet the saved
   copy answers, and a page load falls back to the saved folder page. It
-  never reads or deletes another app's cache on the shared
-  `jvtomax99.github.io` address; the one cache it removes is its own old
-  name, `closet-app`. On the first visit, `main.tsx` fetches the page's
+  never reads or deletes any cache, its own or another app's, on the
+  shared `jvtomax99.github.io` address. On the first visit, `main.tsx` fetches the page's
   files again once the worker is in charge, so the copy is complete.
 - **Per address**: each address, browser and iPhone home-screen app has
   its own database. On Marce's PC the closet lives in the Edge app window's

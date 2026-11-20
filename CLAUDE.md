@@ -80,12 +80,13 @@ is live and her closet is moved over.
   button is the quick way.
 - **Hosting: GitHub Pages** (Jose, 2026-11-20), at
   `https://jvtomax99.github.io/Marcela-s-Closet-/` (the path is
-  case-sensitive). The zip expects the root of an address, so Phase 1 must:
-  relative paths everywhere (`base: './'` in `vite.config.ts`, `index.html`,
-  `src/main.tsx`, `public/sw.js`, `public/manifest.webmanifest`), and
+  case-sensitive). The app lives in a sub-folder there, so every path is
+  relative (`base: './'` in `vite.config.ts`, `index.html`, `src/main.tsx`,
+  `public/sw.js`, `public/manifest.webmanifest`): a link starting with `/`
+  breaks. Pages can't build the app itself, so
   `.github/workflows/pages.yml` tests, builds and publishes `dist/` on
-  every push to `main`, since Pages can't build it itself. Relative paths only: a link
-  starting with `/` breaks there.
+  every push to `main`. `npm run deploy` (Cloudflare) would publish to a
+  different address with an empty closet: don't use it.
 - **Shared address.** Jose's other Pages sites live on the same
   `jvtomax99.github.io`, so they share storage with her closet. The worker
   only ever opens, matches or deletes its own cache (named with the
