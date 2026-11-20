@@ -86,6 +86,27 @@ calmer motion when the phone asks for reduced motion. Values in
 - Done when: every screen looks right at 390 px and 1440 px, light and
   dark.
 
+### Intro screen (in progress, asked for by Jose 2026-11-20)
+Before the app, on every launch: her wardrobe with the doors closed,
+"Marce's Closet" in the magazine serif, and two buttons, "Open with
+sound" and "Open quietly", plus Skip. A tap opens the doors in a short
+clip (Marce in front of her open wardrobe), with an original music loop
+if she chose sound, then fades into the app. A tap or Escape skips ahead.
+It never waits on a slow connection: if the clip isn't ready 1.5 s after
+the tap, it goes straight in. Reduced motion or data saver: the still
+and a fade, no clip. `?intro=0` skips it. Pictures and clip made with
+Runway, music with ElevenLabs (`CREDITS.md`).
+- Her likeness: Jose chose to show Marce's real face. Nothing using her
+  face is made until Marce says yes. TO FILL: the date she agreed. Until
+  then the intro runs with the empty wardrobe and no clip.
+- Done when: in the iPhone home-screen app, every launch shows the closed
+  wardrobe within a second; "Open with sound" plays the clip with music
+  and lands on the Closet page; "Open quietly" does the same silently;
+  Skip or a tap goes straight in; in airplane mode (after one visit) it
+  still plays; with reduced motion only the still and a fade show.
+- Not in v1: her voice or narration, Spanish words, seasonal versions, a
+  3D model of her, a once-a-day setting.
+
 ## Open decisions
 
 1. **Hosting: decided, GitHub Pages** (Jose, 2026-11-20), at
@@ -149,4 +170,11 @@ calmer motion when the phone asks for reduced motion. Values in
     app.
   - Done when: the check is green, the app is live at its address, and
     Marce's closet opens in the iPhone home-screen app.
+- [ ] Intro screen (Jose, 2026-11-20), next to Phase 1.
+  - [x] Music and the empty wardrobe still; the screen, with skip,
+    timeout, reduced motion and offline handling.
+  - [ ] Jose picks the still and the music take.
+  - [ ] Marce agrees to her likeness; then the scenes with her and the
+    doors-open clip (phone and desktop).
+  - Done when: see "Intro screen" above.
 - [ ] Phase next: to decide with Jose.

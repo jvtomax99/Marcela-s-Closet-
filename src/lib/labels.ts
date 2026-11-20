@@ -92,3 +92,15 @@ export const COLOR_SWATCHES: Record<ColorName, string> = {
   pink: '#e784ab',
   blush: '#efc5bb',
 }
+
+/** Words on the intro screen (the wardrobe that opens before the app). */
+export const INTRO_LABELS = {
+  kicker: 'Marce’s',
+  title: 'Closet',
+  tagline: 'Outfits from the clothes you already own.',
+  withSound: 'Open with sound',
+  quietly: 'Open quietly',
+  skip: 'Skip',
+  mute: 'Mute music',
+  unmute: 'Play music',
+} as const

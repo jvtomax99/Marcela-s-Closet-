@@ -93,3 +93,20 @@ Big serif numbers ("Nº 07") use old-style figures (`.oldstyle`).
 - Laptop (`md`, 768 px and up): a magazine masthead along the top ("The
   ... edit" on the left, the italic serif name in the middle); forms in a
   centered panel.
+
+## Intro screen (`src/components/Intro.tsx`)
+
+- Full-screen picture of her wardrobe (`public/intro/closed-*.webp`,
+  phone or desk chosen by the screen's shape), `object-cover`.
+- A paper wash in `--canvas` over the top fifth and the bottom, fading to
+  clear, so the words read on the picture in light and dark mode. It
+  fades away when the doors open.
+- Kicker "Marce's" between two short `--accent` rules, "Closet" in
+  `text-display` italic serif, a muted italic serif tagline.
+- Buttons: the app's usual dark pill (`bg-ink`, `text-canvas`, eyebrow
+  type) for "Open with sound"; an eyebrow text link for "Open quietly";
+  Skip as a muted eyebrow link top right.
+- Motion: words fade and rise in (0.5 s, the app's ease), buttons 0.15 s
+  later; everything fades out on tap; the whole screen fades into the app
+  in 0.6 s; the music fades out over 1.2 s.
+- No new colors, fonts or sizes: all from `src/index.css`.
