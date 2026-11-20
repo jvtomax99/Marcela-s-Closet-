@@ -4,14 +4,25 @@ import { EmptyState } from '../components/EmptyState'
 import { OutfitCollage } from '../components/OutfitCollage'
 import { PageHeader } from '../components/PageHeader'
 import { StarRating } from '../components/StarRating'
+import { dayLabel, useWornLog } from '../components/WornToast'
 import { rateLook, removeLook, renameLook, restoreHiddenLooks } from '../db'
+import { toDay, wearStats } from '../engine'
 import { goTo } from '../lib/useRoute'
-import type { ClothingItem, Outfit } from '../types'
+import type { ClothingItem, Outfit, Wear } from '../types'
 
 const SAVED_ON = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' })
 
-function SavedLook({ look, items }: { look: Outfit; items: ClothingItem[] }) {
+interface SavedLookProps {
+  look: Outfit
+  items: ClothingItem[]
+  wears: Wear[]
+  onWore: () => void
+}
+
+function SavedLook({ look, items, wears, onWore }: SavedLookProps) {
   const [name, setName] = useState(look.name)
+  const today = toDay(Date.now())
+  const worn = wearStats(look.itemIds, wears, today)
 
   return (
     <motion.article
@@ -25,6 +36,11 @@ function SavedLook({ look, items }: { look: Outfit; items: ClothingItem[] }) {
       <OutfitCollage items={items} />
       <p className="mt-5 text-[0.625rem] tracking-[0.18em] text-muted uppercase">
         Saved {SAVED_ON.format(look.createdAt)}
+        {worn.last && (
+          <>
+            {' · '}Worn {worn.times === 1 ? 'once' : `${worn.times} times`}, last {dayLabel(worn.last, today)}
+          </>
+        )}
       </p>
       <input
         aria-label="Look name"
@@ -36,13 +52,22 @@ function SavedLook({ look, items }: { look: Outfit; items: ClothingItem[] }) {
       <p className="mt-1.5 text-xs leading-relaxed text-muted">{items.map((item) => item.name).join(' · ')}</p>
       <div className="mt-2 flex items-center justify-between">
         <StarRating value={look.rating} onChange={(rating) => rateLook(look.id, rating)} />
-        <button
-          type="button"
-          onClick={() => removeLook(look.id)}
-          className="py-2 text-eyebrow text-muted uppercase transition-colors hover:text-accent"
-        >
-          Remove
-        </button>
+        <div className="flex items-center gap-5">
+          <button
+            type="button"
+            onClick={onWore}
+            className="py-2 text-eyebrow text-ink uppercase transition-colors hover:text-accent"
+          >
+            Wore it
+          </button>
+          <button
+            type="button"
+            onClick={() => removeLook(look.id)}
+            className="py-2 text-eyebrow text-muted uppercase transition-colors hover:text-accent"
+          >
+            Remove
+          </button>
+        </div>
       </div>
     </motion.article>
   )
@@ -51,9 +76,11 @@ function SavedLook({ look, items }: { look: Outfit; items: ClothingItem[] }) {
 interface LookbookViewProps {
   items: ClothingItem[]
   outfits: Outfit[]
+  wears: Wear[]
 }
 
-export function LookbookView({ items, outfits }: LookbookViewProps) {
+export function LookbookView({ items, outfits, wears }: LookbookViewProps) {
+  const { logLook, toast } = useWornLog()
   const byId = new Map(items.map((item) => [item.id, item]))
   const saved = outfits
     .filter((outfit) => outfit.status === 'saved')
@@ -95,11 +122,15 @@ export function LookbookView({ items, outfits }: LookbookViewProps) {
                 key={look.id}
                 look={look}
                 items={look.itemIds.flatMap((id) => byId.get(id) ?? [])}
+                wears={wears}
+                onWore={() => logLook(look.itemIds)}
               />
             ))}
           </AnimatePresence>
         </div>
       )}
+
+      {toast}
 
       {hiddenCount > 0 && (
         <p className="mt-20 border-t border-line pt-6 text-sm text-muted">

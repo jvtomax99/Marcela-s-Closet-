@@ -5,8 +5,9 @@ import { Icon } from '../components/Icon'
 import { ItemPhoto } from '../components/ItemPhoto'
 import { LookCard } from '../components/LookCard'
 import { Sheet } from '../components/Sheet'
+import { useWornLog } from '../components/WornToast'
 import { hideLook, removeLook, saveLook } from '../db'
-import { suggestOutfits } from '../engine'
+import { suggestOutfits, toDay } from '../engine'
 import { FORMALITY_LABELS, OCCASION_PHRASES, SEASON_LABELS } from '../lib/labels'
 import { goTo } from '../lib/useRoute'
 import {
@@ -18,6 +19,7 @@ import {
   type Outfit,
   type Season,
   type SuggestionFilters,
+  type Wear,
 } from '../types'
 
 const PAGE_SIZE = 12
@@ -26,6 +28,7 @@ const FORMALITIES: Formality[] = [1, 2, 3, 4, 5]
 interface LooksViewProps {
   items: ClothingItem[]
   outfits: Outfit[]
+  wears: Wear[]
   filters: SuggestionFilters
   onFilters: (filters: SuggestionFilters) => void
 }
@@ -68,7 +71,7 @@ function missingPieces(items: ClothingItem[]): string | null {
   return missing.length === 1 ? missing[0] : `${missing.slice(0, -1).join(', ')} and ${missing.at(-1)}`
 }
 
-export function LooksView({ items, outfits, filters, onFilters }: LooksViewProps) {
+export function LooksView({ items, outfits, wears, filters, onFilters }: LooksViewProps) {
   const [limit, setLimit] = useState(PAGE_SIZE)
   const [picking, setPicking] = useState(false)
   const closePicker = useCallback(() => setPicking(false), [])
@@ -80,7 +83,12 @@ export function LooksView({ items, outfits, filters, onFilters }: LooksViewProps
     () => (anchor || !filters.anchorId ? filters : { ...filters, anchorId: undefined }),
     [anchor, filters],
   )
-  const looks = useMemo(() => suggestOutfits(items, active, outfits, limit), [items, active, outfits, limit])
+  const { logLook, toast } = useWornLog()
+  const today = toDay(Date.now())
+  const looks = useMemo(
+    () => suggestOutfits(items, active, outfits, limit, { wears, today }),
+    [items, active, outfits, limit, wears, today],
+  )
 
   const update = (change: SuggestionFilters) => {
     setLimit(PAGE_SIZE)
@@ -221,6 +229,7 @@ export function LooksView({ items, outfits, filters, onFilters }: LooksViewProps
                       saved ? removeLook(saved.id) : saveLook(itemIds, `Look Nº ${savedCount + 1}`)
                     }
                     onHide={() => hideLook(itemIds)}
+                    onWore={() => logLook(itemIds)}
                   />
                 )
               })}
@@ -239,6 +248,8 @@ export function LooksView({ items, outfits, filters, onFilters }: LooksViewProps
           )}
         </>
       )}
+
+      {toast}
 
       <Sheet open={picking} onClose={closePicker} title="Build around…">
         <div className="grid grid-cols-3 gap-2.5">

@@ -30,22 +30,26 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
 - `src/engine/`: the suggestion engine, plain TypeScript, no React.
   - `color.ts`: the color wheel, neutrals and harmony rules.
   - `rules.ts`: the hard rules and filters.
-  - `score.ts`: scoring, learning from ratings and hidden looks, the "why
-    it works" line.
+  - `score.ts`: scoring, learning from ratings and hidden looks and from
+    what she wore, the "why it works" line.
+  - `wear.ts`: what she wore, by day: last worn per piece, forgotten
+    pieces, `toDay` (her phone's local date).
   - `suggest.ts`: building, finishing (outerwear, bag, accessories) and
     picking outfits.
-  - `index.ts`: what the rest of the app may use; `engine.test.ts`: 38
+  - `index.ts`: what the rest of the app may use; `engine.test.ts`: 49
     tests.
 - `src/db/`: storage.
   - `index.ts`: the Dexie database and every read and write.
   - `backup.ts`: Back up / Restore to a `.json` file.
-  - `db.test.ts`, `backup.test.ts`: 8 tests (with `fake-indexeddb`).
+  - `db.test.ts`, `backup.test.ts`, `upgrade.test.ts` (a version-1
+    closet opens intact): 14 tests (with `fake-indexeddb`).
 - `src/lib/`: `labels.ts` (all the words shown for options), `image.ts`
   (photo shrinking), `id.ts`, `useRoute.ts` (the `#/` routing).
 - `src/components/`: building blocks: `OutfitCollage` (the moodboard),
   `LookCard`, `ItemForm`, `ItemPhoto`, `Sheet`, `Navigation`, `Chips`,
   `ColorPicker`, `StarRating`, `PageHeader`, `EmptyState`,
-  `BackupControls`, `Icon`.
+  `BackupControls`, `Icon`, `WornToast` (logs a look as worn, with the
+  change-day and undo bar).
 - `src/views/`: the three pages: `ClosetView`, `LooksView`,
   `LookbookView`.
 - `.github/workflows/`: `check.yml` ("App checks": test, typecheck, build
@@ -63,7 +67,8 @@ Nothing leaves the device. There is no account, database server or
 analytics.
 
 - **The closet** is the browser's IndexedDB database `closet` (Dexie,
-  `version(1)`), two tables:
+  `version(1)` for pieces and looks, `version(2)` added what she wore),
+  three tables:
   - `items` (indexed by `id`, `category`, `createdAt`): one row per piece.
     `id`, `name`, `category`, `colors` (first is the main), `pattern`,
     `fabric`, `formality` 1 to 5, `seasons`, `occasions`, `tags`,
@@ -73,13 +78,21 @@ analytics.
     `createdAt`): saved and hidden looks. `signature` is the piece ids
     sorted and joined, so one combination is never stored twice.
     `itemIds`, `status` (saved or hidden), `name`, `rating` 0 to 5.
-  - Deleting a piece deletes every look that used it, in one step.
-- **Suggestions** are worked out fresh from `items` and `outfits` each
-  time Looks opens: the engine builds every valid combination, scores it
-  (ratings, favorites and hidden looks shift scores), and shows the best 12
+  - `wears` (indexed by `id`, `date`): what she wore. `date` is a
+    `YYYY-MM-DD` day on her phone, `itemIds` the pieces. All entries on
+    one day add up to that day's outfit (a look logged with "Wore it",
+    or pieces logged one by one).
+  - Deleting a piece deletes every look that used it and takes it out of
+    the days she wore it (a day left empty goes), in one step.
+- **Suggestions** are worked out fresh from `items`, `outfits` and
+  `wears` each time Looks opens: the engine builds every valid
+  combination, scores it (ratings, favorites, hidden looks and what she
+  wore recently or not for a month shift scores), and shows the best 12
   at a time, with a small penalty for reusing a piece so the list stays
   varied. The same closet always gives the same looks.
-- **Backup file**: `{ app: "closet", version: 1, items, outfits }`, each
+- **Backup file**: `{ app: "closet", version: 1, items, outfits, wears }`
+  (`wears` since Phase 2; a file without it restores as before, and an
+  older copy of the app ignores it), each
   photo inside as base64 text. Restore merges: a piece or look in both is replaced by the
   backup's copy.
 - **Pages**: `#/closet` (the default), `#/looks`, `#/lookbook`. Refresh

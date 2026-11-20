@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react'
-import { deleteItem, saveItem } from '../db'
+import { deleteItem, saveItem, unwearPiece, wearPiece } from '../db'
+import { toDay, wearStats } from '../engine'
 import { newId } from '../lib/id'
 import { photoUrl, preparePhoto } from '../lib/image'
 import {
@@ -23,10 +24,12 @@ import {
   type Occasion,
   type Pattern,
   type Season,
+  type Wear,
 } from '../types'
 import { Field, PickMany, PickOne } from './Chips'
 import { ColorPicker } from './ColorPicker'
 import { Icon } from './Icon'
+import { dayLabel } from './WornToast'
 
 const FORMALITIES = [1, 2, 3, 4, 5] as const
 const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
@@ -39,11 +42,38 @@ interface ItemFormProps {
   item?: ClothingItem
   /** How many saved or hidden looks use this piece. */
   looksUsing?: number
+  /** What she logged, for the "worn" line and button. */
+  wears?: Wear[]
   onDone: () => void
   onStyle?: (id: string) => void
 }
 
-export function ItemForm({ item, looksUsing = 0, onDone, onStyle }: ItemFormProps) {
+/** "Worn 4 times, last Nov 12", and a one-tap "Wore it today" that can be taken back. */
+function WornLine({ itemId, wears }: { itemId: string; wears: Wear[] }) {
+  const today = toDay(Date.now())
+  const { times, last } = wearStats([itemId], wears, today)
+  const wornToday = last === today
+  return (
+    <div className="mt-4 flex items-center justify-between gap-4 border-b border-line pb-3">
+      <p className="text-sm text-muted">
+        {last ? `Worn ${times === 1 ? 'once' : `${times} times`}, last ${dayLabel(last, today)}` : 'Not worn yet'}
+      </p>
+      <button
+        type="button"
+        aria-pressed={wornToday}
+        onClick={() => (wornToday ? unwearPiece(itemId, today) : wearPiece(itemId, today))}
+        className={`flex shrink-0 items-center gap-2 py-2 text-eyebrow uppercase transition-colors ${
+          wornToday ? 'text-accent' : 'text-ink hover:text-accent'
+        }`}
+      >
+        <Icon name="hanger" className="size-4" />
+        {wornToday ? 'Worn today · Undo' : 'Wore it today'}
+      </button>
+    </div>
+  )
+}
+
+export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onStyle }: ItemFormProps) {
   const [photo, setPhoto] = useState<Blob | null>(item?.photo ?? null)
   const [name, setName] = useState(item?.name ?? '')
   const [category, setCategory] = useState<Category | null>(item?.category ?? null)
@@ -126,6 +156,8 @@ export function ItemForm({ item, looksUsing = 0, onDone, onStyle }: ItemFormProp
         )}
         <input type="file" accept="image/*" onChange={pickPhoto} className="sr-only" aria-label="Photo" />
       </label>
+
+      {item && <WornLine itemId={item.id} wears={wears} />}
 
       <div className="mt-6 flex items-end gap-4">
         <label className="min-w-0 flex-1">

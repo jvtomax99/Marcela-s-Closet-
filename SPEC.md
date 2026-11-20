@@ -70,6 +70,29 @@ with every piece, photo and look; "Restore a backup" reads one back
 - Done when: a backup made on her PC, restored in the iPhone home-screen
   app, shows the same pieces, photos and saved looks.
 
+### What she wore (Phase 2)
+"Wore it" on every look in Looks and the Lookbook logs it for today; a bar
+at the bottom lets her change the day (yesterday or earlier) or undo. On a
+piece, "Wore it today" logs that one piece, so outfits she put together
+herself count too: pieces logged on the same day make that day's outfit.
+A piece shows "Worn 4 times, last Nov 12" or "Not worn yet"; a saved look
+shows how often she wore it. The Closet gets a "Forgotten" shelf: pieces
+not worn in 30 days or more (a piece added less than 30 days ago, or
+before she started logging, is counted from then).
+Looks use it, by rule (`src/engine/wear.ts`, `score.ts`): a piece worn
+today or yesterday costs 20 points, 2 days ago 12, 3 days ago 6, added up
+per piece; the same base (top, bottom or dress, shoes) worn in the last 14
+days costs 30, whatever bag or accessory goes with it; a forgotten piece
+adds 6 points (8 for two or more) and leads the "why" line ("Brings back
+your camel coat, not worn in 7 weeks"). Nothing changes until she logs
+for the first time, and "build around" never pushes down the piece she
+picked. Backups carry what she wore; older backups still restore.
+- Done when: on her iPhone, she taps "Wore it" on a look and it drops
+  out of the top of Looks; a piece she hasn't worn in a month shows under
+  "Forgotten" and comes back in a look with the "Brings back" reason; a
+  backup made after logging restores what she wore in another browser;
+  her existing closet opens after the update with nothing lost.
+
 ### Install and offline
 Installable from Safari (Share, Add to Home Screen) with the Closet icon;
 opens full screen; after one visit with signal it opens with none (say, in
@@ -112,8 +135,9 @@ calmer motion when the phone asks for reduced motion. Values in
 - Background removal on clothing photos (would make the board a true
   flat-lay).
 - Spanish version of the app.
-- Wear tracking: log what she wore, avoid repeats, surface forgotten
-  pieces.
+- For wear tracking: a calendar page, cost per wear (no prices are
+  stored), outfit selfies, planning outfits ahead, a stats dashboard,
+  reminders.
 - AI styling (an AI describing or ranking looks), and only ever on top of
   the rules.
 - Syncing a closet between devices automatically (Back up and Restore do
@@ -124,8 +148,8 @@ calmer motion when the phone asks for reduced motion. Values in
 - Offline on a weak signal: the app waits for the internet before using
   its saved copy, with no time limit, so in a fitting room with one bar it
   can hang. A time limit (Phillis's site uses 4 s) would fix it.
-- Background removal, Spanish, wear tracking and AI styling, in an order
-  to decide with Jose and Marce.
+- Background removal, Spanish and AI styling, in an order to decide with
+  Jose and Marce.
 
 ## Phases
 
@@ -144,4 +168,8 @@ calmer motion when the phone asks for reduced motion. Values in
     app (Jose confirmed, 2026-11-20).
   - Done when: the check is green, the app is live at its address, and
     Marce's closet opens in the iPhone home-screen app.
+- [ ] Phase 2: wear tracking ("What she wore" above).
+  - [x] Built and checked on a test closet (63 tests; preview at 390 and
+    1440 px, light and dark; backup round trip; version-1 closet opens).
+  - [ ] Live, and Marce has used it on her iPhone.
 - [ ] Phase next: to decide with Jose.

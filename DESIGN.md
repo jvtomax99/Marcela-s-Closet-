@@ -90,6 +90,10 @@ Big serif numbers ("Nº 07") use old-style figures (`.oldstyle`).
   `sm`.
 - Phone: a bottom tab bar (Closet, Looks, Lookbook); forms in sheets that
   slide up from the bottom.
+- After "Wore it": a small `--ink` bar with `--canvas` text sits just
+  above the tab bar (at the bottom on laptops) for 8 seconds: "Worn
+  *today*" (the day is a dashed-underlined italic serif word that opens
+  the date picker) and "Undo". Same spring as the sheets.
 - Laptop (`md`, 768 px and up): a magazine masthead along the top ("The
   ... edit" on the left, the italic serif name in the middle); forms in a
   centered panel.

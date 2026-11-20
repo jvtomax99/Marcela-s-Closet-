@@ -42,9 +42,10 @@ export function BackupControls() {
     if (!file) return
     setBusy(true)
     try {
-      const { items, outfits } = await importCloset(file)
+      const { items, outfits, wears } = await importCloset(file)
+      const worn = wears > 0 ? ', plus what you wore' : ''
       setStatus(
-        `Restored ${items} ${items === 1 ? 'piece' : 'pieces'} and ${outfits} ${outfits === 1 ? 'look' : 'looks'}.`,
+        `Restored ${items} ${items === 1 ? 'piece' : 'pieces'} and ${outfits} ${outfits === 1 ? 'look' : 'looks'}${worn}.`,
       )
     } catch {
       setStatus("That file isn't a closet backup.")

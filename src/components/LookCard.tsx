@@ -11,11 +11,12 @@ interface LookCardProps {
   saved: boolean
   onToggleSave: () => void
   onHide: () => void
+  onWore: () => void
 }
 
 /** forwardRef lets the list animate a card out when it is hidden. */
 export const LookCard = forwardRef<HTMLElement, LookCardProps>(function LookCard(
-  { number, items, why, saved, onToggleSave, onHide },
+  { number, items, why, saved, onToggleSave, onHide, onWore },
   ref,
 ) {
   return (
@@ -39,7 +40,7 @@ export const LookCard = forwardRef<HTMLElement, LookCardProps>(function LookCard
           <p className="mt-2 text-xs leading-relaxed text-muted">
             {items.map((item) => item.name).join(' · ')}
           </p>
-          <div className="mt-3 flex items-center gap-6">
+          <div className="mt-3 flex flex-wrap items-center gap-x-6">
             <button
               type="button"
               aria-pressed={saved}
@@ -50,6 +51,14 @@ export const LookCard = forwardRef<HTMLElement, LookCardProps>(function LookCard
             >
               <Icon name="heart" filled={saved} className="size-4" />
               {saved ? 'Saved' : 'Save'}
+            </button>
+            <button
+              type="button"
+              onClick={onWore}
+              className="flex items-center gap-2 py-2 text-eyebrow text-ink uppercase transition-colors hover:text-accent"
+            >
+              <Icon name="hanger" className="size-4" />
+              Wore it
             </button>
             <button
               type="button"

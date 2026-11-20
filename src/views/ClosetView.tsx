@@ -7,12 +7,14 @@ import { ItemForm } from '../components/ItemForm'
 import { ItemPhoto } from '../components/ItemPhoto'
 import { PageHeader } from '../components/PageHeader'
 import { Sheet } from '../components/Sheet'
+import { FORGOTTEN_DAYS, forgottenPieces, toDay } from '../engine'
 import { CATEGORY_LABELS, CATEGORY_PLURALS, COLOR_SWATCHES } from '../lib/labels'
-import { CATEGORIES, type Category, type ClothingItem, type Outfit } from '../types'
+import { CATEGORIES, type Category, type ClothingItem, type Outfit, type Wear } from '../types'
 
 interface ClosetViewProps {
   items: ClothingItem[]
   outfits: Outfit[]
+  wears: Wear[]
   onStyle: (id: string) => void
 }
 
@@ -58,16 +60,20 @@ function PieceCard({ item, index, onOpen }: { item: ClothingItem; index: number;
   )
 }
 
-export function ClosetView({ items, outfits, onStyle }: ClosetViewProps) {
-  const [category, setCategory] = useState<Category | 'all'>('all')
+type Shelf = Category | 'all' | 'forgotten'
+
+export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) {
+  const [category, setCategory] = useState<Shelf>('all')
   const [editing, setEditing] = useState<Editing>(null)
   const close = useCallback(() => setEditing(null), [])
 
   const present = CATEGORIES.filter((option) => items.some((item) => item.category === option))
-  const active = category !== 'all' && present.includes(category) ? category : 'all'
-  const visible = active === 'all' ? items : items.filter((item) => item.category === active)
-  const countOf = (option: Category | 'all') =>
-    option === 'all' ? items.length : items.filter((item) => item.category === option).length
+  const forgotten = forgottenPieces(items, wears, toDay(Date.now()))
+  const shelves: Shelf[] = ['all', ...present, ...(forgotten.length > 0 ? ['forgotten' as const] : [])]
+  const active = shelves.includes(category) ? category : 'all'
+  const shelf = (option: Shelf) =>
+    option === 'all' ? items : option === 'forgotten' ? forgotten : items.filter((item) => item.category === option)
+  const visible = shelf(active)
 
   const addButton = (
     <button
@@ -99,7 +105,7 @@ export function ClosetView({ items, outfits, onStyle }: ClosetViewProps) {
       ) : (
         <>
           <div className="no-scrollbar -mx-4 mb-8 flex gap-7 overflow-x-auto border-b border-line px-4 sm:mx-0 sm:px-0">
-            {(['all', ...present] as const).map((option) => {
+            {shelves.map((option) => {
               const selected = option === active
               return (
                 <button
@@ -111,14 +117,20 @@ export function ClosetView({ items, outfits, onStyle }: ClosetViewProps) {
                     selected ? 'border-accent text-ink' : 'border-transparent text-muted hover:text-ink'
                   }`}
                 >
-                  {option === 'all' ? 'All' : CATEGORY_PLURALS[option]}
+                  {option === 'all' ? 'All' : option === 'forgotten' ? 'Forgotten' : CATEGORY_PLURALS[option]}
                   <sup className="ml-1 font-serif text-[0.8125rem] tracking-normal normal-case italic">
-                    {countOf(option)}
+                    {shelf(option).length}
                   </sup>
                 </button>
               )
             })}
           </div>
+
+          {active === 'forgotten' && (
+            <p className="-mt-3 mb-8 max-w-md text-sm leading-relaxed text-muted">
+              Not worn in {FORGOTTEN_DAYS} days or more. Looks now bring these back first.
+            </p>
+          )}
 
           <div className="grid grid-cols-2 gap-x-3 gap-y-9 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 lg:gap-y-12">
             {visible.map((item, index) => (
@@ -152,6 +164,7 @@ export function ClosetView({ items, outfits, onStyle }: ClosetViewProps) {
                 ? outfits.filter((outfit) => outfit.itemIds.includes(editing.item.id)).length
                 : 0
             }
+            wears={wears}
             onDone={close}
             onStyle={(id) => {
               close()
