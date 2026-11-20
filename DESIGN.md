@@ -30,7 +30,7 @@ Dark mode follows the phone's setting (`prefers-color-scheme`).
 | Name | Light | Dark | Used for |
 |---|---|---|---|
 | `--canvas` | `#fbf3ea` | `#1a1116` | page background |
-| `--surface` | `#ffffff` | `#251a20` | cards, sheets, chips, the pill behind the current tab |
+| `--surface` | `#ffffff` | `#251a20` | cards, chips, the pill behind the current tab (sheets use `--canvas`) |
 | `--sand` | `#f3e4d8` | `#30232a` | quiet fills behind photos |
 | `--board` | `#f7e6d8` | `#2a1e24` | the moodboard behind a look |
 | `--ink` | `#2b1a22` | `#f6eaf0` | text (a deep plum, never black) |
@@ -65,7 +65,7 @@ and the manifest) is `#fbf3ea` light and `#1a1116` dark, the same as
 |---|---|---|
 | `--font-serif` | Cormorant Garamond Variable, then Iowan Old Style, Georgia | headlines, the masthead, italics for emphasis |
 | `--font-sans` | Inter Variable, then system-ui | everything read or tapped |
-| `--font-script` | Parisienne, then Snell Roundhand | only "Hola, Marce" at the top of Looks (52 px, 64 px from `sm`), as in the Hub's hello banner |
+| `--font-script` | Parisienne, then Snell Roundhand | only "Hola, Marce" at the top of Looks, as in the Hub's hello banner |
 
 All three are bundled from npm (`@fontsource-variable/...`,
 `@fontsource/parisienne`), so nothing loads from Google. The serif italic
@@ -78,18 +78,28 @@ Inter carries buttons (13 px, weight 500) and small caps labels.
 | `text-headline` | `clamp(2.5rem, 8vw, 4.75rem)` | 1.05 | -0.02em |
 | `text-title` | `clamp(1.75rem, 5vw, 2.25rem)` | 1.1 | |
 | `text-eyebrow` | `0.6875rem` (11 px), uppercase | 1 | 0.2em |
+| `text-greeting` | `clamp(3.25rem, 11vw, 4rem)` (52 to 64 px), script | 1 | |
+| `text-quote` | `1.3125rem` (21 px), serif italic | 1.35 | |
+| `text-button` | `0.8125rem` (13 px), Inter 500 | | |
+
+Card corners are the token `--radius-card` (`rounded-card`, 22 px). The
+greeting and the saying carry `lang="es"`, so a screen reader speaks them
+in Spanish; the saying's source line is `--ink` at 80% (it sits on the
+pink glow, where `--muted` drops to about 4.4:1).
 
 Big serif numbers ("Nº 07") use old-style figures (`.oldstyle`).
 
 ## Texture, shadow, corners
 
 - **Paper grain:** `--grain`, an SVG noise drawn by the browser (no image
-  file), on `body` and on panels with the `.grain` class.
+  file), on `html` (under the glow) and on panels with the `.grain`
+  class.
 - **Print shadow:** `--print-shadow` (`shadow-print`), three soft layers,
   deeper in dark mode.
 - **Corners:** photo prints stay square, like paper. Cards are 22 px
   round, the board inside a card 16 px (the smaller radius inside, as in
-  the Hub). Buttons and chips are pills, 44 px tall.
+  the Hub). Buttons and chips are pills, at least 44 px tall. The "Worn"
+  undo bar is 16 px round.
 - **Focus:** a 2 px `--accent` outline, 2 px off the element.
 
 ## Outfit collage (`src/components/OutfitCollage.tsx`)
@@ -132,8 +142,8 @@ Big serif numbers ("Nº 07") use old-style figures (`.oldstyle`).
   small caps over the italic number, the note, the pieces, then pill
   buttons: Save (filled hibiscus when saved), Wore it (mango hanger), Not
   for me (plain text).
-- Lookbook: the same cards, "Track 01 · Saved Nov 20" over the look's
-  name.
+- Lookbook: the same cards, "Track 01 · Saved November 20" over the
+  look's name.
 - Piece cards: a heart in a small `--mat` circle with `shadow-print` at
   the photo's top right, outlined in `--ink` at 55%, filled `--accent`
   when it's a favorite. The tap area is 40 px.

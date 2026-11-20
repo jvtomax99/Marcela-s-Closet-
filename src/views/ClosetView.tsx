@@ -78,7 +78,7 @@ export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) 
                   }`}
                 >
                   {option === 'all' ? 'All' : option === 'forgotten' ? 'Forgotten' : CATEGORY_PLURALS[option]}
-                  <sup className="ml-1 font-serif text-[0.8125rem] tracking-normal normal-case italic">
+                  <sup className="ml-1 font-serif text-button tracking-normal normal-case italic">
                     {shelf(option).length}
                   </sup>
                 </button>

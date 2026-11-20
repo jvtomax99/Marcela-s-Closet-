@@ -35,7 +35,7 @@ function SavedLook({ track, look, items, wears, onWore }: SavedLookProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className="group rounded-[1.375rem] bg-surface p-3 shadow-card"
+      className="group rounded-card bg-surface p-3 shadow-card"
     >
       <div className="overflow-hidden rounded-2xl">
         <OutfitCollage items={items} />
@@ -64,7 +64,7 @@ function SavedLook({ track, look, items, wears, onWore }: SavedLookProps) {
             <button
               type="button"
               onClick={onWore}
-              className="flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface pr-4 pl-3 text-[0.8125rem] font-medium whitespace-nowrap text-ink transition-colors hover:border-muted active:scale-[0.97]"
+              className="flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface pr-4 pl-3 text-button font-medium whitespace-nowrap text-ink transition-colors hover:border-muted active:scale-[0.97]"
             >
               <Icon name="hanger" tone="mango" className="size-5" />
               Wore it
@@ -72,7 +72,7 @@ function SavedLook({ track, look, items, wears, onWore }: SavedLookProps) {
             <button
               type="button"
               onClick={() => removeLook(look.id)}
-              className="flex h-11 items-center rounded-full px-3 text-[0.8125rem] font-medium text-muted transition-colors hover:text-accent"
+              className="flex h-11 items-center rounded-full px-3 text-button font-medium text-muted transition-colors hover:text-accent"
             >
               Remove
             </button>
@@ -140,7 +140,7 @@ export function LookbookView({ items, outfits, wears, onStyle }: LookbookViewPro
             }`}
           >
             {label}
-            <sup className="ml-1 font-serif text-[0.8125rem] tracking-normal normal-case italic">{count}</sup>
+            <sup className="ml-1 font-serif text-button tracking-normal normal-case italic">{count}</sup>
           </button>
         ))}
       </div>

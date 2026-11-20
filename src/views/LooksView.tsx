@@ -110,11 +110,13 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
   return (
     <>
       <div className="pt-8 pb-10 sm:pt-12 sm:pb-14">
-        <p className="font-script text-[3.25rem] leading-none text-accent sm:text-[4rem]">Hola, {OWNER_NAME}</p>
-        <figure className="mt-2">
-          <blockquote className="font-serif text-[1.3125rem] leading-snug italic">“{dicho.text}”</blockquote>
-          <figcaption className="mt-2 flex items-center gap-2.5 text-eyebrow text-muted uppercase">
-            <span aria-hidden="true" className="h-px w-6 bg-muted" />
+        <p lang="es" className="font-script text-greeting text-accent">
+          Hola, {OWNER_NAME}
+        </p>
+        <figure lang="es" className="mt-2">
+          <blockquote className="font-serif text-quote italic">“{dicho.text}”</blockquote>
+          <figcaption className="mt-2 flex items-center gap-2.5 text-eyebrow text-ink/80 uppercase">
+            <span aria-hidden="true" className="h-px w-6 bg-ink/60" />
             {dicho.source}
           </figcaption>
         </figure>
@@ -222,7 +224,7 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
         </EmptyState>
       ) : (
         <>
-          <p className="mx-auto mb-5 flex max-w-5xl items-center gap-2.5 rounded-full bg-glass px-4 py-2.5 text-[0.8125rem] font-medium shadow-card backdrop-blur-xl sm:w-fit sm:pr-6">
+          <p className="mx-auto mb-5 flex max-w-5xl items-center gap-2.5 rounded-full bg-glass px-4 py-2.5 text-button font-medium shadow-card backdrop-blur-xl sm:w-fit sm:pr-6">
             <span aria-hidden="true" className="flex h-3.5 items-end gap-0.5">
               {[0.6, 1, 0.75, 0.9].map((height, index) => (
                 <span

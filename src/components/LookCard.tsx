@@ -27,7 +27,7 @@ export const LookCard = forwardRef<HTMLElement, LookCardProps>(function LookCard
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="group rounded-[1.375rem] bg-surface p-3 shadow-card md:even:mt-20"
+      className="group rounded-card bg-surface p-3 shadow-card md:even:mt-20"
     >
       <div className="overflow-hidden rounded-2xl">
         <OutfitCollage items={items} />
@@ -51,7 +51,7 @@ export const LookCard = forwardRef<HTMLElement, LookCardProps>(function LookCard
           type="button"
           aria-pressed={saved}
           onClick={onToggleSave}
-          className={`flex h-11 items-center gap-1.5 rounded-full border pr-4 pl-3 text-[0.8125rem] font-medium transition-colors active:scale-[0.97] ${
+          className={`flex h-11 items-center gap-1.5 rounded-full border pr-4 pl-3 text-button font-medium transition-colors active:scale-[0.97] ${
             saved ? 'border-accent bg-accent text-on-accent' : 'border-line bg-surface text-ink hover:border-muted'
           }`}
         >
@@ -61,7 +61,7 @@ export const LookCard = forwardRef<HTMLElement, LookCardProps>(function LookCard
         <button
           type="button"
           onClick={onWore}
-          className="flex h-11 items-center gap-1.5 rounded-full border border-line bg-surface pr-4 pl-3 text-[0.8125rem] font-medium text-ink transition-colors hover:border-muted active:scale-[0.97]"
+          className="flex h-11 items-center gap-1.5 rounded-full border border-line bg-surface pr-4 pl-3 text-button font-medium text-ink transition-colors hover:border-muted active:scale-[0.97]"
         >
           <Icon name="hanger" tone="mango" className="size-5" />
           Wore it
@@ -69,7 +69,7 @@ export const LookCard = forwardRef<HTMLElement, LookCardProps>(function LookCard
         <button
           type="button"
           onClick={onHide}
-          className="flex h-11 items-center rounded-full px-3 text-[0.8125rem] font-medium text-muted transition-colors hover:text-ink"
+          className="flex h-11 items-center rounded-full px-3 text-button font-medium text-muted transition-colors hover:text-ink"
         >
           Not for me
         </button>
