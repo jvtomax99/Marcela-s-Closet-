@@ -29,5 +29,16 @@ export const INTRO_FILES = {
   clip: 'intro/open.mp4',
 } as const
 
+/** AAC for Safari, Opus elsewhere: the same 12 s piece. */
+export function introMusicFile(canPlayAac: boolean) {
+  return canPlayAac ? 'intro/music.m4a' : 'intro/music.webm'
+}
+
 /** How long after the tap the clip may take to be ready before the intro skips it. */
 export const CLIP_WAIT_MS = 1500
+
+/** How long a ready clip may take to start playing (a phone may refuse) before going in. */
+export const CLIP_START_MS = 1000
+
+/** Whatever happens, the intro is gone this long after the tap. */
+export const INTRO_MAX_MS = 8000

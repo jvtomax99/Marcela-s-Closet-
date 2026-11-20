@@ -104,10 +104,13 @@ Runway, music with ElevenLabs (`CREDITS.md`).
 - Done when: in the iPhone home-screen app, every launch shows the closed
   wardrobe within a second; "Open with sound" plays the clip with music
   and lands on the Closet page; "Open quietly" does the same silently;
-  Skip or a tap goes straight in; in airplane mode (after one visit) it
-  still plays; with reduced motion only the still and a fade show.
+  a tap anywhere while waiting opens with sound; Skip, Escape or a tap
+  while it plays goes straight in; if the phone won't play the clip it
+  goes in within a second; in airplane mode (after one visit) it still
+  plays; with reduced motion only the still and a fade show.
 - Not in v1: her voice or narration, Spanish words, seasonal versions, a
-  3D model of her, a once-a-day setting.
+  3D model of her, a once-a-day setting, changing layout when the phone
+  is turned while the intro shows.
 
 ## Open decisions
 

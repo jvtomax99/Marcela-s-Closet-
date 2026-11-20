@@ -5,6 +5,7 @@ import '@fontsource-variable/cormorant-garamond/wght.css'
 import '@fontsource-variable/cormorant-garamond/wght-italic.css'
 import './index.css'
 import { App } from './App'
+import { INTRO_FILES, introMusicFile } from './lib/intro'
 
 // Asks the browser not to clear the closet when the device runs low on space.
 void navigator.storage?.persist?.()
@@ -18,7 +19,10 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
       .getEntriesByType('resource')
       .map((entry) => entry.name)
       .filter((url) => new URL(url).origin === location.origin)
-    for (const url of ['./', ...files]) void fetch(url).catch(() => undefined)
+    // The intro's clip and music may still be downloading (or cancelled by Skip), so ask for
+    // them again too: then the intro also plays offline after a single visit.
+    const music = introMusicFile(document.createElement('audio').canPlayType('audio/mp4; codecs="mp4a.40.2"') !== '')
+    for (const url of ['./', ...files, ...Object.values(INTRO_FILES), music]) void fetch(url).catch(() => undefined)
   }
   if (!navigator.serviceWorker.controller) {
     navigator.serviceWorker.addEventListener('controllerchange', keepOfflineCopy, { once: true })

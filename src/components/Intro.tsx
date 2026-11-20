@@ -1,17 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { CLIP_WAIT_MS, INTRO_FILES, introLayout, introMode } from '../lib/intro'
+import { CLIP_START_MS, CLIP_WAIT_MS, INTRO_FILES, INTRO_MAX_MS, introLayout, introMode, introMusicFile } from '../lib/intro'
 import { INTRO_LABELS } from '../lib/labels'
 
 type Phase = 'waiting' | 'opening' | 'leaving'
 
 const ease = [0.22, 1, 0.36, 1] as const
 
-/** AAC for Safari, Opus elsewhere. Both are the same 12 s piece. */
-function musicFile() {
-  const probe = document.createElement('audio')
-  return probe.canPlayType('audio/mp4; codecs="mp4a.40.2"') ? 'intro/music.m4a' : 'intro/music.webm'
-}
+const musicFile = () =>
+  introMusicFile(document.createElement('audio').canPlayType('audio/mp4; codecs="mp4a.40.2"') !== '')
 
 /**
  * Whole-file downloads, played from memory. Safari asks for videos in pieces, which the
@@ -50,6 +47,9 @@ export function Intro({ onDone }: { onDone: () => void }) {
   const clipUrl = useRef<Promise<string | null>>(Promise.resolve(null))
   const musicData = useRef<Promise<ArrayBuffer | null>>(Promise.resolve(null))
   const audio = useRef<{ context: AudioContext; gain: GainNode } | null>(null)
+  const video = useRef<HTMLVideoElement>(null)
+  const playing = useRef(false)
+  const openButton = useRef<HTMLButtonElement>(null)
 
   // Start downloading the clip and music as soon as the screen shows, so a tap starts at once.
   useEffect(() => {
@@ -95,6 +95,9 @@ export function Intro({ onDone }: { onDone: () => void }) {
     const Context =
       window.AudioContext ?? (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
     if (!Context) return
+    // On iPhone, play even with the silent switch on: she asked for sound.
+    const session = (navigator as Navigator & { audioSession?: { type: string } }).audioSession
+    if (session) session.type = 'playback'
     // Made inside the tap, or the phone won't let it play.
     const context = new Context()
     void context.resume()
@@ -104,8 +107,8 @@ export function Intro({ onDone }: { onDone: () => void }) {
     audio.current = { context, gain }
     void musicData.current.then(async (data) => {
       if (!data || audio.current?.context !== context) return
-      const buffer = await context.decodeAudioData(data.slice(0))
-      if (audio.current?.context !== context) return
+      const buffer = await context.decodeAudioData(data.slice(0)).catch(() => null)
+      if (!buffer || audio.current?.context !== context) return
       const source = context.createBufferSource()
       source.buffer = buffer
       source.loop = true
@@ -121,6 +124,8 @@ export function Intro({ onDone }: { onDone: () => void }) {
     phaseRef.current = 'opening'
     setPhase('opening')
     if (withSound) startMusic()
+    // A safety net: never stay on the intro, whatever the phone does with the clip.
+    setTimeout(leave, INTRO_MAX_MS)
     void Promise.race([clipUrl.current, timeout(CLIP_WAIT_MS)]).then((url) => {
       if (phaseRef.current !== 'opening') return
       if (url) setClipSrc(url)
@@ -136,6 +141,20 @@ export function Intro({ onDone }: { onDone: () => void }) {
     sound.gain.gain.setTargetAtTime(muted ? 0 : 0.9, sound.context.currentTime, 0.05)
     setMusic(muted ? 'muted' : 'on')
   }
+
+  // Play the clip once it's on screen. A phone can refuse (Low Power Mode, for example)
+  // without any error, so if it hasn't started soon, go straight in.
+  useEffect(() => {
+    if (!clipSrc) return
+    video.current?.play().catch(leave)
+    const fallback = setTimeout(() => {
+      if (!playing.current) leave()
+    }, CLIP_START_MS)
+    return () => clearTimeout(fallback)
+  }, [clipSrc, leave])
+
+  // Keyboard and screen-reader users start on the main button, not in the app underneath.
+  useEffect(() => openButton.current?.focus({ preventScroll: true }), [])
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -157,13 +176,16 @@ export function Intro({ onDone }: { onDone: () => void }) {
       <img src={INTRO_FILES.still} alt="" className="absolute inset-0 h-full w-full object-cover" />
       {clipSrc && (
         <video
+          ref={video}
           src={clipSrc}
-          autoPlay
           muted
           playsInline
           aria-hidden="true"
           className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-200 ${clipShowing ? 'opacity-100' : 'opacity-0'}`}
-          onPlaying={() => setClipShowing(true)}
+          onPlaying={() => {
+            playing.current = true
+            setClipShowing(true)
+          }}
           onEnded={() => setTimeout(leave, 350)}
           onError={leave}
         />
@@ -190,6 +212,7 @@ export function Intro({ onDone }: { onDone: () => void }) {
   const buttons = (
     <>
       <button
+        ref={openButton}
         type="button"
         className="w-full max-w-xs rounded-full bg-ink py-4 text-eyebrow text-canvas uppercase shadow-print transition-transform duration-300 hover:-translate-y-0.5"
         onClick={(event) => {
@@ -218,6 +241,7 @@ export function Intro({ onDone }: { onDone: () => void }) {
     transition: { duration: 0.5, ease },
   }
   const fadeButtons = {
+    style: { pointerEvents: waiting ? ('auto' as const) : ('none' as const) },
     initial: { opacity: 0, y: 16 },
     animate: waiting ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 },
     transition: { duration: 0.5, delay: waiting ? 0.15 : 0, ease },
@@ -226,6 +250,7 @@ export function Intro({ onDone }: { onDone: () => void }) {
   return (
     <motion.div
       role="dialog"
+      aria-modal="true"
       aria-label={`${INTRO_LABELS.kicker} ${INTRO_LABELS.title}`}
       className="grain fixed inset-0 z-50 overflow-hidden bg-canvas select-none"
       initial={{ opacity: 1 }}

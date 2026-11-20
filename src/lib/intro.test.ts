@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { INTRO_FILES, introLayout, introMode, shouldShowIntro } from './intro'
+import { INTRO_FILES, introLayout, introMode, introMusicFile, shouldShowIntro } from './intro'
 
 describe('intro screen', () => {
   it('shows on every launch unless ?intro=0', () => {
@@ -21,6 +21,7 @@ describe('intro screen', () => {
   })
 
   it('uses relative paths only', () => {
-    for (const path of Object.values(INTRO_FILES)) expect(path.startsWith('/')).toBe(false)
+    for (const path of [...Object.values(INTRO_FILES), introMusicFile(true), introMusicFile(false)])
+      expect(path.startsWith('/')).toBe(false)
   })
 })
