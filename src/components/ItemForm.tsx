@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type FormEvent } from 'react'
+import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { deleteItem, saveItem, unwearPiece, wearPiece } from '../db'
 import { toDay, wearStats } from '../engine'
 import { newId } from '../lib/id'
@@ -93,6 +93,10 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
   const [preparing, setPreparing] = useState(false)
   /** True while the colors are the app's guess from the photo, not her choice. */
   const [colorFromPhoto, setColorFromPhoto] = useState(false)
+  /** Set the moment she taps a color herself; a photo guess never overrides that. */
+  const pickedColors = useRef(Boolean(item))
+  const [saving, setSaving] = useState(false)
+  const savingNow = useRef(false)
   const autoName = category && colors[0] ? `${capitalize(colors[0])} ${CATEGORY_LABELS[category].toLowerCase()}` : null
 
   const pickPhoto = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -104,9 +108,9 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
       setPhoto(prepared)
       setMessage('')
       // Guess the main color, unless she already chose colors herself.
-      if (colors.length === 0 || colorFromPhoto) {
+      if (!pickedColors.current) {
         const guess = await readPhotoColor(prepared).catch(() => null)
-        if (guess) {
+        if (guess && !pickedColors.current) {
           setColors([guess])
           setColorFromPhoto(true)
         }
@@ -123,6 +127,10 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
     if (!photo) return setMessage('Add a photo of this piece.')
     if (!category) return setMessage('Choose a category.')
     if (colors.length === 0) return setMessage('Choose at least one color.')
+    // A ref, not state: a fast double tap must see the first tap at once.
+    if (savingNow.current) return
+    savingNow.current = true
+    setSaving(true)
 
     await saveItem({
       id: item?.id ?? newId(),
@@ -184,6 +192,7 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
           onChange={(next) => {
             setColors(next)
             setColorFromPhoto(false)
+            pickedColors.current = true
           }}
         />
         {colorFromPhoto && (
@@ -254,7 +263,7 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
 
       <button
         type="submit"
-        disabled={preparing}
+        disabled={preparing || saving}
         className="mt-8 w-full rounded-full bg-ink py-4 text-eyebrow text-canvas uppercase shadow-print transition-opacity hover:opacity-90 disabled:opacity-50"
       >
         {preparing ? 'Preparing photo…' : item ? 'Save changes' : 'Add to closet'}
@@ -263,7 +272,7 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
       {!item && onAddAnother && (
         <button
           type="button"
-          disabled={preparing}
+          disabled={preparing || saving}
           onClick={(event) => submit(event, true)}
           className="mt-3 w-full rounded-full border border-ink py-3.5 text-eyebrow uppercase transition-colors hover:bg-ink hover:text-canvas disabled:opacity-50"
         >

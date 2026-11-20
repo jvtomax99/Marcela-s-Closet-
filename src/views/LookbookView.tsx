@@ -83,10 +83,16 @@ interface LookbookViewProps {
 }
 
 type Tab = 'looks' | 'pieces'
+/** Remembers the tab while the app is open, so coming back from a favorite's looks lands on Pieces. */
+let lastTab: Tab = 'looks'
 
 export function LookbookView({ items, outfits, wears, onStyle }: LookbookViewProps) {
   const { logLook, toast } = useWornLog()
-  const [tab, setTab] = useState<Tab>('looks')
+  const [tab, setTabState] = useState<Tab>(lastTab)
+  const setTab = (next: Tab) => {
+    lastTab = next
+    setTabState(next)
+  }
   const favorites = items.filter((item) => item.favorite)
   const byId = new Map(items.map((item) => [item.id, item]))
   const saved = outfits

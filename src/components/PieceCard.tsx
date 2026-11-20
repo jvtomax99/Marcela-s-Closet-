@@ -42,7 +42,7 @@ export function PieceCard({ item, index, onOpen }: PieceCardProps) {
       <button
         type="button"
         aria-pressed={item.favorite}
-        aria-label={item.favorite ? `Remove ${item.name} from favorites` : `Add ${item.name} to favorites`}
+        aria-label={`Favorite: ${item.name}`}
         onClick={() => setFavorite(item.id, !item.favorite)}
         className={`absolute top-1.5 right-1.5 grid size-10 place-items-center rounded-full transition-colors ${
           item.favorite ? 'text-accent' : 'text-ink/55 hover:text-ink'
