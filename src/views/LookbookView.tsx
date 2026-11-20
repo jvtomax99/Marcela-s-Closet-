@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { EmptyState } from '../components/EmptyState'
+import { Icon } from '../components/Icon'
 import { OutfitCollage } from '../components/OutfitCollage'
 import { PageHeader } from '../components/PageHeader'
 import { PieceCard } from '../components/PieceCard'
@@ -14,13 +15,15 @@ import type { ClothingItem, Outfit, Wear } from '../types'
 const SAVED_ON = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' })
 
 interface SavedLookProps {
+  /** Its place in the playlist, newest first. */
+  track: number
   look: Outfit
   items: ClothingItem[]
   wears: Wear[]
   onWore: () => void
 }
 
-function SavedLook({ look, items, wears, onWore }: SavedLookProps) {
+function SavedLook({ track, look, items, wears, onWore }: SavedLookProps) {
   const [name, setName] = useState(look.name)
   const today = toDay(Date.now())
   const worn = wearStats(look.itemIds, wears, today)
@@ -32,42 +35,48 @@ function SavedLook({ look, items, wears, onWore }: SavedLookProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className="group"
+      className="group rounded-[1.375rem] bg-surface p-3 shadow-card"
     >
-      <OutfitCollage items={items} />
-      <p className="mt-5 text-[0.625rem] tracking-[0.18em] text-muted uppercase">
-        Saved {SAVED_ON.format(look.createdAt)}
-        {worn.last && (
-          <>
-            {' · '}Worn {worn.times === 1 ? 'once' : `${worn.times} times`}, last {dayLabel(worn.last, today)}
-          </>
-        )}
-      </p>
-      <input
-        aria-label="Look name"
-        value={name}
-        onChange={(event) => setName(event.target.value)}
-        onBlur={() => renameLook(look.id, name.trim() || look.name)}
-        className="mt-1 w-full border-b border-transparent bg-transparent py-1 font-serif text-[1.75rem] leading-tight italic outline-none transition-colors hover:border-line focus:border-accent"
-      />
-      <p className="mt-1.5 text-xs leading-relaxed text-muted">{items.map((item) => item.name).join(' · ')}</p>
-      <div className="mt-2 flex items-center justify-between">
-        <StarRating value={look.rating} onChange={(rating) => rateLook(look.id, rating)} />
-        <div className="flex items-center gap-5">
-          <button
-            type="button"
-            onClick={onWore}
-            className="py-2 text-eyebrow text-ink uppercase transition-colors hover:text-accent"
-          >
-            Wore it
-          </button>
-          <button
-            type="button"
-            onClick={() => removeLook(look.id)}
-            className="py-2 text-eyebrow text-muted uppercase transition-colors hover:text-accent"
-          >
-            Remove
-          </button>
+      <div className="overflow-hidden rounded-2xl">
+        <OutfitCollage items={items} />
+      </div>
+      <div className="px-1.5">
+        <p className="mt-4 text-[0.625rem] tracking-[0.18em] text-muted uppercase">
+          <span className="text-accent">Track {String(track).padStart(2, '0')}</span> · Saved{' '}
+          {SAVED_ON.format(look.createdAt)}
+          {worn.last && (
+            <>
+              {' · '}Worn {worn.times === 1 ? 'once' : `${worn.times} times`}, last {dayLabel(worn.last, today)}
+            </>
+          )}
+        </p>
+        <input
+          aria-label="Look name"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          onBlur={() => renameLook(look.id, name.trim() || look.name)}
+          className="mt-1 w-full border-b border-transparent bg-transparent py-1 font-serif text-[1.75rem] leading-tight italic outline-none transition-colors hover:border-line focus:border-accent"
+        />
+        <p className="mt-1.5 text-xs leading-relaxed text-muted">{items.map((item) => item.name).join(' · ')}</p>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-y-1">
+          <StarRating value={look.rating} onChange={(rating) => rateLook(look.id, rating)} />
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={onWore}
+              className="flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface pr-4 pl-3 text-[0.8125rem] font-medium whitespace-nowrap text-ink transition-colors hover:border-muted active:scale-[0.97]"
+            >
+              <Icon name="hanger" tone="mango" className="size-5" />
+              Wore it
+            </button>
+            <button
+              type="button"
+              onClick={() => removeLook(look.id)}
+              className="flex h-11 items-center rounded-full px-3 text-[0.8125rem] font-medium text-muted transition-colors hover:text-accent"
+            >
+              Remove
+            </button>
+          </div>
         </div>
       </div>
     </motion.article>
@@ -111,7 +120,7 @@ export function LookbookView({ items, outfits, wears, onStyle }: LookbookViewPro
             The <em>lookbook</em>
           </>
         }
-        intro="The looks and pieces you love. Rate your looks, and the suggestions learn your taste."
+        intro="Your playlist: the looks and pieces you love. Rate your looks, and the suggestions learn your taste."
       />
 
       <div className="-mx-4 mb-10 flex gap-7 border-b border-line px-4 sm:mx-0 sm:px-0">
@@ -180,11 +189,12 @@ export function LookbookView({ items, outfits, wears, onStyle }: LookbookViewPro
           Save the looks you love and rate them here. Your ratings shape what gets suggested next.
         </EmptyState>
       ) : (
-        <div className="grid grid-cols-1 gap-x-10 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
           <AnimatePresence initial={false}>
-            {saved.map((look) => (
+            {saved.map((look, index) => (
               <SavedLook
                 key={look.id}
+                track={index + 1}
                 look={look}
                 items={look.itemIds.flatMap((id) => byId.get(id) ?? [])}
                 wears={wears}

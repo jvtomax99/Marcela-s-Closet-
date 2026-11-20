@@ -103,7 +103,7 @@ export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) 
             ))}
           </div>
 
-          <div className="fixed right-4 bottom-[calc(env(safe-area-inset-bottom)+5rem)] z-30 md:right-8 md:bottom-8">
+          <div className="fixed right-4 bottom-[calc(env(safe-area-inset-bottom)+6.25rem)] z-30 md:right-8 md:bottom-8">
             {addButton}
           </div>
         </>

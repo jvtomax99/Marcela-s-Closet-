@@ -43,7 +43,8 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   - `backup.ts`: Back up / Restore to a `.json` file.
   - `db.test.ts`, `backup.test.ts`, `upgrade.test.ts` (a version-1
     closet opens intact): 14 tests (with `fake-indexeddb`).
-- `src/lib/`: `labels.ts` (all the words shown for options), `image.ts`
+- `src/lib/`: `labels.ts` (all the words shown for options, plus the
+  greeting's name and the daily Cali sayings, `DICHOS`), `image.ts`
   (photo shrinking), `photoColor.ts` (reads a photo's main color on the
   phone; `photoColor.test.ts`, 4 tests), `id.ts`, `useRoute.ts` (the `#/` routing).
 - `src/components/`: building blocks: `OutfitCollage` (the moodboard),

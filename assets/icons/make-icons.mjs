@@ -22,21 +22,21 @@ function page(size, card) {
   if (card === 0) return `<!doctype html><html><head><style>
   @font-face { font-family: C; src: url(data:font/woff2;base64,${font}); font-style: italic; font-weight: 300 700; }
   html, body { margin: 0; width: ${size}px; height: ${size}px; overflow: hidden; }
-  body { background: #ece4d6; display: grid; place-items: center; }
-  .c { font: italic 700 ${size * 1.2}px/1 C; color: #8c3a2b; transform: translate(-3%, -2%); }
+  body { background: #f7e6d8; display: grid; place-items: center; }
+  .c { font: italic 700 ${size * 1.2}px/1 C; color: #c2255c; transform: translate(-3%, -2%); }
   </style></head><body><span class="c">C</span></body></html>`
   const w = size * card
   const h = w * 1.25
   return `<!doctype html><html><head><style>
   @font-face { font-family: C; src: url(data:font/woff2;base64,${font}); font-style: italic; font-weight: 300 700; }
   html, body { margin: 0; width: ${size}px; height: ${size}px; overflow: hidden; }
-  body { background: #ece4d6; display: grid; place-items: center; }
+  body { background: #f7e6d8; display: grid; place-items: center; }
   .print { width: ${w}px; height: ${h}px; box-sizing: border-box; padding: ${w * 0.07}px;
     background: #fffdf8; transform: rotate(-4deg);
-    box-shadow: 0 ${size * 0.004}px ${size * 0.004}px rgb(60 45 30 / 0.08),
-      0 ${size * 0.03}px ${size * 0.06}px -${size * 0.012}px rgb(60 45 30 / 0.28); }
-  .photo { width: 100%; height: 100%; background: #e8dfd0; display: grid; place-items: center; }
-  .c { font: italic 500 ${w * 0.78}px/1 C; color: #8c3a2b; transform: translate(-2%, -3%); }
+    box-shadow: 0 ${size * 0.004}px ${size * 0.004}px rgb(60 30 40 / 0.08),
+      0 ${size * 0.03}px ${size * 0.06}px -${size * 0.012}px rgb(60 30 40 / 0.28); }
+  .photo { width: 100%; height: 100%; background: #f3e4d8; display: grid; place-items: center; }
+  .c { font: italic 500 ${w * 0.78}px/1 C; color: #c2255c; transform: translate(-2%, -3%); }
   </style></head><body><div class="print"><div class="photo"><span class="c">C</span></div></div></body></html>`
 }
 

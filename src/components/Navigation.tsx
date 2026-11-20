@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion'
 import type { Route } from '../lib/useRoute'
-import { Icon, type IconName } from './Icon'
+import { Icon, type IconName, type IconTone } from './Icon'
 
-const LINKS: { route: Route; label: string; icon: IconName }[] = [
-  { route: 'closet', label: 'Closet', icon: 'hanger' },
-  { route: 'looks', label: 'Looks', icon: 'looks' },
-  { route: 'lookbook', label: 'Lookbook', icon: 'book' },
+const LINKS: { route: Route; label: string; icon: IconName; tone: IconTone }[] = [
+  { route: 'closet', label: 'Closet', icon: 'hanger', tone: 'mango' },
+  { route: 'looks', label: 'Looks', icon: 'looks', tone: 'accent' },
+  { route: 'lookbook', label: 'Lookbook', icon: 'vinyl', tone: 'palm' },
 ]
 
 const EDITION = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
@@ -48,11 +48,12 @@ export function Navigation({ route }: { route: Route }) {
         </div>
       </header>
 
+      {/* Phone: a floating capsule under the thumb, with a pill behind the current page (after Interpreter Hub). */}
       <nav
         aria-label="Main"
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-canvas/85 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl backdrop-saturate-150 md:hidden"
+        className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] z-40 flex justify-center md:hidden"
       >
-        <div className="mx-auto flex max-w-md justify-around">
+        <div className="flex gap-1 rounded-full bg-glass p-1.5 shadow-card backdrop-blur-xl backdrop-saturate-150">
           {LINKS.map((link) => {
             const active = link.route === route
             return (
@@ -60,19 +61,19 @@ export function Navigation({ route }: { route: Route }) {
                 key={link.route}
                 href={`#/${link.route}`}
                 aria-current={active ? 'page' : undefined}
-                className={`relative flex w-24 flex-col items-center gap-1.5 pt-2.5 pb-2 text-[0.625rem] tracking-[0.18em] uppercase transition-colors ${
+                className={`relative flex w-[5.75rem] flex-col items-center gap-0.5 rounded-full pt-2 pb-1.5 text-[0.6875rem] font-medium transition-colors ${
                   active ? 'text-ink' : 'text-muted'
                 }`}
               >
                 {active && (
                   <motion.span
                     layoutId="nav-bottom"
-                    className="absolute top-0 h-0.5 w-8 bg-accent"
+                    className="absolute inset-0 rounded-full bg-surface shadow-card"
                     transition={{ type: 'spring', stiffness: 420, damping: 36 }}
                   />
                 )}
-                <Icon name={link.icon} className="size-[1.375rem]" />
-                {link.label}
+                <Icon name={link.icon} tone={link.tone} className="relative size-[1.625rem]" />
+                <span className="relative">{link.label}</span>
               </a>
             )
           })}

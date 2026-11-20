@@ -54,7 +54,9 @@ Jose (`SPEC.md`, Later).
   once in `src/index.css`. Don't add one without adding it to `DESIGN.md`
   in the same commit.
 - **Words in the app** are in English for now; Spanish comes later
-  (`src/lib/labels.ts` and the components hold all of it). Don't hard-code
+  (`src/lib/labels.ts` and the components hold all of it). The greeting
+  "Hola, Marce" and the daily Cali sayings (`DICHOS` in `labels.ts`) are
+  Spanish on purpose (Jose, 2026-11-20). Don't hard-code
   new text where a later dictionary can't reach it.
 - **Windows extras.** `scripts/` (desktop shortcut) and
   `.claude/launch.json` (`npm.cmd`) are for Marce's PC. They don't run in a

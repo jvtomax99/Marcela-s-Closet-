@@ -61,7 +61,7 @@ export function useWornLog() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 16 }}
           transition={{ type: 'spring', stiffness: 400, damping: 37 }}
-          className="fixed inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+5rem)] z-40 mx-auto flex max-w-md items-center gap-4 rounded bg-ink px-5 py-3 text-canvas shadow-print md:bottom-8"
+          className="fixed inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+6.25rem)] z-40 mx-auto flex max-w-md items-center gap-4 rounded bg-ink px-5 py-3 text-canvas shadow-print md:bottom-8"
         >
           <span className="min-w-0 flex-1 text-sm">
             Worn{' '}

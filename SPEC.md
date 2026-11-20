@@ -122,8 +122,12 @@ a fitting room).
   shows her closet and looks.
 
 ### Look and feel
-Magazine design, dark mode that follows the phone, bottom tab bar on
-phones (Closet, Looks, Lookbook), a masthead on laptops, forms in sheets,
+Magazine design with a Cali, Colombia and music flavor ("Salsa caleña",
+Phase 4): hibiscus pink, mango and palm green on warm cream; "Hola, Marce"
+in script with a daily Cali saying; looks numbered as tracks, a "Now
+playing" pill and a record for the Lookbook. Structure after Jose's
+Interpreter Hub: floating capsule tab bar, white lifted cards, two-tone
+icons. Dark mode that follows the phone, a masthead on laptops, forms in sheets,
 calmer motion when the phone asks for reduced motion. Values in
 `DESIGN.md`.
 - Done when: every screen looks right at 390 px and 1440 px, light and
@@ -198,4 +202,8 @@ calmer motion when the phone asks for reduced motion. Values in
     px: color picked from the photo, add three in a row, hearts, Pieces
     tab).
   - [ ] Live, and Marce has added pieces with it on her iPhone.
+- [ ] Phase 4: "Salsa caleña" look (Jose picked A of two mockups,
+  2026-11-20).
+  - [x] Built and checked at 390 px light and dark and 1440 px.
+  - [ ] Marce has seen it and likes the sayings (she can change them).
 - [ ] Phase next: to decide with Jose.
