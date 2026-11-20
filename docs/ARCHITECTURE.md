@@ -1,7 +1,6 @@
 # Architecture
 
-Written from the zip (`Closet App/`) on 2026-11-20, before its code is in
-this repo. Check it against the code once Phase 1 brings it in, and update
+Written from the code on 2026-11-20 (brought in from Marce's zip). Update
 it when the structure changes.
 
 A single-page web app: React 19 + TypeScript, built by Vite 8 into static
@@ -12,7 +11,8 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
 
 - `index.html`: the page shell and the iPhone home-screen settings
   (`apple-mobile-web-app-*`, `theme-color`, manifest link, icon).
-- `vite.config.ts`: build and test settings. `tsconfig.json`: types.
+- `vite.config.ts`: build and test settings; `base: './'` makes every
+  built path relative, so the app works in Pages' sub-folder. `tsconfig.json`: types.
 - `wrangler.jsonc`: Cloudflare hosting settings from the zip. Not used:
   the host is GitHub Pages (Jose, 2026-11-20); Phase 1 asks before
   removing it.
@@ -21,7 +21,7 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   - `manifest.webmanifest`, `icon-192.png`, `icon-512.png`,
     `icon-maskable-512.png`, `apple-touch-icon.png`: install info and
     icons.
-- `src/main.tsx`: starts the app and registers `/sw.js` (only in a built
+- `src/main.tsx`: starts the app and registers `./sw.js` (only in a built
   version, `import.meta.env.PROD`).
 - `src/App.tsx`: switches between the three pages by the address's `#/`
   part.
@@ -50,6 +50,9 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   `BackupControls`, `Icon`.
 - `src/views/`: the three pages: `ClosetView`, `LooksView`,
   `LookbookView`.
+- `.github/workflows/`: `check.yml` ("App checks": test, typecheck, build
+  on every pull request) and `pages.yml` (the same, then publishes `dist/`
+  to GitHub Pages on every push to `main`).
 - `scripts/`: Windows only, Marce's PC: `open-closet.ps1` (starts the app
   in its own Edge window), `make-shortcut.ps1`, `closet.ico`.
 - Docs: `SPEC.md`, `CLAUDE.md`, `DESIGN.md`, `CREDITS.md`, and in `docs/`
@@ -84,10 +87,14 @@ analytics.
 - **Pages**: `#/closet` (the default), `#/looks`, `#/lookbook`. Refresh
   and the back gesture keep the page.
 - **Nothing in `localStorage`.**
-- **Offline copy** (`public/sw.js`): every request goes to the internet
-  first and the answer is saved in the cache `closet-app`; with no
-  internet the saved copy answers, and a page load falls back to the saved
-  `/`. Only the app's own address is handled.
+- **Offline copy** (`public/sw.js`): registered from the app's folder, so
+  it only sees that folder. Every request inside it goes to the internet
+  first and the answer is saved in the cache `closet-app:<folder path>`
+  (`closet-app:/Marcela-s-Closet-/` on Pages); with no internet the saved
+  copy answers, and a page load falls back to the saved folder page. It
+  never reads or deletes any cache, its own or another app's, on the
+  shared `jvtomax99.github.io` address. On the first visit, `main.tsx` fetches the page's
+  files again once the worker is in charge, so the copy is complete.
 - **Per address**: each address, browser and iPhone home-screen app has
   its own database. On Marce's PC the closet lives in the Edge app window's
   own profile (`%LOCALAPPDATA%\Closet\window`) at `localhost:5173`.
