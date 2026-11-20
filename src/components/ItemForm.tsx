@@ -3,6 +3,7 @@ import { deleteItem, saveItem, unwearPiece, wearPiece } from '../db'
 import { toDay, wearStats } from '../engine'
 import { newId } from '../lib/id'
 import { photoUrl, preparePhoto } from '../lib/image'
+import { colorFromPhoto as readPhotoColor } from '../lib/photoColor'
 import {
   CATEGORY_LABELS,
   FORMALITY_LABELS,
@@ -45,6 +46,8 @@ interface ItemFormProps {
   /** What she logged, for the "worn" line and button. */
   wears?: Wear[]
   onDone: () => void
+  /** New pieces only: saves, then starts a fresh form for the next photo. */
+  onAddAnother?: () => void
   onStyle?: (id: string) => void
 }
 
@@ -73,7 +76,7 @@ function WornLine({ itemId, wears }: { itemId: string; wears: Wear[] }) {
   )
 }
 
-export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onStyle }: ItemFormProps) {
+export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnother, onStyle }: ItemFormProps) {
   const [photo, setPhoto] = useState<Blob | null>(item?.photo ?? null)
   const [name, setName] = useState(item?.name ?? '')
   const [category, setCategory] = useState<Category | null>(item?.category ?? null)
@@ -88,14 +91,26 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onStyle }: 
   const [message, setMessage] = useState('')
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [preparing, setPreparing] = useState(false)
+  /** True while the colors are the app's guess from the photo, not her choice. */
+  const [colorFromPhoto, setColorFromPhoto] = useState(false)
+  const autoName = category && colors[0] ? `${capitalize(colors[0])} ${CATEGORY_LABELS[category].toLowerCase()}` : null
 
   const pickPhoto = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
     setPreparing(true)
     try {
-      setPhoto(await preparePhoto(file))
+      const prepared = await preparePhoto(file)
+      setPhoto(prepared)
       setMessage('')
+      // Guess the main color, unless she already chose colors herself.
+      if (colors.length === 0 || colorFromPhoto) {
+        const guess = await readPhotoColor(prepared).catch(() => null)
+        if (guess) {
+          setColors([guess])
+          setColorFromPhoto(true)
+        }
+      }
     } catch {
       setMessage("That photo couldn't be opened here. Try a JPEG or PNG.")
     } finally {
@@ -103,7 +118,7 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onStyle }: 
     }
   }
 
-  const submit = async (event: FormEvent) => {
+  const submit = async (event: FormEvent, another = false) => {
     event.preventDefault()
     if (!photo) return setMessage('Add a photo of this piece.')
     if (!category) return setMessage('Choose a category.')
@@ -111,7 +126,7 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onStyle }: 
 
     await saveItem({
       id: item?.id ?? newId(),
-      name: name.trim() || `${capitalize(colors[0])} ${CATEGORY_LABELS[category].toLowerCase()}`,
+      name: name.trim() || autoName || CATEGORY_LABELS[category],
       category,
       colors,
       pattern,
@@ -124,7 +139,8 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onStyle }: 
       photo,
       createdAt: item?.createdAt ?? Date.now(),
     })
-    onDone()
+    if (another && onAddAnother) onAddAnother()
+    else onDone()
   }
 
   const remove = async () => {
@@ -159,13 +175,29 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onStyle }: 
 
       {item && <WornLine itemId={item.id} wears={wears} />}
 
+      <Field label="Category">
+        <PickOne options={CATEGORIES} labels={CATEGORY_LABELS} value={category} onChange={setCategory} />
+      </Field>
+      <Field label="Colors">
+        <ColorPicker
+          values={colors}
+          onChange={(next) => {
+            setColors(next)
+            setColorFromPhoto(false)
+          }}
+        />
+        {colorFromPhoto && (
+          <p className="mt-2.5 text-sm text-muted">Picked from your photo. Tap another color if it's off.</p>
+        )}
+      </Field>
+
       <div className="mt-6 flex items-end gap-4">
         <label className="min-w-0 flex-1">
-          <span className="text-eyebrow uppercase text-muted">Name</span>
+          <span className="text-eyebrow uppercase text-muted">Name (optional)</span>
           <input
             value={name}
             onChange={(event) => setName(event.target.value)}
-            placeholder="Silk slip dress"
+            placeholder={autoName ?? 'Silk slip dress'}
             className="mt-1 w-full border-b border-line bg-transparent py-2 font-serif text-2xl outline-none placeholder:text-muted/60 focus:border-accent"
           />
         </label>
@@ -180,37 +212,39 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onStyle }: 
         </button>
       </div>
 
-      <Field label="Category">
-        <PickOne options={CATEGORIES} labels={CATEGORY_LABELS} value={category} onChange={setCategory} />
-      </Field>
-      <Field label="Colors">
-        <ColorPicker values={colors} onChange={setColors} />
-      </Field>
-      <Field label="Pattern">
-        <PickOne options={PATTERNS} labels={PATTERN_LABELS} value={pattern} onChange={setPattern} />
-      </Field>
-      <Field label="Fabric">
-        <PickOne options={FABRICS} labels={FABRIC_LABELS} value={fabric} onChange={setFabric} />
-      </Field>
-      <Field label="Formality">
-        <PickOne options={FORMALITIES} labels={FORMALITY_LABELS} value={formality} onChange={setFormality} />
-      </Field>
-      <Field label="Seasons (none means all)">
-        <PickMany options={SEASONS} labels={SEASON_LABELS} values={seasons} onChange={setSeasons} />
-      </Field>
-      <Field label="Occasions (none means all)">
-        <PickMany options={OCCASIONS} labels={OCCASION_LABELS} values={occasions} onChange={setOccasions} />
-      </Field>
 
-      <label className="mt-6 block">
-        <span className="text-eyebrow uppercase text-muted">Tags</span>
-        <input
-          value={tags}
-          onChange={(event) => setTags(event.target.value)}
-          placeholder="vintage, gift from mom"
-          className="mt-1 w-full border-b border-line bg-transparent py-2 text-base outline-none placeholder:text-muted/60 focus:border-accent"
-        />
-      </label>
+      <details className="group/more mt-8 border-t border-line pt-4">
+        <summary className="flex cursor-pointer list-none items-center justify-between py-2 text-eyebrow uppercase text-ink [&::-webkit-details-marker]:hidden">
+          More details (optional)
+          <Icon name="plus" className="size-4 transition-transform group-open/more:rotate-45" />
+        </summary>
+        <p className="mt-1 text-sm text-muted">Pattern, dressiness, seasons and occasions sharpen the suggestions.</p>
+        <Field label="Pattern">
+          <PickOne options={PATTERNS} labels={PATTERN_LABELS} value={pattern} onChange={setPattern} />
+        </Field>
+        <Field label="Fabric">
+          <PickOne options={FABRICS} labels={FABRIC_LABELS} value={fabric} onChange={setFabric} />
+        </Field>
+        <Field label="Formality">
+          <PickOne options={FORMALITIES} labels={FORMALITY_LABELS} value={formality} onChange={setFormality} />
+        </Field>
+        <Field label="Seasons (none means all)">
+          <PickMany options={SEASONS} labels={SEASON_LABELS} values={seasons} onChange={setSeasons} />
+        </Field>
+        <Field label="Occasions (none means all)">
+          <PickMany options={OCCASIONS} labels={OCCASION_LABELS} values={occasions} onChange={setOccasions} />
+        </Field>
+
+        <label className="mt-6 block">
+          <span className="text-eyebrow uppercase text-muted">Tags</span>
+          <input
+            value={tags}
+            onChange={(event) => setTags(event.target.value)}
+            placeholder="vintage, gift from mom"
+            className="mt-1 w-full border-b border-line bg-transparent py-2 text-base outline-none placeholder:text-muted/60 focus:border-accent"
+          />
+        </label>
+      </details>
 
       {message && (
         <p role="alert" className="mt-5 text-sm text-accent">
@@ -225,6 +259,17 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onStyle }: 
       >
         {preparing ? 'Preparing photo…' : item ? 'Save changes' : 'Add to closet'}
       </button>
+
+      {!item && onAddAnother && (
+        <button
+          type="button"
+          disabled={preparing}
+          onClick={(event) => submit(event, true)}
+          className="mt-3 w-full rounded-full border border-ink py-3.5 text-eyebrow uppercase transition-colors hover:bg-ink hover:text-canvas disabled:opacity-50"
+        >
+          Add and take another
+        </button>
+      )}
 
       {item && (
         <div className="mt-4 flex items-center justify-between gap-4">

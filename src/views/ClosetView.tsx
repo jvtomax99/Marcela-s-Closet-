@@ -1,14 +1,13 @@
 import { useCallback, useState } from 'react'
-import { motion } from 'framer-motion'
 import { BackupControls } from '../components/BackupControls'
 import { EmptyState } from '../components/EmptyState'
 import { Icon } from '../components/Icon'
 import { ItemForm } from '../components/ItemForm'
-import { ItemPhoto } from '../components/ItemPhoto'
+import { PieceCard } from '../components/PieceCard'
 import { PageHeader } from '../components/PageHeader'
 import { Sheet } from '../components/Sheet'
 import { FORGOTTEN_DAYS, forgottenPieces, toDay } from '../engine'
-import { CATEGORY_LABELS, CATEGORY_PLURALS, COLOR_SWATCHES } from '../lib/labels'
+import { CATEGORY_PLURALS } from '../lib/labels'
 import { CATEGORIES, type Category, type ClothingItem, type Outfit, type Wear } from '../types'
 
 interface ClosetViewProps {
@@ -18,47 +17,8 @@ interface ClosetViewProps {
   onStyle: (id: string) => void
 }
 
-type Editing = { kind: 'new' } | { kind: 'existing'; item: ClothingItem } | null
-
-function PieceCard({ item, index, onOpen }: { item: ClothingItem; index: number; onOpen: () => void }) {
-  return (
-    <motion.button
-      type="button"
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: Math.min(index * 0.035, 0.45), ease: [0.22, 1, 0.36, 1] }}
-      whileTap={{ scale: 0.98 }}
-      onClick={onOpen}
-      className="group text-left"
-    >
-      <span className="relative block aspect-[3/4] overflow-hidden bg-sand">
-        <ItemPhoto item={item} className="transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
-        {item.favorite && (
-          <span
-            aria-label="Favorite"
-            className="absolute top-2.5 right-2.5 grid size-7 place-items-center rounded-full bg-mat/90 text-accent"
-          >
-            <Icon name="heart" filled className="size-3.5" />
-          </span>
-        )}
-      </span>
-      <span className="mt-3 block truncate font-serif text-xl leading-tight">{item.name}</span>
-      <span className="mt-1.5 flex items-center gap-2 text-[0.625rem] tracking-[0.16em] text-muted uppercase">
-        {CATEGORY_LABELS[item.category]}
-        <span className="flex -space-x-0.5">
-          {item.colors.slice(0, 4).map((color) => (
-            <span
-              key={color}
-              title={color}
-              style={{ backgroundColor: COLOR_SWATCHES[color] }}
-              className="size-2.5 rounded-full ring-1 ring-canvas"
-            />
-          ))}
-        </span>
-      </span>
-    </motion.button>
-  )
-}
+/** `added` counts pieces saved with "Add and take another" in a row. */
+type Editing = { kind: 'new'; added: number } | { kind: 'existing'; item: ClothingItem } | null
 
 type Shelf = Category | 'all' | 'forgotten'
 
@@ -78,7 +38,7 @@ export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) 
   const addButton = (
     <button
       type="button"
-      onClick={() => setEditing({ kind: 'new' })}
+      onClick={() => setEditing({ kind: 'new', added: 0 })}
       className="flex items-center gap-2.5 rounded-full bg-ink py-3.5 pr-6 pl-5 text-eyebrow text-canvas uppercase shadow-print transition-transform duration-300 hover:-translate-y-0.5"
     >
       <Icon name="plus" className="size-4" />
@@ -154,10 +114,17 @@ export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) 
       <Sheet
         open={editing !== null}
         onClose={close}
-        title={editing?.kind === 'existing' ? 'Edit piece' : 'New piece'}
+        title={
+          editing?.kind === 'existing'
+            ? 'Edit piece'
+            : editing && editing.added > 0
+              ? `Next piece · ${editing.added} added`
+              : 'New piece'
+        }
       >
         {editing && (
           <ItemForm
+            key={editing.kind === 'new' ? `new-${editing.added}` : editing.item.id}
             item={editing.kind === 'existing' ? editing.item : undefined}
             looksUsing={
               editing.kind === 'existing'
@@ -166,6 +133,10 @@ export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) 
             }
             wears={wears}
             onDone={close}
+            onAddAnother={() => {
+              setEditing((current) => ({ kind: 'new', added: current?.kind === 'new' ? current.added + 1 : 1 }))
+              document.querySelector('[role="dialog"]')?.scrollTo({ top: 0 })
+            }}
             onStyle={(id) => {
               close()
               onStyle(id)

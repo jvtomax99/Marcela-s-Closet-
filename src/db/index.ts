@@ -25,6 +25,7 @@ class ClosetDatabase extends Dexie {
 export const db = new ClosetDatabase()
 
 export const saveItem = (item: ClothingItem) => db.items.put(item)
+export const setFavorite = (id: string, favorite: boolean) => db.items.update(id, { favorite })
 
 /**
  * Removes a piece and every look that needed it, so no look points at a missing photo.

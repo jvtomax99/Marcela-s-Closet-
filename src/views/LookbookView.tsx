@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { EmptyState } from '../components/EmptyState'
 import { OutfitCollage } from '../components/OutfitCollage'
 import { PageHeader } from '../components/PageHeader'
+import { PieceCard } from '../components/PieceCard'
 import { StarRating } from '../components/StarRating'
 import { dayLabel, useWornLog } from '../components/WornToast'
 import { rateLook, removeLook, renameLook, restoreHiddenLooks } from '../db'
@@ -77,10 +78,16 @@ interface LookbookViewProps {
   items: ClothingItem[]
   outfits: Outfit[]
   wears: Wear[]
+  /** Opens Looks built around a favorite piece. */
+  onStyle: (id: string) => void
 }
 
-export function LookbookView({ items, outfits, wears }: LookbookViewProps) {
+type Tab = 'looks' | 'pieces'
+
+export function LookbookView({ items, outfits, wears, onStyle }: LookbookViewProps) {
   const { logLook, toast } = useWornLog()
+  const [tab, setTab] = useState<Tab>('looks')
+  const favorites = items.filter((item) => item.favorite)
   const byId = new Map(items.map((item) => [item.id, item]))
   const saved = outfits
     .filter((outfit) => outfit.status === 'saved')
@@ -90,16 +97,68 @@ export function LookbookView({ items, outfits, wears }: LookbookViewProps) {
   return (
     <>
       <PageHeader
-        kicker={`${saved.length} saved ${saved.length === 1 ? 'look' : 'looks'}`}
+        kicker={`${saved.length} saved ${saved.length === 1 ? 'look' : 'looks'} · ${favorites.length} favorite ${
+          favorites.length === 1 ? 'piece' : 'pieces'
+        }`}
         title={
           <>
             The <em>lookbook</em>
           </>
         }
-        intro="The looks you love. Rate them, and the suggestions learn your taste."
+        intro="The looks and pieces you love. Rate your looks, and the suggestions learn your taste."
       />
 
-      {saved.length === 0 ? (
+      <div className="-mx-4 mb-10 flex gap-7 border-b border-line px-4 sm:mx-0 sm:px-0">
+        {(
+          [
+            ['looks', 'Looks', saved.length],
+            ['pieces', 'Pieces', favorites.length],
+          ] as const
+        ).map(([value, label, count]) => (
+          <button
+            key={value}
+            type="button"
+            aria-pressed={tab === value}
+            onClick={() => setTab(value)}
+            className={`-mb-px border-b py-3.5 text-eyebrow uppercase transition-colors ${
+              tab === value ? 'border-accent text-ink' : 'border-transparent text-muted hover:text-ink'
+            }`}
+          >
+            {label}
+            <sup className="ml-1 font-serif text-[0.8125rem] tracking-normal normal-case italic">{count}</sup>
+          </button>
+        ))}
+      </div>
+
+      {tab === 'pieces' ? (
+        favorites.length === 0 ? (
+          <EmptyState
+            title="No favorite pieces yet"
+            action={
+              <button
+                type="button"
+                onClick={() => goTo('closet')}
+                className="rounded-full bg-ink px-6 py-3.5 text-eyebrow text-canvas uppercase shadow-print"
+              >
+                Go to the closet
+              </button>
+            }
+          >
+            Tap the heart on any piece in your closet to keep it here. Favorites show up more in your looks.
+          </EmptyState>
+        ) : (
+          <>
+            <p className="-mt-4 mb-8 max-w-md text-sm leading-relaxed text-muted">
+              Tap a piece to see looks built around it.
+            </p>
+            <div className="grid grid-cols-2 gap-x-3 gap-y-9 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 lg:gap-y-12">
+              {favorites.map((item, index) => (
+                <PieceCard key={item.id} item={item} index={index} onOpen={() => onStyle(item.id)} />
+              ))}
+            </div>
+          </>
+        )
+      ) : saved.length === 0 ? (
         <EmptyState
           title="Nothing saved yet"
           action={

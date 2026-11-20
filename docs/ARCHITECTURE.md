@@ -44,9 +44,12 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   - `db.test.ts`, `backup.test.ts`, `upgrade.test.ts` (a version-1
     closet opens intact): 14 tests (with `fake-indexeddb`).
 - `src/lib/`: `labels.ts` (all the words shown for options), `image.ts`
-  (photo shrinking), `id.ts`, `useRoute.ts` (the `#/` routing).
+  (photo shrinking), `photoColor.ts` (reads a photo's main color on the
+  phone; `photoColor.test.ts`, 4 tests), `id.ts`, `useRoute.ts` (the `#/` routing).
 - `src/components/`: building blocks: `OutfitCollage` (the moodboard),
-  `LookCard`, `ItemForm`, `ItemPhoto`, `Sheet`, `Navigation`, `Chips`,
+  `LookCard`, `ItemForm`, `ItemPhoto`, `PieceCard` (a piece in a grid,
+  with its one-tap favorite heart; used by the Closet and the Lookbook's
+  Pieces tab), `Sheet`, `Navigation`, `Chips`,
   `ColorPicker`, `StarRating`, `PageHeader`, `EmptyState`,
   `BackupControls`, `Icon`, `WornToast` (logs a look as worn, with the
   change-day and undo bar).

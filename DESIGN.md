@@ -90,6 +90,11 @@ Big serif numbers ("Nº 07") use old-style figures (`.oldstyle`).
   `sm`.
 - Phone: a bottom tab bar (Closet, Looks, Lookbook); forms in sheets that
   slide up from the bottom.
+- Piece cards: a heart in a small `--mat` circle with `shadow-print` at
+  the photo's top right, outlined in `--ink` at 55%, filled `--accent`
+  when it's a favorite. The tap area is 40 px.
+- The add form's optional fields sit in a fold ("More details
+  (optional)", a plus that turns into an x when open).
 - After "Wore it": a small `--ink` bar with `--canvas` text sits just
   above the tab bar (at the bottom on laptops) for 8 seconds: "Worn
   *today*" (the day is a dashed-underlined italic serif word that opens

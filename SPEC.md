@@ -42,6 +42,20 @@ deletes the looks that used it. Photos are shrunk to at most 1200 px.
 - Done when: on an iPhone, Marce adds a piece with a photo from her camera
   roll, sees it in her closet, edits it, and deletes it after a warning.
 
+### Easy adding (Phase 3)
+Adding a piece is photo, category, done. Taking or picking the photo
+reads its main color on the phone (`src/lib/photoColor.ts`: the middle of
+the photo, matched to the nearest closet color) and pre-selects it with
+"Picked from your photo. Tap another color if it's off." The name fills
+itself ("Navy top") unless she types one. Pattern, fabric, dressiness,
+seasons, occasions and tags fold under "More details (optional)".
+"Add and take another" saves and opens a fresh form for the next photo,
+counting how many she added. The photo never leaves her phone; the
+category is not guessed (that needs cloud AI or a large model).
+- Done when: on her iPhone, she photographs a piece, taps a category and
+  saves, with the right main color most of the time, and adds three
+  pieces in a row without closing the form.
+
 ### Looks (suggestions)
 The app builds outfits from her pieces only: (top and bottom) or a dress,
 plus shoes; outerwear (fall or winter only), a bag and up to 2 accessories
@@ -58,7 +72,10 @@ the zip's HANDOFF.md, section 7, and in `src/engine/score.ts`.
 
 ### Lookbook
 Save a look, name it and rate it 1 to 5 stars; hide looks she doesn't
-like. Saved and rated looks raise similar suggestions, hidden ones lower
+like. Favorite pieces (Phase 3): a heart on every piece in the Closet
+grid, one tap; the Lookbook has two tabs, Looks and Pieces, and tapping
+a favorite piece opens Looks built around it. Favorites rank higher in
+suggestions. Saved and rated looks raise similar suggestions, hidden ones lower
 them, and a hidden look never comes back unless she restores it here.
 - Done when: a look Marce hides disappears from Looks and stays gone after
   a reload; restoring it in the Lookbook brings it back.
@@ -176,4 +193,9 @@ calmer motion when the phone asks for reduced motion. Values in
   - [x] Built and checked on a test closet (65 tests; preview at 390 and
     1440 px, light and dark; backup round trip; version-1 closet opens).
   - [ ] Live, and Marce has used it on her iPhone.
+- [ ] Phase 3: easy adding and favorite pieces (Jose, 2026-11-20).
+  - [x] Built and checked on stand-in photos (69 tests; preview at 390
+    px: color picked from the photo, add three in a row, hearts, Pieces
+    tab).
+  - [ ] Live, and Marce has added pieces with it on her iPhone.
 - [ ] Phase next: to decide with Jose.

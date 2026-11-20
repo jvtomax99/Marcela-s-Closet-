@@ -39,7 +39,7 @@ export function App() {
               {route === 'looks' && (
                 <LooksView items={items} outfits={outfits} wears={wears} filters={filters} onFilters={setFilters} />
               )}
-              {route === 'lookbook' && <LookbookView items={items} outfits={outfits} wears={wears} />}
+              {route === 'lookbook' && <LookbookView items={items} outfits={outfits} wears={wears} onStyle={styleAround} />}
             </motion.main>
           </AnimatePresence>
         )}
