@@ -133,6 +133,32 @@ calmer motion when the phone asks for reduced motion. Values in
 - Done when: every screen looks right at 390 px and 1440 px, light and
   dark.
 
+### Intro screen (in progress, asked for by Jose 2026-11-20)
+Before the app, on every launch: her wardrobe with the doors closed,
+"Marce's Closet" in the magazine serif, and two buttons, "Open with
+sound" and "Open quietly", plus Skip. A tap opens the doors in a short
+clip (4 s: the doors open and Marce steps out, arms open), with original
+music if she chose sound, then fades into the app. Phones show it
+full-screen; wide screens show it as a photo print beside the words. A tap or Escape skips ahead.
+It never waits on a slow connection: if the clip isn't ready 1.5 s after
+the tap, it goes straight in. Reduced motion or data saver: the still
+and a fade, no clip. `?intro=0` skips it. Pictures and clip made with
+Runway, music with ElevenLabs (`CREDITS.md`).
+- Her likeness: Jose chose to show Marce's real face, and Marce agreed on
+  2026-11-20 (through Jose). Three of her photos (a selfie, the green
+  dress, a full-length shot) were uploaded to Runway as references; they
+  are not in this repo. Runway may train on uploads under standard plans.
+- Done when: in the iPhone home-screen app, every launch shows the closed
+  wardrobe within a second; "Open with sound" plays the clip with music
+  and lands on the Closet page; "Open quietly" does the same silently;
+  a tap anywhere while waiting opens with sound; Skip, Escape or a tap
+  while it plays goes straight in; if the phone won't play the clip it
+  goes in within a second; in airplane mode (after one visit) it still
+  plays; with reduced motion only the still and a fade show.
+- Not in v1: her voice or narration, Spanish words, seasonal versions, a
+  3D model of her, a once-a-day setting, changing layout when the phone
+  is turned while the intro shows.
+
 ## Open decisions
 
 1. **Hosting: decided, GitHub Pages** (Jose, 2026-11-20), at
@@ -206,4 +232,14 @@ calmer motion when the phone asks for reduced motion. Values in
   2026-11-20).
   - [x] Built and checked at 390 px light and dark and 1440 px.
   - [ ] Marce has seen it and likes the sayings (she can change them).
+- [ ] Intro screen (Jose, 2026-11-20), next to Phase 1.
+  - [x] Music and the empty wardrobe still; the screen, with skip,
+    timeout, reduced motion and offline handling.
+  - [x] Jose picked still B and music take A; desktop still made.
+  - [x] Marce agreed to her likeness (2026-11-20).
+  - [x] The scene with her and the doors-open clip (one clip; wide
+    screens show it as a print, 2026-11-20).
+  - [x] Jose's OK: "Merge for me" (2026-11-20), PR #3.
+  - [ ] Marce has opened it on her iPhone.
+  - Done when: see "Intro screen" above.
 - [ ] Phase next: to decide with Jose.

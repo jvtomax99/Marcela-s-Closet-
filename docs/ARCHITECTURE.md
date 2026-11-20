@@ -15,6 +15,9 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   built path relative, so the app works in Pages' sub-folder. `tsconfig.json`: types.
 - `public/`: copied as is into `dist/`.
   - `sw.js`: the offline worker.
+  - `intro/`: the intro's waiting picture (`closed.webp`, the clip's
+    first frame), the doors-open clip (`open.mp4`, 4 s, H.264, no sound)
+    and the music (`music.m4a` for Safari, `music.webm`, 12 s).
   - `manifest.webmanifest`, `icon-192.png`, `icon-512.png`,
     `icon-maskable-512.png`, `apple-touch-icon.png`: install info and
     icons, drawn by `assets/icons/make-icons.mjs` (run by hand, not part
@@ -22,7 +25,7 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
 - `src/main.tsx`: starts the app and registers `./sw.js` (only in a built
   version, `import.meta.env.PROD`).
 - `src/App.tsx`: switches between the three pages by the address's `#/`
-  part.
+  part, and shows the intro screen on top at every launch.
 - `src/index.css`: design tokens (colors, fonts, sizes, grain, shadow).
   See `DESIGN.md`.
 - `src/types/index.ts`: every data type and option list (categories,
@@ -44,7 +47,8 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   - `db.test.ts`, `backup.test.ts`, `upgrade.test.ts` (a version-1
     closet opens intact): 14 tests (with `fake-indexeddb`).
 - `src/lib/`: `labels.ts` (all the words shown for options, plus the
-  greeting's name and the daily Cali sayings, `DICHOS`), `image.ts`
+  greeting's name and the daily Cali sayings, `DICHOS`, and the intro's words), `intro.ts` (when and how the
+  intro plays; `intro.test.ts`, 4 tests), `image.ts`
   (photo shrinking), `photoColor.ts` (reads a photo's main color on the
   phone; `photoColor.test.ts`, 4 tests), `id.ts`, `useRoute.ts` (the `#/` routing).
 - `src/components/`: building blocks: `OutfitCollage` (the moodboard),
@@ -53,7 +57,7 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   Pieces tab), `Sheet`, `Navigation`, `Chips`,
   `ColorPicker`, `StarRating`, `PageHeader`, `EmptyState`,
   `BackupControls`, `Icon`, `WornToast` (logs a look as worn, with the
-  change-day and undo bar).
+  change-day and undo bar), `Intro` (the wardrobe intro screen).
 - `src/views/`: the three pages: `ClosetView`, `LooksView`,
   `LookbookView`.
 - `.github/workflows/`: `check.yml` ("App checks": test, typecheck, build
@@ -101,6 +105,11 @@ analytics.
   backup's copy.
 - **Pages**: `#/closet` (the default), `#/looks`, `#/lookbook`. Refresh
   and the back gesture keep the page.
+- **Intro**: starts downloading the clip and music when it shows, as
+  whole files played from memory (Safari fetches videos in pieces, which
+  the offline worker can't keep). A missing or slow clip (1.5 s after the
+  tap) means a fade straight into the app. Music plays through Web Audio,
+  started inside the tap. `?intro=0` skips it.
 - **Nothing in `localStorage`.**
 - **Offline copy** (`public/sw.js`): registered from the app's folder, so
   it only sees that folder. Every request inside it goes to the internet

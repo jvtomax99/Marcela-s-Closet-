@@ -113,3 +113,15 @@ export function dichoOfTheDay(now = new Date()) {
   const day = Math.floor((now.getTime() - start.getTime()) / 86_400_000)
   return DICHOS[day % DICHOS.length]
 }
+
+/** Words on the intro screen (the wardrobe that opens before the app). */
+export const INTRO_LABELS = {
+  kicker: 'Marce’s',
+  title: 'Closet',
+  tagline: 'Outfits from the clothes you already own.',
+  withSound: 'Open with sound',
+  quietly: 'Open quietly',
+  skip: 'Skip',
+  mute: 'Mute music',
+  unmute: 'Play music',
+} as const

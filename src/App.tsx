@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { AnimatePresence, MotionConfig, motion } from 'framer-motion'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { Intro } from './components/Intro'
 import { Navigation } from './components/Navigation'
 import { db } from './db'
+import { shouldShowIntro } from './lib/intro'
 import { goTo, useRoute } from './lib/useRoute'
 import type { SuggestionFilters } from './types'
 import { ClosetView } from './views/ClosetView'
@@ -15,6 +17,8 @@ export function App() {
   const outfits = useLiveQuery(() => db.outfits.toArray())
   const wears = useLiveQuery(() => db.wears.toArray())
   const [filters, setFilters] = useState<SuggestionFilters>({})
+  // The wardrobe intro plays over the app on every launch; the closet loads underneath meanwhile.
+  const [intro, setIntro] = useState(() => shouldShowIntro(window.location.search))
 
   const styleAround = (anchorId: string) => {
     setFilters({ anchorId })
@@ -44,6 +48,7 @@ export function App() {
           </AnimatePresence>
         )}
       </div>
+      <AnimatePresence>{intro && <Intro key="intro" onDone={() => setIntro(false)} />}</AnimatePresence>
     </MotionConfig>
   )
 }

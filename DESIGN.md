@@ -157,6 +157,28 @@ Big serif numbers ("Nº 07") use old-style figures (`.oldstyle`).
   ... edit" on the left, the italic serif name in the middle); forms in a
   centered panel.
 
+## Intro screen (`src/components/Intro.tsx`)
+
+- One scene: `public/intro/closed.webp` (the clip's first frame) while
+  waiting, then `open.mp4` (4 s, the doors open and Marce steps out).
+- Portrait screens: the scene full-screen (`object-cover`). A paper wash
+  in `--canvas` over the top fifth and the bottom, fading to clear, so
+  the words read in light and dark mode; it fades away on tap.
+- Landscape screens: the scene as a photo print on the paper page, like
+  the looks: `--mat` border (3.5%), `shadow-print`, tilted -2 degrees,
+  straightening to -0.6 on tap; the words and buttons sit to its left.
+- Kicker "Marce's" after a short `--accent` rule (and before one too when
+  centered), "Closet" in `text-display` italic serif, a muted italic
+  serif tagline.
+- Buttons: the app's usual dark pill (`bg-ink`, `text-canvas`, eyebrow
+  type) for "Open with sound"; an eyebrow text link for "Open quietly";
+  Skip as a muted eyebrow link top right; a round mute button while the
+  music plays.
+- Motion: words fade and rise in (0.5 s, the app's ease), buttons 0.15 s
+  later; everything fades out on tap; the whole screen fades into the app
+  in 0.6 s; the music fades out over 1.2 s.
+- No new colors, fonts or sizes: all from `src/index.css`.
+
 ## App icons
 
 Drawn by `assets/icons/make-icons.mjs` with the light-mode tokens (redrawn
