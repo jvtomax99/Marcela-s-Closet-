@@ -16,8 +16,8 @@ photos as tilted prints on a board.
 It runs in the browser, installs on an iPhone home screen, works offline,
 and keeps everything on her device. No accounts, no server.
 
-Live: not published yet. It will be at
-https://jvtomax99.github.io/Marcela-s-Closet-/ (GitHub Pages, from `main`).
+Live: https://jvtomax99.github.io/Marcela-s-Closet-/ (GitHub Pages, from
+`main`, published by `.github/workflows/pages.yml`).
 
 ## Who it's for
 
@@ -143,8 +143,8 @@ calmer motion when the phone asks for reduced motion. Values in
   - [x] Works in GitHub Pages' sub-folder; the offline copy stays in its
     own folder and cache; "App checks" on every pull request; a workflow
     publishes `main`.
-  - [ ] Jose turns on Pages (Source: GitHub Actions), the first publish
-    runs, and the app opens at its address on his phone.
+  - [x] Pages on (Source: GitHub Actions); published and checked live on
+    2026-11-20 (restore, looks and offline all work at the address).
   - [ ] Marce backs up on her PC and restores in the iPhone home-screen
     app.
   - Done when: the check is green, the app is live at its address, and

@@ -13,8 +13,8 @@ FILL for Jose), `docs/ARCHITECTURE.md` (map of files and how data moves),
 ## Status (2026-11-20)
 
 The app's code is in (from Marce's zip, built on her Windows PC) and set
-up for GitHub Pages. Not published yet: Phase 1 in `SPEC.md` ends when it
-is live and her closet is moved over.
+live on GitHub Pages. Phase 1 in `SPEC.md` ends when Marce has moved her
+closet over with Back up and Restore.
 
 ## Rules for this repo
 
