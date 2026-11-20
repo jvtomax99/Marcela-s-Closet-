@@ -26,13 +26,12 @@ Live: https://jvtomax99.github.io/Marcela-s-Closet-/ (GitHub Pages, from
   and also on her Windows PC. She is not a developer and built the first
   version with an AI assistant on her PC.
 - Jose builds and runs it for her from here.
-- TO FILL: who approves plans, the look and the app's wording: Jose alone,
-  or Marce too?
-- TO FILL: will Marce keep changing the app herself on her PC? If yes, two
-  people (and two AI tools) write to this repo, and every session must
-  fetch before writing, as in Jose's Interp and Vibe-coding-guide repos.
+- Jose alone approves plans, the look and the app's wording (Jose,
+  2026-11-20).
+- Marce no longer changes the app herself on her PC: her ideas come to
+  Jose, and only his sessions write to this repo (Jose, 2026-11-20).
 
-## Features (all built; not published yet)
+## Features (all built and live)
 
 ### Closet (catalog)
 Add a piece with a photo and its details: category (top, bottom, dress,
@@ -101,12 +100,12 @@ calmer motion when the phone asks for reduced motion. Values in
    would remove this risk if it ever matters. Wherever it's published, her closet starts empty there: she
    backs up on the PC and restores on the phone. Vercel and Cloudflare
    were the other options; both give the app its own address.
-2. **Asset budget.** TO FILL (`docs/assets.md` asks for one up front).
-   Background removal for photos may need a paid service or a large
-   library.
-3. **Windows extras.** Keep `scripts/` (Marce's desktop shortcut) and
-   `.claude/launch.json` in the repo, or leave them on her PC only? TO
-   FILL.
+2. **Asset budget.** $0, free assets only (Jose, 2026-11-20). Background
+   removal, when it comes, uses a free library on her device; a paid
+   service would also send her photos off the phone.
+3. **Windows extras.** `scripts/` (Marce's desktop shortcut) and
+   `.claude/launch.json` stay in the repo; the Cloudflare leftovers are
+   removed (Jose, 2026-11-20).
 
 ## Not in v1
 
@@ -119,16 +118,12 @@ calmer motion when the phone asks for reduced motion. Values in
   the rules.
 - Syncing a closet between devices automatically (Back up and Restore do
   it by hand today).
-- TO FILL: Jose's own list.
 
 ## Later
 
 - Offline on a weak signal: the app waits for the internet before using
   its saved copy, with no time limit, so in a fitting room with one bar it
   can hang. A time limit (Phillis's site uses 4 s) would fix it.
-- Remove the Cloudflare leftovers (`wrangler.jsonc`, `npm run deploy`,
-  the `wrangler` package) once Jose agrees.
-
 - Background removal, Spanish, wear tracking and AI styling, in an order
   to decide with Jose and Marce.
 
@@ -136,7 +131,7 @@ calmer motion when the phone asks for reduced motion. Values in
 
 - [x] Phase 0: project docs. CLAUDE.md, SPEC.md, DESIGN.md, the docs
   folder and Jose's shared rules (2026-11-20).
-- [ ] Phase 1: bring in the app and publish it.
+- [x] Phase 1: bring in the app and publish it (2026-11-20).
   - [x] Code in, from the zip (no `node_modules`, `dist`, backups or
     photos); its CLAUDE.md, AGENTS.md and HANDOFF.md folded into these
     docs.
@@ -145,8 +140,8 @@ calmer motion when the phone asks for reduced motion. Values in
     publishes `main`.
   - [x] Pages on (Source: GitHub Actions); published and checked live on
     2026-11-20 (restore, looks and offline all work at the address).
-  - [ ] Marce backs up on her PC and restores in the iPhone home-screen
-    app.
+  - [x] Marce backed up on her PC and restored in the iPhone home-screen
+    app (Jose confirmed, 2026-11-20).
   - Done when: the check is green, the app is live at its address, and
     Marce's closet opens in the iPhone home-screen app.
 - [ ] Phase next: to decide with Jose.

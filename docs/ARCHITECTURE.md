@@ -13,14 +13,12 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   (`apple-mobile-web-app-*`, `theme-color`, manifest link, icon).
 - `vite.config.ts`: build and test settings; `base: './'` makes every
   built path relative, so the app works in Pages' sub-folder. `tsconfig.json`: types.
-- `wrangler.jsonc`: Cloudflare hosting settings from the zip. Not used:
-  the host is GitHub Pages (Jose, 2026-11-20); Phase 1 asks before
-  removing it.
 - `public/`: copied as is into `dist/`.
   - `sw.js`: the offline worker.
   - `manifest.webmanifest`, `icon-192.png`, `icon-512.png`,
     `icon-maskable-512.png`, `apple-touch-icon.png`: install info and
-    icons.
+    icons, drawn by `assets/icons/make-icons.mjs` (run by hand, not part
+    of the build; it also writes `scripts/closet.ico`).
 - `src/main.tsx`: starts the app and registers `./sw.js` (only in a built
   version, `import.meta.env.PROD`).
 - `src/App.tsx`: switches between the three pages by the address's `#/`

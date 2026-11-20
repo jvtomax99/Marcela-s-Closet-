@@ -93,3 +93,14 @@ Big serif numbers ("Nº 07") use old-style figures (`.oldstyle`).
 - Laptop (`md`, 768 px and up): a magazine masthead along the top ("The
   ... edit" on the left, the italic serif name in the middle); forms in a
   centered panel.
+
+## App icons
+
+Drawn by `assets/icons/make-icons.mjs` with the light-mode tokens: an
+italic Cormorant Garamond "C" in `--accent` on a `--sand` photo inside a
+`--mat` print, tilted -4 degrees on `--board` with a soft print shadow,
+the same idea as the outfit collage. The maskable icon shrinks the print
+to stay inside Android's safe circle. At 16 and 32 px (Windows `.ico`)
+the print is dropped and only the bold "C" on `--board` remains; the tab
+icon in `index.html` is that same small version. Change the colors here
+and in the script together, then run it again.
