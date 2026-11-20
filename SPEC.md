@@ -32,7 +32,7 @@ https://jvtomax99.github.io/Marcela-s-Closet-/ (GitHub Pages, from `main`).
   people (and two AI tools) write to this repo, and every session must
   fetch before writing, as in Jose's Interp and Vibe-coding-guide repos.
 
-## Features (all built in the zip, not yet in this repo)
+## Features (all built; not published yet)
 
 ### Closet (catalog)
 Add a piece with a photo and its details: category (top, bottom, dress,
@@ -126,12 +126,17 @@ calmer motion when the phone asks for reduced motion. Values in
 
 - [x] Phase 0: project docs. CLAUDE.md, SPEC.md, DESIGN.md, the docs
   folder and Jose's shared rules (2026-11-20).
-- [ ] Phase 1: bring in the app. Commit the zip's code (no `node_modules`,
-  `dist`, backups or photos), fold its CLAUDE.md, AGENTS.md and HANDOFF.md
-  into these docs, add a GitHub check (test, typecheck, build) on every
-  pull request, make the paths work in a sub-folder, publish on GitHub
-  Pages with a build Action, then Marce moves her closet
-  over with Back up and Restore.
+- [ ] Phase 1: bring in the app and publish it.
+  - [x] Code in, from the zip (no `node_modules`, `dist`, backups or
+    photos); its CLAUDE.md, AGENTS.md and HANDOFF.md folded into these
+    docs.
+  - [x] Works in GitHub Pages' sub-folder; the offline copy stays in its
+    own folder and cache; "App checks" on every pull request; a workflow
+    publishes `main`.
+  - [ ] Jose turns on Pages (Source: GitHub Actions), the first publish
+    runs, and the app opens at its address on his phone.
+  - [ ] Marce backs up on her PC and restores in the iPhone home-screen
+    app.
   - Done when: the check is green, the app is live at its address, and
     Marce's closet opens in the iPhone home-screen app.
 - [ ] Phase next: to decide with Jose.

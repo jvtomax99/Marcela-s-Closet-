@@ -12,10 +12,9 @@ FILL for Jose), `docs/ARCHITECTURE.md` (map of files and how data moves),
 
 ## Status (2026-11-20)
 
-The repo holds only these docs. The app itself came as a zip (`Closet
-App/`, built on Marce's Windows PC: React, TypeScript, Vite) and is not
-committed yet. Bringing it in is Phase 1 in `SPEC.md`. Until then, the
-code facts below describe the zip.
+The app's code is in (from Marce's zip, built on her Windows PC) and set
+up for GitHub Pages. Not published yet: Phase 1 in `SPEC.md` ends when it
+is live and her closet is moved over.
 
 ## Rules for this repo
 
@@ -43,8 +42,8 @@ code facts below describe the zip.
   a new address, or changing the hosting, gives her an empty app there:
   warn Jose first, and plan the Back up / Restore step with her.
 - **Offline worker.** `public/sw.js` keeps a copy of the app (internet
-  first, the copy when there's none) in the cache `closet-app`. It never
-  holds the closet itself.
+  first, the copy when there's none) in the cache
+  `closet-app:/Marcela-s-Closet-/`. It never holds the closet itself.
 - **Public repo.** Never commit her clothing photos, a closet backup
   (`closet-backup-*.json`, photos inside; `.gitignore` blocks it) or
   anything personal of hers. Paid raw files
@@ -72,19 +71,20 @@ code facts below describe the zip.
 ## Preview, checks and going live
 
 - **Checks.** `npm test`, `npm run typecheck` and `npm run build` must all
-  pass before asking Jose to push. A GitHub check that runs them on every
-  pull request is part of Phase 1.
-- **Preview.** Build, run `npm run preview`, and send Playwright
-  screenshots at 390 px, then 1440 px, plus a "try this" list. The app
+  pass before asking Jose to push. `.github/workflows/check.yml` ("App
+  checks") runs them on every pull request.
+- **Preview.** Build, serve `dist/` from a parent folder as
+  `/Marcela-s-Closet-/` (as Pages does), and send Playwright screenshots at 390 px, then 1440 px, plus a "try this" list. The app
   starts empty: add a top, a bottom and shoes with photos (stand-in
-  pictures made for the test, never hers) to see looks.
+  pictures made for the test, never hers) to see looks. Restoring a made-up backup file through the Restore
+  button is the quick way.
 - **Hosting: GitHub Pages** (Jose, 2026-11-20), at
   `https://jvtomax99.github.io/Marcela-s-Closet-/` (the path is
   case-sensitive). The zip expects the root of an address, so Phase 1 must:
-  set `base` in `vite.config.ts`; make the paths in `index.html`,
-  `src/main.tsx`, `public/sw.js` and `public/manifest.webmanifest`
-  relative; and build with a GitHub Action (`npm ci`, test, build, publish
-  `dist/`), since Pages can't build it itself. Relative paths only: a link
+  relative paths everywhere (`base: './'` in `vite.config.ts`, `index.html`,
+  `src/main.tsx`, `public/sw.js`, `public/manifest.webmanifest`), and
+  `.github/workflows/pages.yml` tests, builds and publishes `dist/` on
+  every push to `main`, since Pages can't build it itself. Relative paths only: a link
   starting with `/` breaks there.
 - **Shared address.** Jose's other Pages sites live on the same
   `jvtomax99.github.io`, so they share storage with her closet. The worker
