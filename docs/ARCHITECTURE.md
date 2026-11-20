@@ -13,8 +13,9 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
 - `index.html`: the page shell and the iPhone home-screen settings
   (`apple-mobile-web-app-*`, `theme-color`, manifest link, icon).
 - `vite.config.ts`: build and test settings. `tsconfig.json`: types.
-- `wrangler.jsonc`: Cloudflare hosting settings (only used if Cloudflare
-  is the host).
+- `wrangler.jsonc`: Cloudflare hosting settings from the zip. Not used:
+  the host is GitHub Pages (Jose, 2026-11-20); Phase 1 asks before
+  removing it.
 - `public/`: copied as is into `dist/`.
   - `sw.js`: the offline worker.
   - `manifest.webmanifest`, `icon-192.png`, `icon-512.png`,

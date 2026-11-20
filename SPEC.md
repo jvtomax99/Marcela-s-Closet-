@@ -16,7 +16,8 @@ photos as tilted prints on a board.
 It runs in the browser, installs on an iPhone home screen, works offline,
 and keeps everything on her device. No accounts, no server.
 
-Live: not published yet (see "Open decisions").
+Live: not published yet. It will be at
+https://jvtomax99.github.io/Marcela-s-Closet-/ (GitHub Pages, from `main`).
 
 ## Who it's for
 
@@ -87,21 +88,15 @@ calmer motion when the phone asks for reduced motion. Values in
 
 ## Open decisions
 
-1. **Hosting** (Phase 1). The app must move off `localhost` to a real
-   address. Whatever we pick, her closet starts empty there: she backs up
-   on the PC and restores on the phone.
-   - **Vercel** (recommended): its own address at the root, so no code
-     changes; a preview link for every branch, so Marce can try a change
-     before it goes live (none of Jose's GitHub Pages apps have that);
-     works if the repo goes private later. Jose already uses it for Interp.
-   - **GitHub Pages**: same as Jose's other sites and free, but it serves
-     the app at `/Marcela-s-Closet-/`, which needs path changes in five
-     files, and it shares one address (`jvtomax99.github.io`) and its
-     storage with his other apps, so clearing that site's data in Safari
-     would also wipe her closet. Needs a build workflow, since this app
-     has a build step.
-   - **Cloudflare**: what the zip was set up for (`wrangler.jsonc`), own
-     address, but a new account and dashboard for Jose.
+1. **Hosting: decided, GitHub Pages** (Jose, 2026-11-20), at
+   `https://jvtomax99.github.io/Marcela-s-Closet-/`. Same as his other
+   sites, and free. Costs Phase 1 has to cover: path changes in five files
+   (the app expected the root of an address), a GitHub Action to build and
+   publish, and a shared address with his other apps, so clearing that
+   site's data in Safari would also wipe her closet (she keeps a recent
+   backup). Wherever it's published, her closet starts empty there: she
+   backs up on the PC and restores on the phone. Vercel and Cloudflare
+   were the other options; both give the app its own address.
 2. **Asset budget.** TO FILL (`docs/assets.md` asks for one up front).
    Background removal for photos may need a paid service or a large
    library.
@@ -134,7 +129,8 @@ calmer motion when the phone asks for reduced motion. Values in
 - [ ] Phase 1: bring in the app. Commit the zip's code (no `node_modules`,
   `dist`, backups or photos), fold its CLAUDE.md, AGENTS.md and HANDOFF.md
   into these docs, add a GitHub check (test, typecheck, build) on every
-  pull request, decide hosting and publish, then Marce moves her closet
+  pull request, make the paths work in a sub-folder, publish on GitHub
+  Pages with a build Action, then Marce moves her closet
   over with Back up and Restore.
   - Done when: the check is green, the app is live at its address, and
     Marce's closet opens in the iPhone home-screen app.

@@ -78,12 +78,21 @@ code facts below describe the zip.
   screenshots at 390 px, then 1440 px, plus a "try this" list. The app
   starts empty: add a top, a bottom and shoes with photos (stand-in
   pictures made for the test, never hers) to see looks.
-- **Hosting.** TO DECIDE in Phase 1, with Jose. The zip is set up for
-  Cloudflare (`wrangler.jsonc`) and expects to live at the root of an
-  address (`/sw.js`, `/manifest.webmanifest`, `start_url: "/"`). GitHub
-  Pages would serve it at `/Marcela-s-Closet-/`, which needs those paths
-  changed, and shares one address (and its storage) with Jose's other
-  apps. The options are in `SPEC.md`, "Open decisions".
+- **Hosting: GitHub Pages** (Jose, 2026-11-20), at
+  `https://jvtomax99.github.io/Marcela-s-Closet-/` (the path is
+  case-sensitive). The zip expects the root of an address, so Phase 1 must:
+  set `base` in `vite.config.ts`; make the paths in `index.html`,
+  `src/main.tsx`, `public/sw.js` and `public/manifest.webmanifest`
+  relative; and build with a GitHub Action (`npm ci`, test, build, publish
+  `dist/`), since Pages can't build it itself. Relative paths only: a link
+  starting with `/` breaks there.
+- **Shared address.** Jose's other Pages sites live on the same
+  `jvtomax99.github.io`, so they share storage with her closet. The worker
+  only ever opens, matches or deletes its own cache (named with the
+  `/Marcela-s-Closet-/` path), never another app's, and its fallback page
+  is the app's own folder, not `/`. Never rename the database `closet`.
+  Clearing that site's data in Safari would wipe her closet too: remind
+  her to keep a recent backup.
 - **Going live.** Into `main` by pull request, phone notification that it
   needs Jose's "push", wait for his OK, then one line on how to undo it.
 
