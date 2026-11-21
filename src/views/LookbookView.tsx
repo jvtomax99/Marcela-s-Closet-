@@ -66,7 +66,7 @@ function SavedLook({ track, look, items, wears, onWore }: SavedLookProps) {
               onClick={onWore}
               className="flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface pr-4 pl-3 text-button font-medium whitespace-nowrap text-ink transition-colors hover:border-muted active:scale-[0.97]"
             >
-              <Icon name="hanger" tone="mango" className="size-5" />
+              <Icon name="hanger" className="size-[1.375rem]" />
               Wore it
             </button>
             <button

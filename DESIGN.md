@@ -5,7 +5,7 @@ then restyled the same day as "Salsa caleña" (Jose's pick of two mockups):
 fashion lookbook with a Cali, Colombia and music flavor, and structure
 borrowed from Jose's Interpreter Hub (its `DESIGN.md`): the script hello,
 the floating capsule tab bar, cards with one shared lifted shadow, and
-two-tone icons. Not borrowed on purpose: the Hub's hospital blues and its
+icons with a color fill (now bold stickers). Not borrowed on purpose: the Hub's hospital blues and its
 soft-3D clip-art pins, which would cheapen real clothing photos. Take values from here or from
 `src/index.css`, never from memory, and change this file in the same commit
 when a value changes.
@@ -41,6 +41,9 @@ Dark mode follows the phone's setting (`prefers-color-scheme`).
 | `--mango` | `#f4a63a` | `#f6b65a` | icon blobs only (Closet, Wore it) |
 | `--palm` | `#1f8a5b` | `#4cc08a` | icon blobs only (Lookbook) |
 | `--mat` | `#fffdf8` | `#f3e9ec` | the white border of each photo print |
+| `--icon-line` | `#2b1a22` | `#f6eaf0` | the sticker icons' outline |
+| `--vinyl` | `#2b1a22` | `#120b0f` | the record icon's body |
+| `--accent-soft` | `#fbe3ec` | `#3d1a2a` | behind a chosen chip ("Saved"), hibiscus text on it is 4.7:1 |
 | `--glass` | white at 72% | `#251a20` at 72% | the floating tab bar and the "Now playing" pill, over a blur |
 
 Shadows and glow:
@@ -130,17 +133,21 @@ Big serif numbers ("Nº 07") use old-style figures (`.oldstyle`).
   `--surface` pill that slides between tabs (spring 420/36). Forms in
   sheets that slide up from the bottom. Laptop keeps the magazine
   masthead.
-- Icons are thin line drawings with an optional two-tone blob
-  (`Icon` `tone`: `accent` at 30%, `mango` or `palm` at 50%) spilling to
-  the lower right, after the Hub's duotone icons. Tabs: Closet a hanger on
-  mango, Looks two prints on hibiscus, Lookbook a record on palm.
+- Icons are bold "stickers" (Jose, 2026-11-21: the thin lines looked too
+  minimal): chunky filled shapes in the palette with a 1.5 px
+  `--icon-line` outline and a small white shine, still flat so the photos
+  stay the star (`src/components/Icon.tsx`). Closet: a mango hanger with a
+  hibiscus bow. Looks: two prints, palm and hibiscus. Lookbook: a record
+  (`--vinyl`) with a hibiscus label. Heart: white when not chosen,
+  hibiscus when saved or a favorite. Plus, close and arrow stay line
+  icons, 1.75 px. Tab icons are 28 px, button icons 22 px.
 - Looks: "Hola, Marce" in script, the day's Cali saying in serif italic
   with its source in small caps (`DICHOS` in `src/lib/labels.ts`), then
   the filter sentence. Above the looks a `--glass` "Now playing" pill with
   four small hibiscus bars that bob (still for reduced motion) and the
   count of "tracks". Each look is a white card: the board, "Track" in
   small caps over the italic number, the note, the pieces, then pill
-  buttons: Save (filled hibiscus when saved), Wore it (mango hanger), Not
+  buttons: Save (`--accent-soft` with a hibiscus border and text when saved), Wore it (mango hanger), Not
   for me (plain text).
 - Lookbook: the same cards, "Track 01 · Saved November 20" over the
   look's name.
@@ -181,12 +188,13 @@ Big serif numbers ("Nº 07") use old-style figures (`.oldstyle`).
 
 ## App icons
 
-Drawn by `assets/icons/make-icons.mjs` with the light-mode tokens (redrawn
-in the Salsa caleña colors): an italic Cormorant Garamond "C" in
-`--accent` (hibiscus) on a `--sand` photo inside a
-`--mat` print, tilted -4 degrees on `--board` with a soft print shadow,
-the same idea as the outfit collage. The maskable icon shrinks the print
-to stay inside Android's safe circle. At 16 and 32 px (Windows `.ico`)
-the print is dropped and only the bold "C" on `--board` remains; the tab
-icon in `index.html` is that same small version. Change the colors here
-and in the script together, then run it again.
+A magazine cover (Jose's pick "C1b" after several rounds, 2026-11-21),
+drawn by `assets/icons/make-icons.mjs`: Marce in front of her wardrobe
+(`assets/icons/cover-photo.jpg`, cropped from the last frame of the
+intro clip, so it's the AI-made scene she approved, never one of her
+photos), a `--canvas` cream fade over the top 40%, a small "CLOSET" in
+Inter 600 with wide spacing in `--muted`, and "Marce" in the greeting's
+Parisienne in `--accent`, both above her head. The maskable icon draws
+the words smaller toward the middle so Android's circle keeps them. At
+48 px and under (Windows `.ico`) the words go and only her face shows,
+closer. The browser tab icon in `index.html` stays the small "C".

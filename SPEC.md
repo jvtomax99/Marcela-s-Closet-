@@ -148,6 +148,8 @@ Runway, music with ElevenLabs (`CREDITS.md`).
   2026-11-20 (through Jose). Three of her photos (a selfie, the green
   dress, a full-length shot) were uploaded to Runway as references; they
   are not in this repo. Runway may train on uploads under standard plans.
+  Marce also agreed (2026-11-21, through Jose) to her face on the app
+  icon, cropped from the clip's last frame.
 - Done when: in the iPhone home-screen app, every launch shows the closed
   wardrobe within a second; "Open with sound" plays the clip with music
   and lands on the Closet page; "Open quietly" does the same silently;

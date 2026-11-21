@@ -1,7 +1,4 @@
-// Draws the app icons: an italic serif "C" on a photo print pinned at a
-// slight angle on the paper board, the same look as the outfit collage.
-// Colors are the light-mode tokens from src/index.css (--board, --mat,
-// --sand, --accent). Not part of the build; run by hand after `npm install`
+// Draws the app icons (see page() below). Not part of the build; run by hand after `npm install`
 // with the installed Playwright:  node assets/icons/make-icons.mjs
 // Writes public/icon-192.png, icon-512.png, icon-maskable-512.png,
 // apple-touch-icon.png and scripts/closet.ico.
@@ -12,32 +9,35 @@ import { fileURLToPath } from 'node:url'
 // Playwright is not in package.json: use the copy installed on the machine
 const { chromium } = createRequire(import.meta.url)('playwright')
 const root = fileURLToPath(new URL('../../', import.meta.url))
-const font = readFileSync(
-  root + 'node_modules/@fontsource-variable/cormorant-garamond/files/cormorant-garamond-latin-wght-italic.woff2',
-).toString('base64')
 
-// card: print width as a share of the icon (maskable keeps inside the safe circle)
-function page(size, card) {
-  // too small for the print to read: just the letter on the board
-  if (card === 0) return `<!doctype html><html><head><style>
-  @font-face { font-family: C; src: url(data:font/woff2;base64,${font}); font-style: italic; font-weight: 300 700; }
+const inter = readFileSync(root + 'node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2').toString('base64')
+const script = readFileSync(root + 'node_modules/@fontsource/parisienne/files/parisienne-latin-400-normal.woff2').toString('base64')
+// Marce from the intro clip's last frame (AI-made, approved by her for the intro and, on
+// 2026-11-21, for the icon; her own photos are never in the repo).
+const photo = 'data:image/jpeg;base64,' + readFileSync(root + 'assets/icons/cover-photo.jpg').toString('base64')
+
+// The icon (Jose's pick "C1b", 2026-11-21): a magazine cover. Marce in front of her wardrobe,
+// a cream fade at the top, a small "CLOSET" over "Marce" in the greeting's script, both above
+// her head. `scale` shrinks the words toward the middle (maskable icons keep inside Android's
+// safe circle); 0 means too small for words: just her face, closer.
+function page(size, scale) {
+  const head = `<!doctype html><html><head><style>
+  @font-face { font-family: I; src: url(data:font/woff2;base64,${inter}); font-weight: 100 900; }
+  @font-face { font-family: P; src: url(data:font/woff2;base64,${script}); }
   html, body { margin: 0; width: ${size}px; height: ${size}px; overflow: hidden; }
-  body { background: #f7e6d8; display: grid; place-items: center; }
-  .c { font: italic 700 ${size * 1.2}px/1 C; color: #c2255c; transform: translate(-3%, -2%); }
-  </style></head><body><span class="c">C</span></body></html>`
-  const w = size * card
-  const h = w * 1.25
-  return `<!doctype html><html><head><style>
-  @font-face { font-family: C; src: url(data:font/woff2;base64,${font}); font-style: italic; font-weight: 300 700; }
-  html, body { margin: 0; width: ${size}px; height: ${size}px; overflow: hidden; }
-  body { background: #f7e6d8; display: grid; place-items: center; }
-  .print { width: ${w}px; height: ${h}px; box-sizing: border-box; padding: ${w * 0.07}px;
-    background: #fffdf8; transform: rotate(-4deg);
-    box-shadow: 0 ${size * 0.004}px ${size * 0.004}px rgb(60 30 40 / 0.08),
-      0 ${size * 0.03}px ${size * 0.06}px -${size * 0.012}px rgb(60 30 40 / 0.28); }
-  .photo { width: 100%; height: 100%; background: #f3e4d8; display: grid; place-items: center; }
-  .c { font: italic 500 ${w * 0.78}px/1 C; color: #c2255c; transform: translate(-2%, -3%); }
-  </style></head><body><div class="print"><div class="photo"><span class="c">C</span></div></div></body></html>`
+  body { position: relative; background: #fbf3ea url(${photo}) center / cover; }`
+  if (scale === 0)
+    return `${head} body { background-size: 230%; background-position: 54% 48%; } </style></head><body></body></html>`
+  const u = (n) => n * size
+  const top = (1 - scale) * 0.5
+  return `${head}
+  .fade { position: absolute; inset: 0; background: linear-gradient(180deg, rgb(251 243 234 / 0.96) 0,
+    rgb(251 243 234 / 0.7) ${(top + 0.22 * scale) * 100}%, rgb(251 243 234 / 0) ${(top + 0.4 * scale) * 100}%); }
+  .k { position: absolute; top: ${u(top + 0.045 * scale)}px; left: 0; right: 0; text-align: center;
+    font: 600 ${u(0.045 * scale)}px/1 I; letter-spacing: 0.35em; padding-left: 0.35em; color: #6e5a63; }
+  .m { position: absolute; top: ${u(top + 0.075 * scale)}px; left: 0; right: 0; text-align: center;
+    font: 400 ${u(0.2 * scale)}px/1.1 P; color: #c2255c; }
+  </style></head><body><div class="fade"></div><div class="k">CLOSET</div><div class="m">Marce</div></body></html>`
 }
 
 // Windows .ico holding PNG images (allowed since Vista)
@@ -65,13 +65,13 @@ async function shot(size, card) {
   return buf
 }
 
-writeFileSync(root + 'public/icon-512.png', await shot(512, 0.56))
-writeFileSync(root + 'public/icon-192.png', await shot(192, 0.56))
-writeFileSync(root + 'public/apple-touch-icon.png', await shot(180, 0.56))
-writeFileSync(root + 'public/icon-maskable-512.png', await shot(512, 0.46))
+writeFileSync(root + 'public/icon-512.png', await shot(512, 1))
+writeFileSync(root + 'public/icon-192.png', await shot(192, 1))
+writeFileSync(root + 'public/apple-touch-icon.png', await shot(180, 1))
+writeFileSync(root + 'public/icon-maskable-512.png', await shot(512, 0.8))
 const icoSizes = [16, 32, 48, 256]
 const icoPngs = []
-for (const size of icoSizes) icoPngs.push({ size, buf: await shot(size, size <= 32 ? 0 : 0.6) })
+for (const size of icoSizes) icoPngs.push({ size, buf: await shot(size, size <= 48 ? 0 : 1) })
 writeFileSync(root + 'scripts/closet.ico', ico(icoPngs))
 await browser.close()
 console.log('icons written')

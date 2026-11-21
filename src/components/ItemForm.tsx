@@ -69,7 +69,7 @@ function WornLine({ itemId, wears }: { itemId: string; wears: Wear[] }) {
           wornToday ? 'text-accent' : 'text-ink hover:text-accent'
         }`}
       >
-        <Icon name="hanger" className="size-4" />
+        <Icon name="hanger" className="size-5" />
         {wornToday ? 'Worn today · Undo' : 'Wore it today'}
       </button>
     </div>

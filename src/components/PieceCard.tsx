@@ -48,8 +48,8 @@ export function PieceCard({ item, index, onOpen }: PieceCardProps) {
           item.favorite ? 'text-accent' : 'text-ink/55 hover:text-ink'
         }`}
       >
-        <span className="grid size-8 place-items-center rounded-full bg-mat/90 shadow-print">
-          <Icon name="heart" filled={item.favorite} className="size-4" />
+        <span className="grid size-8 place-items-center rounded-full bg-surface/90 shadow-print">
+          <Icon name="heart" filled={item.favorite} className="size-5" />
         </span>
       </button>
     </motion.div>

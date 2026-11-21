@@ -52,10 +52,10 @@ export const LookCard = forwardRef<HTMLElement, LookCardProps>(function LookCard
           aria-pressed={saved}
           onClick={onToggleSave}
           className={`flex h-11 items-center gap-1.5 rounded-full border pr-4 pl-3 text-button font-medium transition-colors active:scale-[0.97] ${
-            saved ? 'border-accent bg-accent text-on-accent' : 'border-line bg-surface text-ink hover:border-muted'
+            saved ? 'border-accent bg-accent-soft text-accent' : 'border-line bg-surface text-ink hover:border-muted'
           }`}
         >
-          <Icon name="heart" filled={saved} tone={saved ? undefined : 'accent'} className="size-5" />
+          <Icon name="heart" filled={saved} className="size-[1.375rem]" />
           {saved ? 'Saved' : 'Save'}
         </button>
         <button
@@ -63,7 +63,7 @@ export const LookCard = forwardRef<HTMLElement, LookCardProps>(function LookCard
           onClick={onWore}
           className="flex h-11 items-center gap-1.5 rounded-full border border-line bg-surface pr-4 pl-3 text-button font-medium text-ink transition-colors hover:border-muted active:scale-[0.97]"
         >
-          <Icon name="hanger" tone="mango" className="size-5" />
+          <Icon name="hanger" className="size-[1.375rem]" />
           Wore it
         </button>
         <button

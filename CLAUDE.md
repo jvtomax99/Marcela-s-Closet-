@@ -48,8 +48,10 @@ Jose (`SPEC.md`, Later).
 - **Public repo.** Never commit her clothing photos, a closet backup
   (`closet-backup-*.json`, photos inside; `.gitignore` blocks it) or
   anything personal of hers. One exception: the intro's AI-made scenes
-  of her (`public/intro/`), which Marce approved on 2026-11-20; her
-  original photos still never go in. Paid raw files
+  of her (`public/intro/`), which Marce approved on 2026-11-20, and the
+  app icon made from the clip's last frame (`assets/icons/cover-photo.jpg`
+  and the icons in `public/`), approved 2026-11-21; her original photos
+  still never go in. Paid raw files
   (fonts, models) can't be committed either (`docs/assets.md`, section 9).
   The fonts are free and bundled from npm (`@fontsource-variable/...`).
 - **Design tokens.** Every color, font, shadow and display size is defined

@@ -20,7 +20,8 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
     and the music (`music.m4a` for Safari, `music.webm`, 12 s).
   - `manifest.webmanifest`, `icon-192.png`, `icon-512.png`,
     `icon-maskable-512.png`, `apple-touch-icon.png`: install info and
-    icons, drawn by `assets/icons/make-icons.mjs` (run by hand, not part
+    icons, drawn by `assets/icons/make-icons.mjs` over `assets/icons/cover-photo.jpg`
+    (run by hand, not part
     of the build; it also writes `scripts/closet.ico`).
 - `src/main.tsx`: starts the app and registers `./sw.js` (only in a built
   version, `import.meta.env.PROD`).
@@ -56,7 +57,7 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   with its one-tap favorite heart; used by the Closet and the Lookbook's
   Pieces tab), `Sheet`, `Navigation`, `Chips`,
   `ColorPicker`, `StarRating`, `PageHeader`, `EmptyState`,
-  `BackupControls`, `Icon`, `WornToast` (logs a look as worn, with the
+  `BackupControls`, `Icon` (the sticker icons and three line icons), `WornToast` (logs a look as worn, with the
   change-day and undo bar), `Intro` (the wardrobe intro screen).
 - `src/views/`: the three pages: `ClosetView`, `LooksView`,
   `LookbookView`.
