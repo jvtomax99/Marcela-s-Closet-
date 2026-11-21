@@ -2,6 +2,7 @@ import type { ColorName, Day, Garment, Outfit, Pattern } from '../types'
 import { harmonyOf, isNeutral, type Harmony } from './color'
 import { CORE_CATEGORIES, isBold, sharedOccasions, sharedSeasons } from './rules'
 import { daysUnworn, FORGOTTEN_DAYS, RECENT_DAYS, REPEAT_LOOK_DAYS, spanOfDays, type WearHistory } from './wear'
+import { capitalize } from '../lib/labels'
 
 const BASE_SCORE = 50
 
@@ -222,7 +223,6 @@ function scoreWear(items: Garment[], wear: WearContext | undefined): Scored['rea
   return reasons
 }
 
-const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 const lowerFirst = (text: string) => text.charAt(0).toLowerCase() + text.slice(1)
 
 /** Scores an outfit that already passed the hard rules. */

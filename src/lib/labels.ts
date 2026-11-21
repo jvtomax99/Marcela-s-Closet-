@@ -94,6 +94,9 @@ export const COLOR_SWATCHES: Record<ColorName, string> = {
 }
 
 /** Who the app greets. */
+/** "Black" from "black". */
+export const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
+
 export const OWNER_NAME = 'Marce'
 
 /**

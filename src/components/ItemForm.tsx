@@ -5,6 +5,7 @@ import { newId } from '../lib/id'
 import { photoUrl, preparePhoto } from '../lib/image'
 import { colorFromPhoto as readPhotoColor } from '../lib/photoColor'
 import {
+  capitalize,
   CATEGORY_LABELS,
   FORMALITY_LABELS,
   OCCASION_LABELS,
@@ -33,7 +34,6 @@ import { Icon } from './Icon'
 import { dayLabel } from './WornToast'
 
 const FORMALITIES = [1, 2, 3, 4, 5] as const
-const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 const FABRIC_LABELS = Object.fromEntries(
   FABRICS.map((fabric) => [fabric, capitalize(fabric)]),
 ) as Record<Fabric, string>
