@@ -3,30 +3,31 @@
 Last audit: 2026-11-21, after phase 4 (plus the intro screen, PR #3).
 
 Made by `docs/cleanup-audit.md`. Run with "Refactor: CLEANUP.md items ..."
-(`docs/refactor.md`). Report only: nothing here has been changed yet.
+(`docs/refactor.md`). Items 1 to 5 were done on 2026-11-21 (tests, typecheck, build and a
+pixel-identical screenshot of the Looks screen). 6 to 8 are still open.
 
 Tools: `npx knip`, `npx depcheck`, then each hit checked by hand, plus a
 read of `src/` for duplicates, long functions and abandoned files.
 
 ## Items
 
-1. **`noTaste()` is never used** (`src/engine/score.ts:70`). Defined and
+1. **Done 2026-11-21.** **`noTaste()` is never used** (`src/engine/score.ts:70`). Defined and
    exported, called nowhere, not even in tests. Removing it: less engine
    code to read. Risk: low.
 
-2. **Two copies of `capitalize`** (`src/components/ItemForm.tsx:36` and
+2. **Done 2026-11-21.** **Two copies of `capitalize`** (`src/components/ItemForm.tsx:36` and
    `src/engine/score.ts:231`, identical). One shared copy in the engine
    (which has no React, so the form can import it). Removing the copy:
    one place to change. Risk: low.
 
-3. **Two copies of "a, b and c" list joining** (`src/engine/score.ts:87`
+3. **Done 2026-11-21.** **Two copies of "a, b and c" list joining** (`src/engine/score.ts:87`
    and `src/views/LooksView.tsx:71`). Both glue a list with commas and a
    hard-coded English "and". One helper would fix both, and when Spanish
    comes it becomes "y" in one place instead of two scattered strings.
    Risk: low (the "why this look" wording and the missing-pieces hint both
    need a quick check afterwards).
 
-4. **Exports nobody imports from outside their file**: `hueDistance`
+4. **Done 2026-11-21.** **Exports nobody imports from outside their file**: `hueDistance`
    (`engine/color.ts`), `sharedValues` (`engine/rules.ts`), `isForgotten`
    (`engine/wear.ts`), `DICHOS` (`lib/labels.ts`), `ROUTES`
    (`lib/useRoute.ts`), type `OutfitStatus` (`types/index.ts`). Each is
@@ -35,7 +36,7 @@ read of `src/` for duplicates, long functions and abandoned files.
    `DICHOS` and `OutfitStatus` are named in docs; keep those mentions,
    they still describe where things live.
 
-5. **Unused re-exports**: `CORE_CATEGORIES` from `engine/suggest.ts:14`
+5. **Done 2026-11-21.** **Unused re-exports**: `CORE_CATEGORIES` from `engine/suggest.ts:14`
    (everyone imports it from `rules.ts`), and `daysBetween` from
    `engine/index.ts:3` (the test imports it from `wear.ts`). Removing
    them: one obvious place to import each from. Risk: low.
