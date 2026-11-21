@@ -109,7 +109,7 @@ export const OWNER_NAME = 'Marce'
  * Sayings from Cali for the greeting, one a day. Real local sayings and nicknames, not song
  * lyrics. Marce can change or add to these.
  */
-export const DICHOS: { text: string; source: string }[] = [
+const DICHOS: { text: string; source: string }[] = [
   { text: 'Cali es Cali, lo demás es loma.', source: 'Dicho caleño' },
   { text: 'Cali, la sucursal del cielo.', source: 'Así le dicen a Cali' },
   { text: 'Oiga, mire, vea.', source: 'El saludo de Cali' },

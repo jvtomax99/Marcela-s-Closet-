@@ -78,7 +78,7 @@ export function daysUnworn(item: Garment, history: WearHistory, today: Day): num
   return Math.min(history.loggingFor, added)
 }
 
-export function isForgotten(item: Garment, history: WearHistory, today: Day): boolean {
+function isForgotten(item: Garment, history: WearHistory, today: Day): boolean {
   const unworn = daysUnworn(item, history, today)
   return unworn !== null && unworn >= FORGOTTEN_DAYS
 }
