@@ -45,6 +45,10 @@ Jose (`SPEC.md`, Later).
 - **Offline worker.** `public/sw.js` keeps a copy of the app (internet
   first, the copy when there's none) in the cache
   `closet-app:/Marcela-s-Closet-/`. It never holds the closet itself.
+- **Updates itself.** `src/components/UpdateBar.tsx` spots a new published
+  version and reloads (or asks while a form is open). Never tell anyone to
+  delete and re-add the home-screen app to update it: on iPhone that
+  deletes her closet.
 - **Public repo.** Never commit her clothing photos, a closet backup
   (`closet-backup-*.json`, photos inside; `.gitignore` blocks it) or
   anything personal of hers. One exception: the intro's AI-made scenes
@@ -69,7 +73,7 @@ Jose (`SPEC.md`, Later).
 
 ## Commands
 
-- `npm install`, then `npm test` (73 tests), `npm run typecheck`,
+- `npm install`, then `npm test` (76 tests), `npm run typecheck`,
   `npm run build` (into `dist/`).
 - `npm run dev` for working, `npm run preview` (port 4173) to see the built
   app; offline support only runs in `preview`.
