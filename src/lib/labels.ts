@@ -97,6 +97,12 @@ export const COLOR_SWATCHES: Record<ColorName, string> = {
 /** "Black" from "black". */
 export const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 
+/** "a, b and c": the one place a list's "and" lives, for the Spanish dictionary later. */
+export function joinWithAnd(list: string[]): string {
+  if (list.length <= 1) return list[0] ?? ''
+  return `${list.slice(0, -1).join(', ')} and ${list[list.length - 1]}`
+}
+
 export const OWNER_NAME = 'Marce'
 
 /**

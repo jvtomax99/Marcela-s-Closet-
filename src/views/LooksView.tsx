@@ -8,7 +8,7 @@ import { Sheet } from '../components/Sheet'
 import { useWornLog } from '../components/WornToast'
 import { hideLook, removeLook, saveLook } from '../db'
 import { suggestOutfits, toDay } from '../engine'
-import { dichoOfTheDay, FORMALITY_LABELS, OCCASION_PHRASES, OWNER_NAME, SEASON_LABELS } from '../lib/labels'
+import { dichoOfTheDay, FORMALITY_LABELS, joinWithAnd, OCCASION_PHRASES, OWNER_NAME, SEASON_LABELS } from '../lib/labels'
 import { goTo } from '../lib/useRoute'
 import {
   OCCASIONS,
@@ -68,7 +68,7 @@ function missingPieces(items: ClothingItem[]): string | null {
   }
   if (!has('shoes')) missing.push('a pair of shoes')
   if (missing.length === 0) return null
-  return missing.length === 1 ? missing[0] : `${missing.slice(0, -1).join(', ')} and ${missing.at(-1)}`
+  return joinWithAnd(missing)
 }
 
 export function LooksView({ items, outfits, wears, filters, onFilters }: LooksViewProps) {

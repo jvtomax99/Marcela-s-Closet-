@@ -1,8 +1,8 @@
-import type { ColorName, Day, Garment, Outfit, Pattern } from '../types'
+import type { Day, Garment, Outfit, Pattern } from '../types'
 import { harmonyOf, isNeutral, type Harmony } from './color'
 import { CORE_CATEGORIES, isBold, sharedOccasions, sharedSeasons } from './rules'
 import { daysUnworn, FORGOTTEN_DAYS, RECENT_DAYS, REPEAT_LOOK_DAYS, spanOfDays, type WearHistory } from './wear'
-import { capitalize } from '../lib/labels'
+import { capitalize, joinWithAnd } from '../lib/labels'
 
 const BASE_SCORE = 50
 
@@ -77,11 +77,6 @@ const HARMONY_LABEL: Record<Exclude<Harmony, 'clash'>, string> = {
   complementary: 'opposites on the color wheel',
 }
 
-function joinColors(colors: ColorName[]): string {
-  if (colors.length <= 1) return colors[0] ?? ''
-  return `${colors.slice(0, -1).join(', ')} and ${colors[colors.length - 1]}`
-}
-
 function scoreColor(items: Garment[]): Scored['reasons'] {
   const mains = items.map((item) => item.colors[0])
   const accents = [...new Set(mains.filter((color) => !isNeutral(color)))]
@@ -89,7 +84,7 @@ function scoreColor(items: Garment[]): Scored['reasons'] {
   const reasons: Scored['reasons'] = []
 
   if (accents.length === 0) {
-    reasons.push({ weight: 10, text: `A quiet palette of ${joinColors(neutrals.slice(0, 3))}` })
+    reasons.push({ weight: 10, text: `A quiet palette of ${joinWithAnd(neutrals.slice(0, 3))}` })
   } else if (accents.length === 1) {
     const anchor = neutrals[0]
     reasons.push(
