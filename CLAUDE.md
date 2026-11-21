@@ -91,7 +91,11 @@ Jose (`SPEC.md`, Later).
   `public/sw.js`, `public/manifest.webmanifest`): a link starting with `/`
   breaks. Pages can't build the app itself, so
   `.github/workflows/pages.yml` tests, builds and publishes `dist/` on
-  every push to `main`. Cloudflare and Vercel would each give a different
+  every push to `main`. The repo's Settings, Pages, Source must stay on
+  "GitHub Actions": on "Deploy from a branch" GitHub also publishes the
+  raw source over the built app and her app opens blank (happened
+  2026-11-20, fixed 2026-11-21). After every merge, check the live page
+  loads `assets/*.js`, not `/src/main.tsx`. Cloudflare and Vercel would each give a different
   address with an empty closet; the Cloudflare setup from the zip was
   removed on purpose.
 - **Shared address.** Jose's other Pages sites live on the same
