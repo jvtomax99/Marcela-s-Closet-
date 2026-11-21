@@ -67,12 +67,6 @@ export function buildTaste(outfits: Outfit[]): Taste {
   return { ratedLooks, itemRatings, hiddenPairs }
 }
 
-export const noTaste = (): Taste => ({
-  ratedLooks: new Map(),
-  itemRatings: new Map(),
-  hiddenPairs: new Map(),
-})
-
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
 const HARMONY_LABEL: Record<Exclude<Harmony, 'clash'>, string> = {
