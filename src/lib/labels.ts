@@ -134,3 +134,9 @@ export const INTRO_LABELS = {
   mute: 'Mute music',
   unmute: 'Play music',
 } as const
+
+/** The bar offered when a new version arrives while a form is open. */
+export const UPDATE_LABELS = {
+  ready: 'A new version of Closet is ready.',
+  update: 'Update',
+} as const

@@ -44,6 +44,8 @@ export function Sheet({ open, onClose, title, children }: SheetProps) {
             role="dialog"
             aria-modal="true"
             aria-label={title}
+            // Tells the update check a form is open, so it asks instead of reloading.
+            data-sheet=""
             tabIndex={-1}
             className="grain relative max-h-[92dvh] w-full overflow-y-auto rounded-t-[1.75rem] bg-canvas shadow-2xl outline-none md:max-w-xl md:rounded-[1.75rem]"
             initial={{ y: '100%' }}

@@ -3,6 +3,7 @@ import { AnimatePresence, MotionConfig, motion } from 'framer-motion'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Intro } from './components/Intro'
 import { Navigation } from './components/Navigation'
+import { UpdateBar } from './components/UpdateBar'
 import { db } from './db'
 import { shouldShowIntro } from './lib/intro'
 import { goTo, useRoute } from './lib/useRoute'
@@ -49,6 +50,7 @@ export function App() {
         )}
       </div>
       <AnimatePresence>{intro && <Intro key="intro" onDone={() => setIntro(false)} />}</AnimatePresence>
+      <UpdateBar />
     </MotionConfig>
   )
 }

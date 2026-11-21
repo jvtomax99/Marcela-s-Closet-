@@ -133,6 +133,20 @@ calmer motion when the phone asks for reduced motion. Values in
 - Done when: every screen looks right at 390 px and 1440 px, light and
   dark.
 
+### Updates itself (Jose, 2026-11-20)
+Changes published to the site reach the installed app without
+reinstalling it. When the app opens, whenever Marce comes back to it, and
+every half hour, it checks quietly for a newer version and reloads into
+it. If a form is open it shows "A new version of Closet is ready" with an
+Update button instead, so nothing she typed is lost. Offline it does
+nothing. The home-screen icon and name are the one thing it can't
+change: iPhone keeps them as they were when the app was added.
+- Never delete the home-screen app to update it: on iPhone that deletes
+  her closet with it.
+- Done when: after a change is published, coming back to the home-screen
+  app on her iPhone shows the change without reinstalling; with a form
+  open it asks first.
+
 ### Intro screen (in progress, asked for by Jose 2026-11-20)
 Before the app, on every launch: her wardrobe with the doors closed,
 "Marce's Closet" in the magazine serif, and two buttons, "Open with

@@ -14,8 +14,13 @@ self.addEventListener('fetch', (event) => {
   const { request } = event
   if (request.method !== 'GET' || !request.url.startsWith(SCOPE)) return
 
+  // The page itself skips the browser's short-term copy (GitHub Pages allows 10 minutes), so
+  // a new version shows the next time the app opens. Its files have new names per version.
+  const fresh =
+    request.mode === 'navigate' ? fetch(request.url, { cache: 'no-cache', credentials: 'same-origin' }) : fetch(request)
+
   event.respondWith(
-    fetch(request)
+    fresh
       .then((response) => {
         if (response.ok) {
           const copy = response.clone()

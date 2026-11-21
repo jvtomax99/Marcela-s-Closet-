@@ -49,7 +49,8 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
     closet opens intact): 14 tests (with `fake-indexeddb`).
 - `src/lib/`: `labels.ts` (all the words shown for options, plus the
   greeting's name, the daily Cali sayings, `DICHOS`, the intro's words, and the shared `capitalize` and `joinWithAnd` text helpers, which the engine uses too), `intro.ts` (when and how the
-  intro plays; `intro.test.ts`, 4 tests), `image.ts`
+  intro plays; `intro.test.ts`, 4 tests), `update.ts` (spotting a new
+  version; `update.test.ts`, 3 tests), `image.ts`
   (photo shrinking), `photoColor.ts` (reads a photo's main color on the
   phone; `photoColor.test.ts`, 4 tests), `id.ts`, `useRoute.ts` (the `#/` routing).
 - `src/components/`: building blocks: `OutfitCollage` (the moodboard),
@@ -58,7 +59,8 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   Pieces tab), `Sheet`, `Navigation`, `Chips`,
   `ColorPicker`, `StarRating`, `PageHeader`, `EmptyState`,
   `BackupControls`, `Icon` (the sticker icons and three line icons), `WornToast` (logs a look as worn, with the
-  change-day and undo bar), `Intro` (the wardrobe intro screen).
+  change-day and undo bar), `Intro` (the wardrobe intro screen), `UpdateBar` (checks for a new
+  version and reloads, or offers Update while a form is open).
 - `src/views/`: the three pages: `ClosetView`, `LooksView`,
   `LookbookView`.
 - `.github/workflows/`: `check.yml` ("App checks": test, typecheck, build
@@ -111,6 +113,14 @@ analytics.
   the offline worker can't keep). A missing or slow clip (1.5 s after the
   tap) means a fade straight into the app. Music plays through Web Audio,
   started inside the tap. `?intro=0` skips it.
+- **Updates**: `UpdateBar` fetches the page (`./`, never from a cache)
+  when the app opens, when it comes back to the front and every 30
+  minutes, and compares its main script name (`assets/index-<hash>.js`)
+  with the one running. A new name means a new version: it reloads, unless
+  a sheet (`data-sheet`) is open, then it shows an Update bar. It goes for
+  each version once per visit (`sessionStorage` key
+  `closet-update-tried`), so it can't loop. The offline worker fetches the
+  page itself past the browser's 10-minute copy (`cache: 'no-cache'`).
 - **Nothing in `localStorage`.**
 - **Offline copy** (`public/sw.js`): registered from the app's folder, so
   it only sees that folder. Every request inside it goes to the internet

@@ -164,6 +164,13 @@ Big serif numbers ("Nº 07") use old-style figures (`.oldstyle`).
   ... edit" on the left, the italic serif name in the middle); forms in a
   centered panel.
 
+## Update bar (`src/components/UpdateBar.tsx`)
+
+Only while a form is open and a new version is waiting: the same dark
+toast as "Worn" (`bg-ink`, `text-canvas`, `shadow-print`, rounded 2xl,
+above the tab bar on phones, bottom on laptops, same spring), with the
+line in small sans and "Update" as an eyebrow link. No new values.
+
 ## Intro screen (`src/components/Intro.tsx`)
 
 - One scene: `public/intro/closed.webp` (the clip's first frame) while
@@ -198,3 +205,5 @@ Parisienne in `--accent`, both above her head. The maskable icon draws
 the words smaller toward the middle so Android's circle keeps them. At
 48 px and under (Windows `.ico`) the words go and only her face shows,
 closer. The browser tab icon in `index.html` stays the small "C".
+The icon links carry `?v=2` (`index.html`, the manifest): Safari keeps
+home-screen icons in its own cache, so a new icon needs a new number.
