@@ -28,7 +28,7 @@ export type Harmony = 'monochrome' | 'analogous' | 'triadic' | 'complementary' |
 export const isNeutral = (color: ColorName) => NEUTRALS.has(color)
 
 /** The shortest way round the color wheel between two colors (0–180). */
-export function hueDistance(a: ColorName, b: ColorName): number {
+function hueDistance(a: ColorName, b: ColorName): number {
   const diff = Math.abs((HUES[a] ?? 0) - (HUES[b] ?? 0))
   return Math.min(diff, 360 - diff)
 }

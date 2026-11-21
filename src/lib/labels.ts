@@ -94,13 +94,22 @@ export const COLOR_SWATCHES: Record<ColorName, string> = {
 }
 
 /** Who the app greets. */
+/** "Black" from "black". */
+export const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
+
+/** "a, b and c": the one place a list's "and" lives, for the Spanish dictionary later. */
+export function joinWithAnd(list: string[]): string {
+  if (list.length <= 1) return list[0] ?? ''
+  return `${list.slice(0, -1).join(', ')} and ${list[list.length - 1]}`
+}
+
 export const OWNER_NAME = 'Marce'
 
 /**
  * Sayings from Cali for the greeting, one a day. Real local sayings and nicknames, not song
  * lyrics. Marce can change or add to these.
  */
-export const DICHOS: { text: string; source: string }[] = [
+const DICHOS: { text: string; source: string }[] = [
   { text: 'Cali es Cali, lo demás es loma.', source: 'Dicho caleño' },
   { text: 'Cali, la sucursal del cielo.', source: 'Así le dicen a Cali' },
   { text: 'Oiga, mire, vea.', source: 'El saludo de Cali' },

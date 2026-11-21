@@ -52,8 +52,10 @@ Jose (`SPEC.md`, Later).
 - **Public repo.** Never commit her clothing photos, a closet backup
   (`closet-backup-*.json`, photos inside; `.gitignore` blocks it) or
   anything personal of hers. One exception: the intro's AI-made scenes
-  of her (`public/intro/`), which Marce approved on 2026-11-20; her
-  original photos still never go in. Paid raw files
+  of her (`public/intro/`), which Marce approved on 2026-11-20, and the
+  app icon made from the clip's last frame (`assets/icons/cover-photo.jpg`
+  and the icons in `public/`), approved 2026-11-21; her original photos
+  still never go in. Paid raw files
   (fonts, models) can't be committed either (`docs/assets.md`, section 9).
   The fonts are free and bundled from npm (`@fontsource-variable/...`).
 - **Design tokens.** Every color, font, shadow and display size is defined
@@ -73,7 +75,7 @@ Jose (`SPEC.md`, Later).
 
 ## Commands
 
-- `npm install`, then `npm test` (76 tests), `npm run typecheck`,
+- `npm install`, then `npm test` (77 tests), `npm run typecheck`,
   `npm run build` (into `dist/`).
 - `npm run dev` for working, `npm run preview` (port 4173) to see the built
   app; offline support only runs in `preview`.
@@ -95,7 +97,11 @@ Jose (`SPEC.md`, Later).
   `public/sw.js`, `public/manifest.webmanifest`): a link starting with `/`
   breaks. Pages can't build the app itself, so
   `.github/workflows/pages.yml` tests, builds and publishes `dist/` on
-  every push to `main`. Cloudflare and Vercel would each give a different
+  every push to `main`. The repo's Settings, Pages, Source must stay on
+  "GitHub Actions": on "Deploy from a branch" GitHub also publishes the
+  raw source over the built app and her app opens blank (happened
+  2026-11-20, fixed 2026-11-21). After every merge, check the live page
+  loads `assets/*.js`, not `/src/main.tsx`. Cloudflare and Vercel would each give a different
   address with an empty closet; the Cloudflare setup from the zip was
   removed on purpose.
 - **Shared address.** Jose's other Pages sites live on the same

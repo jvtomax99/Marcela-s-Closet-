@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion'
 import type { Route } from '../lib/useRoute'
-import { Icon, type IconName, type IconTone } from './Icon'
+import { Icon, type IconName } from './Icon'
 
-const LINKS: { route: Route; label: string; icon: IconName; tone: IconTone }[] = [
-  { route: 'closet', label: 'Closet', icon: 'hanger', tone: 'mango' },
-  { route: 'looks', label: 'Looks', icon: 'looks', tone: 'accent' },
-  { route: 'lookbook', label: 'Lookbook', icon: 'vinyl', tone: 'palm' },
+const LINKS: { route: Route; label: string; icon: IconName }[] = [
+  { route: 'closet', label: 'Closet', icon: 'hanger' },
+  { route: 'looks', label: 'Looks', icon: 'looks' },
+  { route: 'lookbook', label: 'Lookbook', icon: 'vinyl' },
 ]
 
 const EDITION = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
@@ -72,7 +72,7 @@ export function Navigation({ route }: { route: Route }) {
                     transition={{ type: 'spring', stiffness: 420, damping: 36 }}
                   />
                 )}
-                <Icon name={link.icon} tone={link.tone} className="relative size-[1.625rem]" />
+                <Icon name={link.icon} className="relative size-7" />
                 <span className="relative">{link.label}</span>
               </a>
             )

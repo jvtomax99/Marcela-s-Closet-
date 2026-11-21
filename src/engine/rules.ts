@@ -10,7 +10,7 @@ const BOLD_PATTERNS: ReadonlySet<Pattern> = new Set<Pattern>(['plaid', 'floral',
 export const isBold = (pattern: Pattern) => BOLD_PATTERNS.has(pattern)
 
 /** The values every item shares. An item with an empty list accepts anything. */
-export function sharedValues<T>(lists: T[][]): T[] | 'any' {
+function sharedValues<T>(lists: T[][]): T[] | 'any' {
   const specific = lists.filter((list) => list.length > 0)
   if (specific.length === 0) return 'any'
   return specific.reduce((shared, list) => shared.filter((value) => list.includes(value)))

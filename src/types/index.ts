@@ -50,7 +50,7 @@ export interface ClothingItem extends Garment {
   createdAt: number
 }
 
-export type OutfitStatus = 'saved' | 'hidden'
+type OutfitStatus = 'saved' | 'hidden'
 
 /** A look I kept (saved) or rejected (hidden). */
 export interface Outfit {

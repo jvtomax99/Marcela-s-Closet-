@@ -11,7 +11,6 @@ const FINISHING_TOLERANCE = 5
 /** Score taken off for each repeated piece, so the results show variety. */
 const REPEAT_PENALTY = 5
 
-export { CORE_CATEGORIES }
 
 interface Candidate {
   items: Garment[]
