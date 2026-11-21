@@ -152,7 +152,9 @@ Before the app, on every launch: her wardrobe with the doors closed,
 "Marce's Closet" in the magazine serif, and two buttons, "Open with
 sound" and "Open quietly", plus Skip. A tap opens the doors in a short
 clip (4 s: the doors open and Marce steps out, arms open), with original
-music if she chose sound, then fades into the app. Phones show it
+music if she chose sound, then fades into the app. The music keeps
+looping in the app, softer, with a mute button in the masthead (Jose,
+2026-11-21); "Open quietly" stays silent. Phones show it
 full-screen; wide screens show it as a photo print beside the words. A tap or Escape skips ahead.
 It never waits on a slow connection: if the clip isn't ready 1.5 s after
 the tap, it goes straight in. Reduced motion or data saver: the still
