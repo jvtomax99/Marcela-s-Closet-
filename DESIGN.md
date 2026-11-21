@@ -188,6 +188,11 @@ line in small sans and "Update" as an eyebrow link. No new values.
   type) for "Open with sound"; an eyebrow text link for "Open quietly";
   Skip as a muted eyebrow link top right; a round mute button while the
   music plays.
+- Music after the intro (Jose, 2026-11-21): after "Open with sound" it
+  keeps looping in the app at half volume, and the same round button
+  (`MusicButton`, 44 px, `bg-surface/80`, `shadow-print`) sits top right
+  of the masthead on phones and after the links on wide screens. It only
+  shows once the music has started.
 - Motion: words fade and rise in (0.5 s, the app's ease), buttons 0.15 s
   later; everything fades out on tap; the whole screen fades into the app
   in 0.6 s; the music fades out over 1.2 s.

@@ -49,7 +49,7 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
     closet opens intact): 14 tests (with `fake-indexeddb`).
 - `src/lib/`: `labels.ts` (all the words shown for options, plus the
   greeting's name, the daily Cali sayings, `DICHOS`, the intro's words, and the shared `capitalize` and `joinWithAnd` text helpers, which the engine uses too), `intro.ts` (when and how the
-  intro plays; `intro.test.ts`, 4 tests), `update.ts` (spotting a new
+  intro plays; `intro.test.ts`, 4 tests), `music.ts` (the intro music, which carries on into the app), `update.ts` (spotting a new
   version; `update.test.ts`, 3 tests), `image.ts`
   (photo shrinking), `photoColor.ts` (reads a photo's main color on the
   phone; `photoColor.test.ts`, 4 tests), `id.ts`, `useRoute.ts` (the `#/` routing).
@@ -59,7 +59,7 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   Pieces tab), `Sheet`, `Navigation`, `Chips`,
   `ColorPicker`, `StarRating`, `PageHeader`, `EmptyState`,
   `BackupControls`, `Icon` (the sticker icons and three line icons), `WornToast` (logs a look as worn, with the
-  change-day and undo bar), `Intro` (the wardrobe intro screen), `UpdateBar` (checks for a new
+  change-day and undo bar), `Intro` (the wardrobe intro screen), `MusicButton` (mute / play for the music), `UpdateBar` (checks for a new
   version and reloads, or offers Update while a form is open).
 - `src/views/`: the three pages: `ClosetView`, `LooksView`,
   `LookbookView`.
@@ -112,7 +112,9 @@ analytics.
   whole files played from memory (Safari fetches videos in pieces, which
   the offline worker can't keep). A missing or slow clip (1.5 s after the
   tap) means a fade straight into the app. Music plays through Web Audio,
-  started inside the tap. `?intro=0` skips it.
+  started inside the tap, from `src/lib/music.ts`, which owns it so it
+  keeps looping in the app at half volume after the intro; `MusicButton`
+  mutes it from the intro or the masthead. `?intro=0` skips it.
 - **Updates**: `UpdateBar` fetches the page (`./`, never from a cache)
   when the app opens, when it comes back to the front and every 30
   minutes, and compares its main script name (`assets/index-<hash>.js`)

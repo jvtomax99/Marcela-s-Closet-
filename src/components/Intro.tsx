@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
+import { APP_VOLUME, setMusicVolume, startMusic } from '../lib/music'
+import { MusicButton } from './MusicButton'
 import { CLIP_START_MS, CLIP_WAIT_MS, INTRO_FILES, INTRO_MAX_MS, introLayout, introMode, introMusicFile } from '../lib/intro'
 import { INTRO_LABELS } from '../lib/labels'
 
@@ -14,7 +16,7 @@ const musicFile = () =>
  * Whole-file downloads, played from memory. Safari asks for videos in pieces, which the
  * offline helper can't keep, so a plain <video src> would be missing with no signal.
  */
-async function download(url: string, signal: AbortSignal) {
+async function download(url: string, signal?: AbortSignal) {
   const response = await fetch(url, { signal })
   if (!response.ok) throw new Error(`${url}: ${response.status}`)
   return response
@@ -31,7 +33,6 @@ export function Intro({ onDone }: { onDone: () => void }) {
   const [phase, setPhase] = useState<Phase>('waiting')
   const [clipSrc, setClipSrc] = useState<string | null>(null)
   const [clipShowing, setClipShowing] = useState(false)
-  const [music, setMusic] = useState<'off' | 'on' | 'muted'>('off')
 
   const [setup] = useState(() => {
     const layout = introLayout(window.innerWidth, window.innerHeight)
@@ -46,7 +47,6 @@ export function Intro({ onDone }: { onDone: () => void }) {
   const phaseRef = useRef<Phase>('waiting')
   const clipUrl = useRef<Promise<string | null>>(Promise.resolve(null))
   const musicData = useRef<Promise<ArrayBuffer | null>>(Promise.resolve(null))
-  const audio = useRef<{ context: AudioContext; gain: GainNode } | null>(null)
   const video = useRef<HTMLVideoElement>(null)
   const playing = useRef(false)
   const openButton = useRef<HTMLButtonElement>(null)
@@ -65,7 +65,8 @@ export function Intro({ onDone }: { onDone: () => void }) {
         })
         .catch(() => null)
     }
-    musicData.current = download(musicFile(), controller.signal)
+    // Not cancelled when the intro closes: the music carries on into the app.
+    musicData.current = download(musicFile())
       .then((response) => response.arrayBuffer())
       .catch(() => null)
     return () => {
@@ -79,51 +80,16 @@ export function Intro({ onDone }: { onDone: () => void }) {
     if (phaseRef.current === 'leaving') return
     phaseRef.current = 'leaving'
     setPhase('leaving')
-    const sound = audio.current
-    if (sound) {
-      const now = sound.context.currentTime
-      sound.gain.gain.cancelScheduledValues(now)
-      sound.gain.gain.setValueAtTime(sound.gain.gain.value, now)
-      sound.gain.gain.linearRampToValueAtTime(0, now + 1.2)
-      setTimeout(() => void sound.context.close(), 1400)
-      audio.current = null
-    }
+    // The music keeps looping in the app, softer (Jose, 2026-11-21).
+    setMusicVolume(APP_VOLUME, 1.2)
     onDone()
   }, [onDone])
-
-  const startMusic = () => {
-    const Context =
-      window.AudioContext ?? (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
-    if (!Context) return
-    // On iPhone, play even with the silent switch on: she asked for sound.
-    const session = (navigator as Navigator & { audioSession?: { type: string } }).audioSession
-    if (session) session.type = 'playback'
-    // Made inside the tap, or the phone won't let it play.
-    const context = new Context()
-    void context.resume()
-    const gain = context.createGain()
-    gain.gain.value = 0
-    gain.connect(context.destination)
-    audio.current = { context, gain }
-    void musicData.current.then(async (data) => {
-      if (!data || audio.current?.context !== context) return
-      const buffer = await context.decodeAudioData(data.slice(0)).catch(() => null)
-      if (!buffer || audio.current?.context !== context) return
-      const source = context.createBufferSource()
-      source.buffer = buffer
-      source.loop = true
-      source.connect(gain)
-      source.start()
-      gain.gain.linearRampToValueAtTime(0.9, context.currentTime + 0.4)
-      setMusic('on')
-    })
-  }
 
   const open = (withSound: boolean) => {
     if (phaseRef.current !== 'waiting') return
     phaseRef.current = 'opening'
     setPhase('opening')
-    if (withSound) startMusic()
+    if (withSound) startMusic(musicData.current)
     // A safety net: never stay on the intro, whatever the phone does with the clip.
     setTimeout(leave, INTRO_MAX_MS)
     void Promise.race([clipUrl.current, timeout(CLIP_WAIT_MS)]).then((url) => {
@@ -132,14 +98,6 @@ export function Intro({ onDone }: { onDone: () => void }) {
       // No clip (reduced motion, data saver, slow or missing): a short pause, then straight in.
       else setTimeout(leave, withSound ? 1200 : 500)
     })
-  }
-
-  const toggleMute = () => {
-    const sound = audio.current
-    if (!sound) return
-    const muted = music === 'on'
-    sound.gain.gain.setTargetAtTime(muted ? 0 : 0.9, sound.context.currentTime, 0.05)
-    setMusic(muted ? 'muted' : 'on')
   }
 
   // Play the clip once it's on screen. A phone can refuse (Low Power Mode, for example)
@@ -314,25 +272,8 @@ export function Intro({ onDone }: { onDone: () => void }) {
         </button>
       )}
 
-      {music !== 'off' && phase === 'opening' && (
-        <button
-          type="button"
-          aria-label={music === 'on' ? INTRO_LABELS.mute : INTRO_LABELS.unmute}
-          className="absolute right-4 bottom-[calc(env(safe-area-inset-bottom)+1rem)] grid h-11 w-11 place-items-center rounded-full bg-surface/80 text-ink shadow-print"
-          onClick={(event) => {
-            event.stopPropagation()
-            toggleMute()
-          }}
-        >
-          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-            <path d="M4 9h4l5-4v14l-5-4H4z" strokeLinejoin="round" />
-            {music === 'on' ? (
-              <path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" strokeLinecap="round" />
-            ) : (
-              <path d="m16 9 6 6m0-6-6 6" strokeLinecap="round" />
-            )}
-          </svg>
-        </button>
+      {phase === 'opening' && (
+        <MusicButton className="absolute right-4 bottom-[calc(env(safe-area-inset-bottom)+1rem)]" />
       )}
     </motion.div>
   )
