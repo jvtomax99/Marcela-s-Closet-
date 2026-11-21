@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Garment, Outfit, Wear } from '../types'
 import { colorsClash, harmonyOf } from './color'
+import { scoreOutfit } from './score'
 import { outfitAllowed } from './rules'
 import { forgottenPieces, wearStats, outfitSignature, suggestOutfits, toDay } from './index'
 import { daysBetween } from './wear'
@@ -457,5 +458,19 @@ describe('what she wore', () => {
 
   it('ignores entries dated after today', () => {
     expect(forgottenPieces([dress], [wore('2026-12-25', [dress])], TODAY)).toEqual([])
+  })
+})
+
+describe('reason wording', () => {
+  // Pins the current text before the list-joining helper moves (CLEANUP.md item 3).
+  it('lists three neutrals as "a, b and c"', () => {
+    const items = [
+      piece({ category: 'top', colors: ['white'] }),
+      piece({ category: 'bottom', colors: ['black'] }),
+      piece({ category: 'shoes', colors: ['beige'] }),
+    ]
+    const taste = { ratedLooks: new Map(), itemRatings: new Map(), hiddenPairs: new Map() }
+    const texts = scoreOutfit(items, taste).reasons.map((reason) => reason.text)
+    expect(texts).toContain('A quiet palette of white, black and beige')
   })
 })
