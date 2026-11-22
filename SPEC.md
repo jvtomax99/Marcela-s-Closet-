@@ -95,8 +95,10 @@ she backs up. Due means: never backed up on this device and the closet
 has something in it, or the last backup is 14 days old and a piece, look
 or wear was added since. A closet that hasn't changed never nags. Edits to
 a piece don't count (pieces don't record when they were edited). The app
-counts a backup when the share sheet or download finishes; it can't tell
-whether she actually saved the file. The date lives on the device, in
+counts a backup when the share sheet finishes, or a download on a
+computer; it can't tell whether she actually saved the file. If iPhone
+refuses the share sheet, it tries a download but doesn't count it, and
+says "If no file was saved, tap Back up again." The date lives on the device, in
 `localStorage`, and is cleared with the closet.
 - Done when: on her iPhone, the note shows until she taps "Back up now"
   and saves the file, then stays away; two weeks and a new piece later it
@@ -280,7 +282,9 @@ Runway, music with ElevenLabs (`CREDITS.md`).
   backup reminder.
   - [x] Built and checked: 82 tests; on a test server slowed to 30 s per
     request the app opened in 4.1 s (the old worker: still blank after
-    25 s); airplane mode opens at once; reminder screenshots at 390 px
-    light and dark and 1440 px.
+    25 s); airplane mode opens at once; a new version that arrived during
+    a weak-signal open still opens in airplane mode afterwards (the first
+    try at this went blank; a reviewer caught it); reminder screenshots at
+    390 px light and dark and 1440 px.
   - [ ] Live, and Marce has backed up from the note on her iPhone.
 - [ ] Phase next: to decide with Jose.

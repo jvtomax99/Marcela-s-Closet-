@@ -47,7 +47,7 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   - `backup.ts`: Back up / Restore to a `.json` file.
   - `db.test.ts`, `backup.test.ts`, `upgrade.test.ts` (a version-1
     closet opens intact): 14 tests (with `fake-indexeddb`).
-- `src/lib/`: `labels.ts` (all the words shown for options, plus the
+- `src/lib/`: `labels.ts` (all the words shown for options, the backup reminder's words (`BACKUP_LABELS`), plus the
   greeting's name, the daily Cali sayings, `DICHOS`, the intro's words, and the shared `capitalize` and `joinWithAnd` text helpers, which the engine uses too), `intro.ts` (when and how the
   intro plays; `intro.test.ts`, 4 tests), `music.ts` (the intro music, which carries on into the app), `update.ts` (spotting a new
   version; `update.test.ts`, 3 tests), `image.ts`
@@ -135,7 +135,10 @@ analytics.
   download carries on and updates the copy), and a page load falls back to
   the saved folder page. With no saved copy it keeps waiting. The built
   `assets/` files get a new name per version, so they come straight from
-  the copy when it has them, and from the internet only the first time. It
+  the copy when it has them, and from the internet only the first time.
+  A page is saved only after every `assets/` file it names is saved, so a
+  new version that arrives late on a weak signal can't leave a page
+  without its scripts (the next open with no signal would be blank). It
   never reads or deletes any cache, its own or another app's, on the
   shared `jvtomax99.github.io` address. On the first visit, `main.tsx` fetches the page's
   files again once the worker is in charge, so the copy is complete.

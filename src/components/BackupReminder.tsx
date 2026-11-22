@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { backupDue, lastAdded, useLastBackup } from '../lib/backupReminder'
+import { BACKUP_LABELS } from '../lib/labels'
 import type { ClothingItem, Outfit, Wear } from '../types'
 import { backUpCloset, lastBackupWords } from './BackupControls'
 
@@ -16,12 +17,13 @@ interface BackupReminderProps {
 export function BackupReminder({ items, outfits, wears }: BackupReminderProps) {
   const lastBackup = useLastBackup()
   const [busy, setBusy] = useState(false)
+  const [unsure, setUnsure] = useState(false)
   if (!backupDue(lastBackup, lastAdded(items, outfits, wears), Date.now())) return null
 
   const backUp = async () => {
     setBusy(true)
     try {
-      await backUpCloset()
+      setUnsure((await backUpCloset()) === 'unsure')
     } finally {
       setBusy(false)
     }
@@ -34,11 +36,9 @@ export function BackupReminder({ items, outfits, wears }: BackupReminderProps) {
     >
       <p className="max-w-md leading-relaxed text-muted">
         <span className="font-serif text-lg text-ink italic">
-          {lastBackup ? `${lastBackupWords(lastBackup)}.` : 'No backup yet.'}
+          {lastBackup ? `${lastBackupWords(lastBackup)}.` : BACKUP_LABELS.noteNone}
         </span>{' '}
-        {lastBackup
-          ? 'Your closet has grown since. Save a fresh copy, in case this device is lost or cleared.'
-          : 'Your closet lives only on this device. Save a copy, in case it is lost or cleared.'}
+        {unsure ? BACKUP_LABELS.unsure : lastBackup ? BACKUP_LABELS.noteStaleBody : BACKUP_LABELS.noteNoneBody}
       </p>
       <button
         type="button"
@@ -46,7 +46,7 @@ export function BackupReminder({ items, outfits, wears }: BackupReminderProps) {
         disabled={busy}
         className="shrink-0 rounded-full bg-ink px-5 py-2.5 text-eyebrow text-canvas uppercase shadow-print transition-transform duration-300 hover:-translate-y-0.5 disabled:opacity-50"
       >
-        Back up now
+        {BACKUP_LABELS.backUpNow}
       </button>
     </div>
   )

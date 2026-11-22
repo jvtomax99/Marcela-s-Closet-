@@ -50,7 +50,12 @@ self.addEventListener('fetch', (event) => {
   )
 })
 
-/** Fetches from the internet and saves each good answer, so a visit without signal has it. */
+/**
+ * Fetches from the internet and saves each good answer, so a visit without signal has it.
+ * A page is saved only after the built files it names are saved: otherwise a page that
+ * arrived late on a weak signal could be saved without its scripts, and the next visit
+ * without signal would open blank.
+ */
 function fromNetwork(event, request) {
   // The page itself skips the browser's short-term copy (GitHub Pages allows 10 minutes), so
   // a new version shows the next time the app opens.
@@ -59,18 +64,36 @@ function fromNetwork(event, request) {
   return fresh.then((response) => {
     if (response.ok) {
       const copy = response.clone()
-      event.waitUntil(
-        caches
-          .open(CACHE)
-          .then((cache) => cache.put(request, copy))
-          .catch(() => undefined),
-      )
+      const isPage = (response.headers.get('content-type') ?? '').includes('text/html')
+      event.waitUntil((isPage ? savePage(request, copy) : save(request, copy)).catch(() => undefined))
     }
     return response
   })
 }
 
+async function save(request, response) {
+  const cache = await caches.open(CACHE)
+  await cache.put(request, response)
+}
+
+async function savePage(request, response) {
+  const html = await response.clone().text()
+  const cache = await caches.open(CACHE)
+  const files = [...html.matchAll(/(?:src|href)=["'](\.?\/?assets\/[^"'?#]+)/g)].map((m) => new URL(m[1], SCOPE).href)
+  for (const url of files) {
+    if (await cache.match(url, { ignoreVary: true })) continue
+    const file = await fetch(url)
+    if (!file.ok) throw new Error(`Missing ${url}`)
+    await cache.put(url, file)
+  }
+  await cache.put(request, response)
+}
+
 async function savedCopy(request) {
+  return lookUp(request).catch(() => undefined)
+}
+
+async function lookUp(request) {
   const cache = await caches.open(CACHE)
   // ignoreVary: the app's own files are the same whichever way they were requested.
   const cached = await cache.match(request, { ignoreVary: true })

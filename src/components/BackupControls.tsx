@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent } from 'react'
 import { exportCloset, importCloset } from '../db/backup'
 import { rememberBackup, useLastBackup } from '../lib/backupReminder'
+import { BACKUP_LABELS } from '../lib/labels'
 
 const BACKUP_DATE = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' })
 
@@ -15,9 +16,11 @@ function download(file: File) {
 
 /**
  * Saves the whole closet as one file: on iPhone the share sheet, where "Save to Files" keeps
- * a copy; elsewhere a download. Remembers the day, for the backup reminder.
+ * a copy; elsewhere a download. Remembers the day, for the backup reminder. When the share
+ * sheet fails (iPhone can refuse it if reading the photos took too long), it still tries a
+ * download but doesn't count it: in the home-screen app a download may save nothing.
  */
-export async function backUpCloset(): Promise<'shared' | 'downloaded' | 'cancelled'> {
+export async function backUpCloset(): Promise<'shared' | 'downloaded' | 'unsure' | 'cancelled'> {
   const file = await exportCloset()
   if (navigator.canShare?.({ files: [file] })) {
     try {
@@ -26,6 +29,8 @@ export async function backUpCloset(): Promise<'shared' | 'downloaded' | 'cancell
       return 'shared'
     } catch (error) {
       if ((error as Error).name === 'AbortError') return 'cancelled'
+      download(file)
+      return 'unsure'
     }
   }
   download(file)
@@ -36,9 +41,9 @@ export async function backUpCloset(): Promise<'shared' | 'downloaded' | 'cancell
 /** "Last backup today", "yesterday" or "on November 2". */
 export function lastBackupWords(at: number, now: number = Date.now()): string {
   const day = (ms: number) => new Date(ms).toDateString()
-  if (day(at) === day(now)) return 'Last backup today'
-  if (day(at) === day(now - 24 * 60 * 60 * 1000)) return 'Last backup yesterday'
-  return `Last backup on ${BACKUP_DATE.format(at)}`
+  if (day(at) === day(now)) return BACKUP_LABELS.today
+  if (day(at) === day(now - 24 * 60 * 60 * 1000)) return BACKUP_LABELS.yesterday
+  return BACKUP_LABELS.on(BACKUP_DATE.format(at))
 }
 
 /** The closet lives only on this device, so it needs a way out (and back in). */
@@ -51,7 +56,15 @@ export function BackupControls() {
     setBusy(true)
     try {
       const result = await backUpCloset()
-      setStatus(result === 'shared' ? 'Backup ready.' : result === 'downloaded' ? 'Backup downloaded.' : '')
+      setStatus(
+        result === 'shared'
+          ? 'Backup ready.'
+          : result === 'downloaded'
+            ? 'Backup downloaded.'
+            : result === 'unsure'
+              ? BACKUP_LABELS.unsure
+              : '',
+      )
     } finally {
       setBusy(false)
     }
@@ -76,12 +89,12 @@ export function BackupControls() {
   }
 
   return (
-    <section id="backup" className="mt-24 scroll-mt-24 border-t border-line pt-8 text-sm text-muted">
+    <section className="mt-24 border-t border-line pt-8 text-sm text-muted">
       <p className="font-serif text-xl text-ink italic">Keep it safe</p>
       <p className="mt-1.5 max-w-md leading-relaxed">
         Your closet lives only on this device. Save a backup now and then, to move it or keep it.
       </p>
-      <p className="mt-1.5 text-ink">{lastBackup ? `${lastBackupWords(lastBackup)}.` : 'No backup from this device yet.'}</p>
+      <p className="mt-1.5 text-ink">{lastBackup ? `${lastBackupWords(lastBackup)}.` : BACKUP_LABELS.none}</p>
       <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2">
         <button
           type="button"
