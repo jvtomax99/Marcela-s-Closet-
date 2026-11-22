@@ -87,6 +87,21 @@ with every piece, photo and look; "Restore a backup" reads one back
 - Done when: a backup made on her PC, restored in the iPhone home-screen
   app, shows the same pieces, photos and saved looks.
 
+Backup reminder (Jose, 2026-11-22): the Backup section says "Last backup
+today", "yesterday" or "on November 2", or "No backup from this device
+yet". When a backup is due, a note at the top of the Closet says so, with
+"Back up now" (one tap, the same as the button below); it goes away once
+she backs up. Due means: never backed up on this device and the closet
+has something in it, or the last backup is 14 days old and a piece, look
+or wear was added since. A closet that hasn't changed never nags. Edits to
+a piece don't count (pieces don't record when they were edited). The app
+counts a backup when the share sheet or download finishes; it can't tell
+whether she actually saved the file. The date lives on the device, in
+`localStorage`, and is cleared with the closet.
+- Done when: on her iPhone, the note shows until she taps "Back up now"
+  and saves the file, then stays away; two weeks and a new piece later it
+  comes back.
+
 ### What she wore (Phase 2)
 "Wore it" on every look in Looks and the Lookbook logs it for today; a bar
 at the bottom lets her change the day (yesterday or earlier) or undo. On a
@@ -118,8 +133,12 @@ backups still restore.
 Installable from Safari (Share, Add to Home Screen) with the Closet icon;
 opens full screen; after one visit with signal it opens with none (say, in
 a fitting room).
+On a weak signal (Jose, 2026-11-22): the app waits 4 s for the internet,
+then opens from its saved copy; the built files come from the copy at
+once. Before, one bar of signal could leave it blank for a minute or more.
 - Done when: on an iPhone, the home-screen app opens in airplane mode and
-  shows her closet and looks.
+  shows her closet and looks; with one bar of signal it opens within about
+  5 seconds.
 
 ### Look and feel
 Magazine design with a Cali, Colombia and music flavor ("Salsa caleña",
@@ -214,9 +233,6 @@ Runway, music with ElevenLabs (`CREDITS.md`).
 
 ## Later
 
-- Offline on a weak signal: the app waits for the internet before using
-  its saved copy, with no time limit, so in a fitting room with one bar it
-  can hang. A time limit (Phillis's site uses 4 s) would fix it.
 - Background removal, Spanish and AI styling, in an order to decide with
   Jose and Marce.
 
@@ -260,4 +276,11 @@ Runway, music with ElevenLabs (`CREDITS.md`).
   - [x] Jose's OK: "Merge for me" (2026-11-20), PR #3.
   - [ ] Marce has opened it on her iPhone.
   - Done when: see "Intro screen" above.
+- [ ] Two safety fixes (Jose, 2026-11-22): weak-signal offline and the
+  backup reminder.
+  - [x] Built and checked: 82 tests; on a test server slowed to 30 s per
+    request the app opened in 4.1 s (the old worker: still blank after
+    25 s); airplane mode opens at once; reminder screenshots at 390 px
+    light and dark and 1440 px.
+  - [ ] Live, and Marce has backed up from the note on her iPhone.
 - [ ] Phase next: to decide with Jose.

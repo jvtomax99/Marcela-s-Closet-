@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { BackupControls } from '../components/BackupControls'
+import { BackupReminder } from '../components/BackupReminder'
 import { EmptyState } from '../components/EmptyState'
 import { Icon } from '../components/Icon'
 import { ItemForm } from '../components/ItemForm'
@@ -64,6 +65,8 @@ export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) 
         </EmptyState>
       ) : (
         <>
+          <BackupReminder items={items} outfits={outfits} wears={wears} />
+
           <div className="no-scrollbar -mx-4 mb-8 flex gap-7 overflow-x-auto border-b border-line px-4 sm:mx-0 sm:px-0">
             {shelves.map((option) => {
               const selected = option === active
