@@ -43,7 +43,8 @@ Jose (`SPEC.md`, Later).
   a new address, or changing the hosting, gives her an empty app there:
   warn Jose first, and plan the Back up / Restore step with her.
 - **Offline worker.** `public/sw.js` keeps a copy of the app (internet
-  first, the copy when there's none) in the cache
+  first, the copy when there's none or after 4 s on a weak signal; the
+  versioned `assets/` files straight from the copy) in the cache
   `closet-app:/Marcela-s-Closet-/`. It never holds the closet itself.
 - **Updates itself.** `src/components/UpdateBar.tsx` spots a new published
   version and reloads (or asks while a form is open). Never tell anyone to
@@ -75,7 +76,7 @@ Jose (`SPEC.md`, Later).
 
 ## Commands
 
-- `npm install`, then `npm test` (77 tests), `npm run typecheck`,
+- `npm install`, then `npm test` (82 tests), `npm run typecheck`,
   `npm run build` (into `dist/`).
 - `npm run dev` for working, `npm run preview` (port 4173) to see the built
   app; offline support only runs in `preview`.

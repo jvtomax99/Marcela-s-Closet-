@@ -136,6 +136,19 @@ export const INTRO_LABELS = {
 } as const
 
 /** The bar offered when a new version arrives while a form is open. */
+/** The backup reminder and the Backup section's last-backup line. */
+export const BACKUP_LABELS = {
+  today: 'Last backup today',
+  yesterday: 'Last backup yesterday',
+  on: (date: string) => `Last backup on ${date}`,
+  none: 'No backup from this device yet.',
+  noteNone: 'No backup yet.',
+  noteNoneBody: 'Your closet lives only on this device. Save a copy, in case it is lost or cleared.',
+  noteStaleBody: 'Your closet has grown since. Save a fresh copy, in case this device is lost or cleared.',
+  backUpNow: 'Back up now',
+  unsure: "If no file was saved, tap Back up again.",
+} as const
+
 export const UPDATE_LABELS = {
   ready: 'A new version of Closet is ready.',
   update: 'Update',

@@ -47,18 +47,18 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   - `backup.ts`: Back up / Restore to a `.json` file.
   - `db.test.ts`, `backup.test.ts`, `upgrade.test.ts` (a version-1
     closet opens intact): 14 tests (with `fake-indexeddb`).
-- `src/lib/`: `labels.ts` (all the words shown for options, plus the
+- `src/lib/`: `labels.ts` (all the words shown for options, the backup reminder's words (`BACKUP_LABELS`), plus the
   greeting's name, the daily Cali sayings, `DICHOS`, the intro's words, and the shared `capitalize` and `joinWithAnd` text helpers, which the engine uses too), `intro.ts` (when and how the
   intro plays; `intro.test.ts`, 4 tests), `music.ts` (the intro music, which carries on into the app), `update.ts` (spotting a new
   version; `update.test.ts`, 3 tests), `image.ts`
   (photo shrinking), `photoColor.ts` (reads a photo's main color on the
-  phone; `photoColor.test.ts`, 4 tests), `id.ts`, `useRoute.ts` (the `#/` routing).
+  phone; `photoColor.test.ts`, 4 tests), `id.ts`, `useRoute.ts` (the `#/` routing), `backupReminder.ts` (when a backup is due and the last-backup date; `backupReminder.test.ts`, 5 tests).
 - `src/components/`: building blocks: `OutfitCollage` (the moodboard),
   `LookCard`, `ItemForm`, `ItemPhoto`, `PieceCard` (a piece in a grid,
   with its one-tap favorite heart; used by the Closet and the Lookbook's
   Pieces tab), `Sheet`, `Navigation`, `Chips`,
   `ColorPicker`, `StarRating`, `PageHeader`, `EmptyState`,
-  `BackupControls`, `Icon` (the sticker icons and three line icons), `WornToast` (logs a look as worn, with the
+  `BackupControls` (also `backUpCloset`, shared with the reminder), `BackupReminder` (the "No backup yet" note at the top of the Closet), `Icon` (the sticker icons and three line icons), `WornToast` (logs a look as worn, with the
   change-day and undo bar), `Intro` (the wardrobe intro screen), `MusicButton` (mute / play for the music), `UpdateBar` (checks for a new
   version and reloads, or offers Update while a form is open).
 - `src/views/`: the three pages: `ClosetView`, `LooksView`,
@@ -123,12 +123,22 @@ analytics.
   each version once per visit (`sessionStorage` key
   `closet-update-tried`), so it can't loop. The offline worker fetches the
   page itself past the browser's 10-minute copy (`cache: 'no-cache'`).
-- **Nothing in `localStorage`.**
+- **`localStorage`**: one key only, `marcelas-closet:last-backup` (when
+  she last backed up on this device, for the reminder;
+  `src/lib/backupReminder.ts`). The whole `jvtomax99.github.io` address
+  shares `localStorage`, hence the long name. Never the closet itself.
 - **Offline copy** (`public/sw.js`): registered from the app's folder, so
   it only sees that folder. Every request inside it goes to the internet
   first and the answer is saved in the cache `closet-app:<folder path>`
-  (`closet-app:/Marcela-s-Closet-/` on Pages); with no internet the saved
-  copy answers, and a page load falls back to the saved folder page. It
+  (`closet-app:/Marcela-s-Closet-/` on Pages); with no internet, or no
+  answer within 4 s (one bar of signal), the saved copy answers (the
+  download carries on and updates the copy), and a page load falls back to
+  the saved folder page. With no saved copy it keeps waiting. The built
+  `assets/` files get a new name per version, so they come straight from
+  the copy when it has them, and from the internet only the first time.
+  A page is saved only after every `assets/` file it names is saved, so a
+  new version that arrives late on a weak signal can't leave a page
+  without its scripts (the next open with no signal would be blank). It
   never reads or deletes any cache, its own or another app's, on the
   shared `jvtomax99.github.io` address. On the first visit, `main.tsx` fetches the page's
   files again once the worker is in charge, so the copy is complete.

@@ -164,6 +164,15 @@ Big serif numbers ("Nº 07") use old-style figures (`.oldstyle`).
   ... edit" on the left, the italic serif name in the middle); forms in a
   centered panel.
 
+## Backup note (`src/components/BackupReminder.tsx`)
+
+At the top of the Closet, under the header, only when a backup is due: a
+white card like the others (`rounded-card`, `bg-surface`, `shadow-card`,
+`px-5 py-4`), the first words in the italic serif at `text-lg` in ink,
+the rest in small sans, muted, and "Back up now" as the dark pill (`bg-ink`,
+`text-canvas`, eyebrow, `shadow-print`), beside the words on laptops and
+under them on phones. No new values.
+
 ## Update bar (`src/components/UpdateBar.tsx`)
 
 Only while a form is open and a new version is waiting: the same dark
