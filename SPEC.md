@@ -74,9 +74,13 @@ the zip's HANDOFF.md, section 7, and in `src/engine/score.ts`.
 The app opens on Looks, and the first thing under "Hola, Marce" and the
 daily saying is one big outfit for today: the moodboard, the "why it
 works" line, the pieces, and "Wore it", "Another" and Save. It stays the
-same all day and changes the next day, even if she logs nothing: the 7
-best looks for today's season take turns, one a day. "Another" walks to
-the next one (it isn't a dislike; skips last until midnight). The season
+same all day, even when she adds a piece, rates a look or hides another
+one; it only moves on if that look is hidden or loses a piece. It changes
+the next day, even if she logs nothing: the 7 best looks for today's
+season take turns, one a day, and the new day never opens on the last
+day's look. An app left open overnight switches at midnight or when she
+comes back to it. "Another" walks to the next one (it isn't a dislike;
+skips last until midnight, then the round starts again). The season
 comes from the month, northern hemisphere (Dec to Feb winter, Mar to May
 spring, Jun to Aug summer, Sep to Nov fall); pieces with no season always
 qualify, a coat joins in fall and winter by the usual rule, and if no
@@ -120,7 +124,8 @@ with every piece, photo and look; "Restore a backup" reads one back
 Backup reminder (Jose, 2026-11-22): the Backup section says "Last backup
 today", "yesterday" or "on November 2", or "No backup from this device
 yet". When a backup is due, a note at the top of the Closet says so, with
-"Back up now" (one tap, the same as the button below); it goes away once
+"Back up now" (one tap, the same as the button below; since Today's
+look, the same note also shows on Looks, under the card); it goes away once
 she backs up. Due means: never backed up on this device and the closet
 has something in it, or the last backup is 14 days old and a piece, look
 or wear was added since. A closet that hasn't changed never nags. Edits to
@@ -318,11 +323,14 @@ Runway, music with ElevenLabs (`CREDITS.md`).
     390 px light and dark and 1440 px.
   - [ ] Live, and Marce has backed up from the note on her iPhone.
 - [ ] Phase 5: Today's look (Jose approved the plan, 2026-11-22).
-  - [x] Built and checked: 91 tests; preview with a stand-in closet at
+  - [x] Built and checked: 96 tests; preview with a stand-in closet at
     390 px light and dark and 1440 px: opens on Looks; same pick after a
     reload; a different one the next day; "Another" changes it and stays
     after a reload; "Wore it" shows "Wearing today" and Undo brings the
-    pick back; the card stays while filtering; a coat in January, none in
-    July; the list below doesn't repeat it.
+    pick back; hiding a look in the list leaves the card alone; left open
+    overnight it switches to the new day; the card stays while filtering;
+    a coat in January, none in July; the list below doesn't repeat it.
+    A reviewer caught that the first version could change the pick during
+    the day and repeat yesterday's; fixed with tests.
   - [ ] Live, and Marce has used it on her iPhone for a week.
 - [ ] Phase next: to decide with Jose.

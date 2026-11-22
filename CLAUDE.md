@@ -76,7 +76,7 @@ Jose (`SPEC.md`, Later).
 
 ## Commands
 
-- `npm install`, then `npm test` (91 tests), `npm run typecheck`,
+- `npm install`, then `npm test` (96 tests), `npm run typecheck`,
   `npm run build` (into `dist/`).
 - `npm run dev` for working, `npm run preview` (port 4173) to see the built
   app; offline support only runs in `preview`.

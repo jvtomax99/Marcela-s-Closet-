@@ -42,7 +42,7 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
     picking outfits.
   - `today.ts`: Today's look: the season from the month (northern
     hemisphere) and the 7 best looks for it, taking turns by day.
-  - `index.ts`: what the rest of the app may use; `engine.test.ts`: 61
+  - `index.ts`: what the rest of the app may use; `engine.test.ts`: 66
     tests.
 - `src/db/`: storage.
   - `index.ts`: the Dexie database and every read and write.
@@ -54,13 +54,13 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   intro plays; `intro.test.ts`, 4 tests), `music.ts` (the intro music, which carries on into the app), `update.ts` (spotting a new
   version; `update.test.ts`, 3 tests), `image.ts`
   (photo shrinking), `photoColor.ts` (reads a photo's main color on the
-  phone; `photoColor.test.ts`, 4 tests), `id.ts`, `useRoute.ts` (the `#/` routing), `backupReminder.ts` (when a backup is due and the last-backup date; `backupReminder.test.ts`, 5 tests).
+  phone; `photoColor.test.ts`, 4 tests), `id.ts`, `useRoute.ts` (the `#/` routing), `useToday.ts` (today's date, kept current past midnight), `backupReminder.ts` (when a backup is due and the last-backup date; `backupReminder.test.ts`, 5 tests).
 - `src/components/`: building blocks: `OutfitCollage` (the moodboard), `TodaysLook` (the big card at the top of Looks, and `useTodaysPick`, which holds today's pick and "Another"),
   `LookCard`, `ItemForm`, `ItemPhoto`, `PieceCard` (a piece in a grid,
   with its one-tap favorite heart; used by the Closet and the Lookbook's
   Pieces tab), `Sheet`, `Navigation`, `Chips`,
   `ColorPicker`, `StarRating`, `PageHeader`, `EmptyState`,
-  `BackupControls` (also `backUpCloset`, shared with the reminder), `BackupReminder` (the "No backup yet" note at the top of the Closet), `Icon` (the sticker icons and three line icons), `WornToast` (logs a look as worn, with the
+  `BackupControls` (also `backUpCloset`, shared with the reminder), `BackupReminder` (the "No backup yet" note at the top of the Closet, and on Looks under Today's look), `Icon` (the sticker icons and three line icons), `WornToast` (logs a look as worn, with the
   change-day and undo bar), `Intro` (the wardrobe intro screen), `MusicButton` (mute / play for the music), `UpdateBar` (checks for a new
   version and reloads, or offers Update while a form is open).
 - `src/views/`: the three pages: `ClosetView`, `LooksView`,
@@ -97,10 +97,14 @@ analytics.
     or pieces logged one by one).
   - Deleting a piece deletes every look that used it and takes it out of
     the days she wore it (a day left empty goes), in one step.
-- **Today's look** (`engine/today.ts`): the 7 best looks for today's
-  season (any season if none fits), scored with what she wore before
-  today, so logging today doesn't reshuffle them. They take turns by day
-  (day number mod 7 picks the first), and "Another" walks down the list.
+- **Today's look** (`engine/today.ts`, `todaysPick`): the best looks for
+  today's season (any season if none fits), scored with what she wore
+  before today, so logging today doesn't reshuffle them. The first 7 take
+  turns by day (day number mod 7 picks the first), skipping the last
+  day's pick, and "Another" (`passOn`) walks down them. Once picked, the
+  look stays all day (it is remembered) unless it is hidden or loses a
+  piece; it may slip to 40th place and still stay. `src/lib/useToday.ts`
+  keeps the date current in an app left open overnight.
   Once anything is logged for today, the card shows those pieces instead.
   The plain list below leaves out today's pick unless a filter is on.
 - **Suggestions** are worked out fresh from `items`, `outfits` and
@@ -136,9 +140,9 @@ analytics.
   names.
   - `marcelas-closet:last-backup`: when she last backed up on this device,
     for the reminder (`src/lib/backupReminder.ts`).
-  - `marcelas-closet:today`: `{ day, skipped }`, how many times she tapped
-    "Another" on Today's look today (`src/components/TodaysLook.tsx`); a
-    new day starts from 0.
+  - `marcelas-closet:today`: `{ day, pick, skipped, previous }` for
+    Today's look (`src/components/TodaysLook.tsx`): today's pick, the looks
+    she passed on today with "Another", and the last day's pick.
 - **Offline copy** (`public/sw.js`): registered from the app's folder, so
   it only sees that folder. Every request inside it goes to the internet
   first and the answer is saved in the cache `closet-app:<folder path>`

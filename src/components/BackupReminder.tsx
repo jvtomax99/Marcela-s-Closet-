@@ -5,16 +5,18 @@ import type { ClothingItem, Outfit, Wear } from '../types'
 import { backUpCloset, lastBackupWords } from './BackupControls'
 
 interface BackupReminderProps {
+  /** Spacing around the note where it sits on the page. */
+  className?: string
   items: ClothingItem[]
   outfits: Outfit[]
   wears: Wear[]
 }
 
 /**
- * A note at the top of the Closet page when a backup is due: never made on this device, or
+ * A note on the Closet and Looks pages when a backup is due: never made on this device, or
  * two weeks old with something added since. One tap backs up; then the note goes away.
  */
-export function BackupReminder({ items, outfits, wears }: BackupReminderProps) {
+export function BackupReminder({ className = 'mb-8', items, outfits, wears }: BackupReminderProps) {
   const lastBackup = useLastBackup()
   const [busy, setBusy] = useState(false)
   const [unsure, setUnsure] = useState(false)
@@ -32,7 +34,7 @@ export function BackupReminder({ items, outfits, wears }: BackupReminderProps) {
   return (
     <div
       role="note"
-      className="mb-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 rounded-card bg-surface px-5 py-4 text-sm shadow-card"
+      className={`${className} flex flex-wrap items-center justify-between gap-x-6 gap-y-3 rounded-card bg-surface px-5 py-4 text-sm shadow-card`}
     >
       <p className="max-w-md leading-relaxed text-muted">
         <span className="font-serif text-lg text-ink italic">

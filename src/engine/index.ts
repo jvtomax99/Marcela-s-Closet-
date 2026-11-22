@@ -1,4 +1,4 @@
 export { suggestOutfits } from './suggest'
 export { outfitSignature } from './score'
 export { FORGOTTEN_DAYS, forgottenPieces, wearStats, toDay } from './wear'
-export { TODAY_CHOICES, seasonOf, todaysLooks } from './today'
+export { TODAY_CHOICES, passOn, seasonOf, todaysLooks, todaysPick, type TodayMemory } from './today'

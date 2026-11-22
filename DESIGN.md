@@ -180,7 +180,8 @@ serif title size, with no buttons. No new values.
 
 ## Backup note (`src/components/BackupReminder.tsx`)
 
-At the top of the Closet, under the header, only when a backup is due: a
+At the top of the Closet, under the header, and on Looks under Today's
+look (same width as the card), only when a backup is due: a
 white card like the others (`rounded-card`, `bg-surface`, `shadow-card`,
 `px-5 py-4`), the first words in the italic serif at `text-lg` in ink,
 the rest in small sans, muted, and "Back up now" as the dark pill (`bg-ink`,

@@ -1,55 +1,62 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { removeLook, saveLook } from '../db'
-import { todaysLooks } from '../engine'
+import { passOn, todaysPick, type TodayMemory } from '../engine'
 import { TODAY_LABELS } from '../lib/labels'
 import type { ClothingItem, Day, Outfit, Suggestion, Wear } from '../types'
 import { Icon } from './Icon'
 import { OutfitCollage } from './OutfitCollage'
 
-/** Remembers how many times she tapped "Another" today, so reopening the app doesn't undo it. */
-const SKIPS_KEY = 'marcelas-closet:today'
+/** Today's pick, what she passed on and the last day's pick, so the card stays put all day. */
+const MEMORY_KEY = 'marcelas-closet:today'
 
 const LONG_DAY = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
 
-interface Skips {
-  day: Day
-  skipped: number
-}
-
-function readSkips(): Skips | null {
+function readMemory(): TodayMemory | null {
   try {
-    const value = JSON.parse(localStorage.getItem(SKIPS_KEY) ?? 'null') as Skips | null
-    return value && typeof value.day === 'string' && Number.isInteger(value.skipped) ? value : null
+    const value = JSON.parse(localStorage.getItem(MEMORY_KEY) ?? 'null') as TodayMemory | null
+    const text = (v: unknown) => v === null || typeof v === 'string'
+    return value &&
+      typeof value.day === 'string' &&
+      text(value.pick) &&
+      text(value.previous) &&
+      Array.isArray(value.skipped)
+      ? value
+      : null
   } catch {
     return null
   }
 }
 
-function writeSkips(skips: Skips) {
+function writeMemory(memory: TodayMemory) {
   try {
-    localStorage.setItem(SKIPS_KEY, JSON.stringify(skips))
+    localStorage.setItem(MEMORY_KEY, JSON.stringify(memory))
   } catch {
-    // Storage blocked: "Another" still works until the app is closed.
+    // Storage blocked: the card still works until the app is closed.
   }
 }
 
 /**
- * Today's pick and the "Another" button behind it. The pick stays put all day, skips last
- * until midnight, and the list wraps around after the last look.
+ * Today's pick and the "Another" button behind it. The pick stays put all day (until it is
+ * hidden or loses a piece), "Another" walks to the next look, and tomorrow starts elsewhere.
  */
 export function useTodaysPick(items: ClothingItem[], outfits: Outfit[], wears: Wear[], today: Day) {
-  const looks = useMemo(() => todaysLooks(items, outfits, wears, today), [items, outfits, wears, today])
-  const [skips, setSkips] = useState<Skips | null>(readSkips)
-  const skipped = skips?.day === today ? skips.skipped : 0
-  const look: Suggestion | undefined = looks.length > 0 ? looks[skipped % looks.length] : undefined
+  const [memory, setMemory] = useState<TodayMemory | null>(readMemory)
+  const result = useMemo(() => todaysPick(items, outfits, wears, today, memory), [items, outfits, wears, today, memory])
+
+  // A new pick (first open today, or the old one can't be made any more) is remembered.
+  useEffect(() => {
+    if (JSON.stringify(result.memory) === JSON.stringify(memory)) return
+    writeMemory(result.memory)
+    setMemory(result.memory)
+  }, [result.memory, memory])
 
   const another = () => {
-    const next = { day: today, skipped: skipped + 1 }
-    writeSkips(next)
-    setSkips(next)
+    const next = passOn(result.memory)
+    writeMemory(next)
+    setMemory(next)
   }
-  return { look, another, choices: looks.length }
+  return { look: result.look, another, choices: result.choices }
 }
 
 interface TodaysLookProps {
@@ -86,12 +93,12 @@ export function TodaysLook({ look, wearing, byId, saved, savedCount, choices, to
           <OutfitCollage items={pieces} />
         </div>
         <div className="px-1.5 pb-1.5 md:pr-6">
-          <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-eyebrow text-accent uppercase">
+          <h2 className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-eyebrow text-accent uppercase">
             <span aria-hidden="true" className="h-px w-6 bg-accent" />
             <span>{isWearing ? TODAY_LABELS.wearing : TODAY_LABELS.kicker} ·</span>
             <span className="whitespace-nowrap">{date}</span>
-          </p>
-          {!isWearing && <h2 className="mt-4 font-serif text-title text-balance">{look.why}</h2>}
+          </h2>
+          {!isWearing && <p className="mt-4 font-serif text-title text-balance">{look.why}</p>}
           <p className={isWearing ? 'mt-4 font-serif text-title text-balance' : 'mt-3 text-sm leading-relaxed text-muted'}>
             {pieces.map((item) => item.name).join(' · ')}
           </p>

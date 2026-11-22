@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
+import { BackupReminder } from '../components/BackupReminder'
 import { EmptyState } from '../components/EmptyState'
 import { Icon } from '../components/Icon'
 import { ItemPhoto } from '../components/ItemPhoto'
@@ -8,7 +9,7 @@ import { Sheet } from '../components/Sheet'
 import { TodaysLook, useTodaysPick } from '../components/TodaysLook'
 import { useWornLog } from '../components/WornToast'
 import { hideLook, removeLook, saveLook } from '../db'
-import { suggestOutfits, toDay } from '../engine'
+import { suggestOutfits } from '../engine'
 import {
   dichoOfTheDay,
   FORMALITY_LABELS,
@@ -19,6 +20,7 @@ import {
   TODAY_LABELS,
 } from '../lib/labels'
 import { goTo } from '../lib/useRoute'
+import { useToday } from '../lib/useToday'
 import {
   OCCASIONS,
   SEASONS,
@@ -93,7 +95,7 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
     [anchor, filters],
   )
   const { logLook, toast, pendingId } = useWornLog()
-  const today = toDay(Date.now())
+  const today = useToday()
   // While the "Worn" bar shows, the list stays still: no card jumps under her finger, and Undo
   // is next to the look she just logged. It re-sorts when the bar closes.
   const settled = useMemo(() => wears.filter((wear) => wear.id !== pendingId), [wears, pendingId])
@@ -101,7 +103,9 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
     () => suggestOutfits(items, active, outfits, limit, { wears: settled, today }),
     [items, active, outfits, limit, settled, today],
   )
-  const todays = useTodaysPick(items, outfits, wears, today)
+  // Scored as the list is (without a log the Worn bar is still offering to move), so neither
+  // jumps while the bar shows.
+  const todays = useTodaysPick(items, outfits, settled, today)
   // What she logged today, any way: Today's look then shows that instead of a pick.
   const wearingToday = useMemo(() => {
     const ids = new Set(wears.filter((wear) => wear.date === today).flatMap((wear) => wear.itemIds))
@@ -130,9 +134,9 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
   return (
     <>
       <div className="pt-8 sm:pt-12">
-        <p lang="es" className="font-script text-greeting text-accent">
+        <h1 lang="es" className="font-script text-greeting text-accent">
           Hola, {OWNER_NAME}
-        </p>
+        </h1>
         <figure lang="es" className="mt-2">
           <blockquote className="font-serif text-quote italic">“{dicho.text}”</blockquote>
           <figcaption className="mt-2 flex items-center gap-2.5 text-eyebrow text-ink/80 uppercase">
@@ -156,8 +160,10 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
         />
       )}
 
+      {!missing && <BackupReminder className="mx-auto mt-9 max-w-5xl" items={items} outfits={outfits} wears={wears} />}
+
       <div className="pb-10 sm:pb-14">
-        <h1 className="mt-9 max-w-4xl font-serif text-headline font-light">
+        <h2 className="mt-9 max-w-4xl font-serif text-headline font-light">
           A look for{' '}
           <SentenceSelect
             label="Occasion"
@@ -191,7 +197,7 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
               })),
             ]}
           />
-        </h1>
+        </h2>
 
         <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2">
           {anchor ? (
