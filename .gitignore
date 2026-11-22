@@ -8,3 +8,6 @@ dist
 .env.*
 # Marce's closet backups hold her photos: never commit them.
 closet-backup-*.json
+
+# Guide video work files (narration, recordings, test profiles)
+tools/guide-video/.work/

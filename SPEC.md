@@ -104,6 +104,30 @@ pieces, like every look. Compared with Cladwell, Whering and Acloset
   notification, planning ahead or packing, weekday vs weekend, pinning a
   piece and shuffling the rest, AI.
 
+### Video guide, "How it works" (Jose, 2026-11-22)
+A round play button in the masthead on every page (top left on phones,
+opposite the music; beside the music on laptops) opens "How it works": a
+narrated video of the whole app, Spanish first, with a switch to English.
+About two minutes: the intro, putting Closet on the home screen (the iOS
+26 Safari steps, drawn), Today's look, adding a piece, more looks,
+Lookbook, Forgotten and backing up. Voice by ElevenLabs (a warm Colombian
+voice in both languages), captions in the picture, recorded from the app
+with a closet drawn in code, never her photos. The app's music fades while
+it plays. It streams: the offline copy skips it, and without signal the
+sheet says the guide needs internet while everything else keeps working.
+Made with `tools/guide-video/`, which re-makes it after a screen changes.
+Compared with Stylebook (demo videos in its help section), Indyx (written
+FAQ on its website) and Whering (blog and social posts): inside the app,
+in her language and accent, no YouTube or account.
+- Done when: on her iPhone home-screen app, the play button shows top left
+  on every page; it opens "How it works" and plays the Spanish guide;
+  "English" switches; the music fades while it plays and comes back after;
+  closing stops the video; in airplane mode the sheet says it needs
+  internet and the rest of the app works.
+- Not in v1: playing offline, chapters, captions she can turn off,
+  playing by itself on first launch, the app's words in Spanish,
+  re-recording by itself.
+
 ### Lookbook
 Save a look, name it and rate it 1 to 5 stars; hide looks she doesn't
 like. Favorite pieces (Phase 3): a heart on every piece in the Closet
@@ -333,4 +357,11 @@ Runway, music with ElevenLabs (`CREDITS.md`).
     A reviewer caught that the first version could change the pick during
     the day and repeat yesterday's; fixed with tests.
   - [ ] Live, and Marce has used it on her iPhone for a week.
+- [ ] Video guide in the app (Jose approved the plan, 2026-11-22).
+  - [x] Built and checked: tests, typecheck and build pass; preview at 390
+    px light and dark and 1440 px: the button in the masthead, Spanish
+    plays first, English switches, closing stops it, offline message,
+    nothing from `guide/` in the offline copy; both files under 5 MB; the
+    guides re-made with `tools/guide-video/` from the repo.
+  - [ ] Live, and Marce has watched it on her iPhone.
 - [ ] Phase next: to decide with Jose.

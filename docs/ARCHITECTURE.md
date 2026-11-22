@@ -15,6 +15,10 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   built path relative, so the app works in Pages' sub-folder. `tsconfig.json`: types.
 - `public/`: copied as is into `dist/`.
   - `sw.js`: the offline worker.
+  - `guide/`: the "How it works" video guides, `guia-es.mp4` and
+    `guide-en.mp4` (each under 5 MB, narrated, captions in the picture) and
+    their first frames `poster-es.webp`, `poster-en.webp`. Made with
+    `tools/guide-video/`.
   - `intro/`: the intro's waiting picture (`closed.webp`, the clip's
     first frame), the doors-open clip (`open.mp4`, 4 s, H.264, no sound)
     and the music (`music.m4a` for Safari, `music.webm`, 12 s).
@@ -49,7 +53,7 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   - `backup.ts`: Back up / Restore to a `.json` file.
   - `db.test.ts`, `backup.test.ts`, `upgrade.test.ts` (a version-1
     closet opens intact): 14 tests (with `fake-indexeddb`).
-- `src/lib/`: `labels.ts` (all the words shown for options, the backup reminder's words (`BACKUP_LABELS`), Today's look's words (`TODAY_LABELS`), plus the
+- `src/lib/`: `labels.ts` (all the words shown for options, the backup reminder's words (`BACKUP_LABELS`), Today's look's words (`TODAY_LABELS`), the guide's words (`GUIDE_LABELS`), plus the
   greeting's name, the daily Cali sayings, `DICHOS`, the intro's words, and the shared `capitalize` and `joinWithAnd` text helpers, which the engine uses too), `intro.ts` (when and how the
   intro plays; `intro.test.ts`, 4 tests), `music.ts` (the intro music, which carries on into the app), `update.ts` (spotting a new
   version; `update.test.ts`, 3 tests), `image.ts`
@@ -61,13 +65,17 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   Pieces tab), `Sheet`, `Navigation`, `Chips`,
   `ColorPicker`, `StarRating`, `PageHeader`, `EmptyState`,
   `BackupControls` (also `backUpCloset`, shared with the reminder), `BackupReminder` (the "No backup yet" note at the top of the Closet, and on Looks under Today's look), `Icon` (the sticker icons and three line icons), `WornToast` (logs a look as worn, with the
-  change-day and undo bar), `Intro` (the wardrobe intro screen), `MusicButton` (mute / play for the music), `UpdateBar` (checks for a new
+  change-day and undo bar), `Intro` (the wardrobe intro screen), `MusicButton` (mute / play for the music), `GuideButton` (the play button in the masthead, shown twice for phones and laptops, and `GuideSheet`, the one "How it works" sheet with the video and the Español / English switch, rendered once by `Navigation`), `UpdateBar` (checks for a new
   version and reloads, or offers Update while a form is open).
 - `src/views/`: the three pages: `ClosetView`, `LooksView`,
   `LookbookView`.
 - `.github/workflows/`: `check.yml` ("App checks": test, typecheck, build
   on every pull request) and `pages.yml` (the same, then publishes `dist/`
   to GitHub Pages on every push to `main`).
+- `tools/guide-video/`: how the video guides are made (not part of the
+  app or the build): the bilingual script, the recorder, the illustrated
+  install step, the mixer and a server for `dist/`. See its README. Work
+  files go in `tools/guide-video/.work/` (ignored by git).
 - `scripts/`: Windows only, Marce's PC: `open-closet.ps1` (starts the app
   in its own Edge window), `make-shortcut.ps1`, `closet.ico`.
 - Docs: `SPEC.md`, `CLAUDE.md`, `DESIGN.md`, `CREDITS.md`, and in `docs/`
@@ -155,7 +163,8 @@ analytics.
   A page is saved only after every `assets/` file it names is saved, so a
   new version that arrives late on a weak signal can't leave a page
   without its scripts (the next open with no signal would be blank). It
-  never reads or deletes any cache, its own or another app's, on the
+  leaves the video guides (`guide/`) to the internet, never saving them.
+  It never reads or deletes any cache, its own or another app's, on the
   shared `jvtomax99.github.io` address. On the first visit, `main.tsx` fetches the page's
   files again once the worker is in charge, so the copy is complete.
 - **Per address**: each address, browser and iPhone home-screen app has

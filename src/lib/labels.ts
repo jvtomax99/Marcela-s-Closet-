@@ -135,6 +135,16 @@ export const INTRO_LABELS = {
   unmute: 'Play music',
 } as const
 
+/** The "How it works" video guide (the play button in the masthead). */
+export const GUIDE_LABELS = {
+  open: 'How it works',
+  title: 'How it works',
+  spanish: 'Español',
+  english: 'English',
+  language: 'Language',
+  offline: 'The guide needs an internet connection. Everything else works without one.',
+} as const
+
 /** The Today's look card at the top of Looks. */
 export const TODAY_LABELS = {
   kicker: "Today's look",

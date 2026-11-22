@@ -188,6 +188,17 @@ the rest in small sans, muted, and "Back up now" as the dark pill (`bg-ink`,
 `text-canvas`, eyebrow, `shadow-print`), beside the words on laptops and
 under them on phones. No new values.
 
+## Guide button and player (`src/components/GuideButton.tsx`)
+
+The same round button as the music (`h-11 w-11`, `bg-surface/80`,
+`shadow-print`) with a line play icon: top left of the masthead on phones,
+mirroring the music button top right; beside it in the laptop masthead.
+It opens the usual sheet, "How it works": a two-way switch (Español |
+English) in a sand pill with the chosen side as a white chip
+(`shadow-card`), then the video, rounded 2xl, `shadow-print`, at most
+68% of the screen tall. Offline, the line "The guide needs an internet
+connection" in the serif at `text-title`. No new values.
+
 ## Update bar (`src/components/UpdateBar.tsx`)
 
 Only while a form is open and a new version is waiting: the same dark

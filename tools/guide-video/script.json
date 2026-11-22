@@ -1,0 +1,65 @@
+[
+ {
+  "id": "s1-intro",
+  "en": "Hi Marce! This is your Closet: outfits made only from the clothes you already own. Let me show you how it works.",
+  "es": "¡Hola, Marce! Este es tu Closet: outfits hechos solo con la ropa que ya tienes. Te muestro cómo funciona."
+ },
+ {
+  "id": "s1b-install",
+  "en": "First, put Closet on your home screen. In Safari, open the link, tap the three dots next to the address, then Share, then Add to Home Screen. Keep Open as Web App on, and tap Add. From now on, open Closet from its icon, not from Safari. It updates itself, so never delete it: that would delete your closet too.",
+  "es": "Primero, pon Closet en tu pantalla de inicio. En Safari, abre el enlace, toca los tres puntos junto a la dirección, luego Compartir, y la opción de agregar a la pantalla de inicio. Deja activado abrir como app web, y toca Agregar. Desde ahí, abre Closet desde su ícono, no desde Safari. Se actualiza sola, así que nunca la borres: borrarías tu closet.",
+  "cues": {
+   "en": [
+    "In Safari",
+    "then Share",
+    "then Add to Home",
+    "Keep Open",
+    "From now on",
+    "It updates"
+   ],
+   "es": [
+    "En Safari",
+    "luego Compartir",
+    "y la opción",
+    "Deja activado",
+    "Desde ahí",
+    "Se actualiza"
+   ]
+  }
+ },
+ {
+  "id": "s2-today",
+  "en": "Every time you open the app, you'll find today's look: one outfit, picked for the season, with a note on why it works. Not feeling it? Tap Another. Wearing it? Tap Wore it, and the app remembers.",
+  "es": "Cada vez que abres la app, te espera el look de hoy: un solo outfit, pensado para la temporada, con una nota de por qué funciona. ¿No te convence? Toca Another. ¿Te lo vas a poner? Toca Wore it, y la app lo recuerda."
+ },
+ {
+  "id": "s3-add",
+  "en": "To add a piece, go to Closet and tap Add a piece. Take a photo or choose one from your camera roll, then pick what it is. The app reads the color from the photo. Tap Add and take another to keep going.",
+  "es": "Para agregar una prenda, ve a Closet y toca Add a piece. Toma una foto o elige una de tu galería, y escoge qué es. La app saca el color de la foto. Con Add and take another sigues con la siguiente."
+ },
+ {
+  "id": "s4-looks",
+  "en": "Below today's look you'll find more ideas. Use the sentence at the top to choose an occasion, a season or a dress code. Save a look with the heart, or tap Not for me, and it won't come back.",
+  "es": "Debajo del look de hoy hay más ideas. Con la frase de arriba eliges la ocasión, la temporada o qué tan formal. Guarda un look con el corazón, o toca Not for me, y no vuelve a salir."
+ },
+ {
+  "id": "s5-lookbook",
+  "en": "Your saved looks live in the Lookbook. Rate them with stars. Your favorite pieces are there too.",
+  "es": "Tus looks guardados quedan en el Lookbook. Califícalos con estrellas. Tus prendas favoritas también están ahí."
+ },
+ {
+  "id": "s6-forgotten",
+  "en": "Pieces you haven't worn in a month show up on the Forgotten shelf, and the app brings them back into your looks.",
+  "es": "Las prendas que no te pones hace un mes aparecen en Forgotten, y la app las vuelve a meter en tus looks."
+ },
+ {
+  "id": "s7-backup",
+  "en": "Your closet lives only on this phone. When the app reminds you, tap Back up now and choose Save to Files, so your closet is always safe.",
+  "es": "Tu closet vive solo en este teléfono. Cuando la app te lo recuerde, toca Back up now y elige Guardar en Archivos, así tu closet siempre está a salvo."
+ },
+ {
+  "id": "s8-close",
+  "en": "That's it. Enjoy your closet, Marce!",
+  "es": "¡Y listo! Que lo disfrutes, Marce."
+ }
+]
