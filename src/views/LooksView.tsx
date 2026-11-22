@@ -5,10 +5,19 @@ import { Icon } from '../components/Icon'
 import { ItemPhoto } from '../components/ItemPhoto'
 import { LookCard } from '../components/LookCard'
 import { Sheet } from '../components/Sheet'
+import { TodaysLook, useTodaysPick } from '../components/TodaysLook'
 import { useWornLog } from '../components/WornToast'
 import { hideLook, removeLook, saveLook } from '../db'
 import { suggestOutfits, toDay } from '../engine'
-import { dichoOfTheDay, FORMALITY_LABELS, joinWithAnd, OCCASION_PHRASES, OWNER_NAME, SEASON_LABELS } from '../lib/labels'
+import {
+  dichoOfTheDay,
+  FORMALITY_LABELS,
+  joinWithAnd,
+  OCCASION_PHRASES,
+  OWNER_NAME,
+  SEASON_LABELS,
+  TODAY_LABELS,
+} from '../lib/labels'
 import { goTo } from '../lib/useRoute'
 import {
   OCCASIONS,
@@ -88,10 +97,16 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
   // While the "Worn" bar shows, the list stays still: no card jumps under her finger, and Undo
   // is next to the look she just logged. It re-sorts when the bar closes.
   const settled = useMemo(() => wears.filter((wear) => wear.id !== pendingId), [wears, pendingId])
-  const looks = useMemo(
+  const suggested = useMemo(
     () => suggestOutfits(items, active, outfits, limit, { wears: settled, today }),
     [items, active, outfits, limit, settled, today],
   )
+  const todays = useTodaysPick(items, outfits, wears, today)
+  // What she logged today, any way: Today's look then shows that instead of a pick.
+  const wearingToday = useMemo(() => {
+    const ids = new Set(wears.filter((wear) => wear.date === today).flatMap((wear) => wear.itemIds))
+    return items.filter((item) => ids.has(item.id))
+  }, [items, wears, today])
 
   const update = (change: SuggestionFilters) => {
     setLimit(PAGE_SIZE)
@@ -104,12 +119,17 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
   const savedCount = savedBySignature.size
   const missing = missingPieces(items)
   const filtered = Boolean(active.occasion || active.season || active.formality || active.anchorId)
+  // Today's look sits above the filters, so it stays while she browses (nothing jumps under her
+  // finger), but not when she came to build around a piece. The plain list then skips it.
+  const todaysLook = !missing && !active.anchorId ? todays.look : undefined
+  const looks =
+    todaysLook && !filtered ? suggested.filter((look) => look.signature !== todaysLook.signature) : suggested
 
   const dicho = dichoOfTheDay()
 
   return (
     <>
-      <div className="pt-8 pb-10 sm:pt-12 sm:pb-14">
+      <div className="pt-8 sm:pt-12">
         <p lang="es" className="font-script text-greeting text-accent">
           Hola, {OWNER_NAME}
         </p>
@@ -120,6 +140,23 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
             {dicho.source}
           </figcaption>
         </figure>
+      </div>
+
+      {todaysLook && (
+        <TodaysLook
+          look={todaysLook}
+          wearing={wearingToday}
+          byId={byId}
+          saved={savedBySignature.get(todaysLook.signature)}
+          savedCount={savedCount}
+          choices={todays.choices}
+          today={today}
+          onAnother={todays.another}
+          onWore={logLook}
+        />
+      )}
+
+      <div className="pb-10 sm:pb-14">
         <h1 className="mt-9 max-w-4xl font-serif text-headline font-light">
           A look for{' '}
           <SentenceSelect
@@ -216,7 +253,7 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
         >
           Add {missing} to your closet, and the first looks will appear here.
         </EmptyState>
-      ) : looks.length === 0 ? (
+      ) : suggested.length === 0 ? (
         <EmptyState title="Nothing fits that brief">
           {filtered
             ? 'No combination in your closet matches all of this. Try loosening a filter.'
@@ -224,21 +261,23 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
         </EmptyState>
       ) : (
         <>
-          <p className="mx-auto mb-5 flex max-w-5xl items-center gap-2.5 rounded-full bg-glass px-4 py-2.5 text-button font-medium shadow-card backdrop-blur-xl sm:w-fit sm:pr-6">
-            <span aria-hidden="true" className="flex h-3.5 items-end gap-0.5">
-              {[0.6, 1, 0.75, 0.9].map((height, index) => (
-                <span
-                  key={index}
-                  className="eq-bar w-[3px] rounded-full bg-accent"
-                  style={{ height: `${height * 100}%`, animationDelay: `${index * 0.17}s` }}
-                />
-              ))}
-            </span>
-            Now playing · {filtered ? 'your picks' : "today's looks"}
-            <span className="ml-auto pl-4 text-xs text-muted">
-              {looks.length} {looks.length === 1 ? 'track' : 'tracks'}
-            </span>
-          </p>
+          {looks.length > 0 && (
+            <p className="mx-auto mb-5 flex max-w-5xl items-center gap-2.5 rounded-full bg-glass px-4 py-2.5 text-button font-medium shadow-card backdrop-blur-xl sm:w-fit sm:pr-6">
+              <span aria-hidden="true" className="flex h-3.5 items-end gap-0.5">
+                {[0.6, 1, 0.75, 0.9].map((height, index) => (
+                  <span
+                    key={index}
+                    className="eq-bar w-[3px] rounded-full bg-accent"
+                    style={{ height: `${height * 100}%`, animationDelay: `${index * 0.17}s` }}
+                  />
+                ))}
+              </span>
+              Now playing · {filtered ? 'your picks' : todaysLook ? TODAY_LABELS.moreLooks : "today's looks"}
+              <span className="ml-auto pl-4 text-xs text-muted">
+                {looks.length} {looks.length === 1 ? 'track' : 'tracks'}
+              </span>
+            </p>
+          )}
           <div className="mx-auto grid max-w-5xl gap-y-10 md:grid-cols-2 md:gap-x-10 md:gap-y-14">
             <AnimatePresence mode="popLayout" initial={false}>
               {looks.map((look, index) => {
@@ -261,7 +300,7 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
               })}
             </AnimatePresence>
           </div>
-          {looks.length === limit && (
+          {suggested.length === limit && (
             <div className="mt-14 text-center">
               <button
                 type="button"

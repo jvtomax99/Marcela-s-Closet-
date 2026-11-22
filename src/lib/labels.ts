@@ -136,6 +136,17 @@ export const INTRO_LABELS = {
 } as const
 
 /** The bar offered when a new version arrives while a form is open. */
+/** The Today's look card at the top of Looks. */
+export const TODAY_LABELS = {
+  kicker: "Today's look",
+  wearing: 'Wearing today',
+  woreIt: 'Wore it',
+  another: 'Another',
+  save: 'Save',
+  saved: 'Saved',
+  moreLooks: 'more looks',
+} as const
+
 /** The backup reminder and the Backup section's last-backup line. */
 export const BACKUP_LABELS = {
   today: 'Last backup today',
