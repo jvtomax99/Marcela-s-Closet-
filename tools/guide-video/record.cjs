@@ -166,7 +166,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, Math.max(0, ms)))
   const text = install[LANG]
   const spoken = dur('s1b-install')
   // The illustrated step is served next to the built app (a scratch copy; the next build drops it).
-  fs.copyFileSync(path.join(HERE, 'install.html'), path.join(DIST, 'guide-install.html'))
+  // Its fonts point at the build's own files, whose names change with each font update.
+  const fontFile = (style) => fs.readdirSync(path.join(DIST, 'assets')).find((f) => f.startsWith(`cormorant-garamond-latin-wght-${style}-`))
+  const installPage = fs.readFileSync(path.join(HERE, 'install.html'), 'utf8')
+    .replace(/cormorant-garamond-latin-wght-normal-[^)]+\.woff2/, fontFile('normal'))
+    .replace(/cormorant-garamond-latin-wght-italic-[^)]+\.woff2/, fontFile('italic'))
+  fs.writeFileSync(path.join(DIST, 'guide-install.html'), installPage)
   await page.goto(BASE + `guide-install.html?lang=${LANG}`)
   await page.waitForTimeout(300)
   start('s1b-install')
@@ -241,6 +246,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, Math.max(0, ms)))
 
   await cdp.send('Page.stopScreencast')
   await ctx.close()
+  fs.rmSync(path.join(DIST, 'guide-install.html'), { force: true })
   // Frames come only when the screen changes: hold each until the next, then encode at 30 fps.
   const list = ['ffconcat version 1.0']
   frames.forEach((f, i) => {

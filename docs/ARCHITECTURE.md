@@ -65,7 +65,7 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   Pieces tab), `Sheet`, `Navigation`, `Chips`,
   `ColorPicker`, `StarRating`, `PageHeader`, `EmptyState`,
   `BackupControls` (also `backUpCloset`, shared with the reminder), `BackupReminder` (the "No backup yet" note at the top of the Closet, and on Looks under Today's look), `Icon` (the sticker icons and three line icons), `WornToast` (logs a look as worn, with the
-  change-day and undo bar), `Intro` (the wardrobe intro screen), `MusicButton` (mute / play for the music), `GuideButton` (the play button in the masthead and the "How it works" sheet with the video and the Español / English switch), `UpdateBar` (checks for a new
+  change-day and undo bar), `Intro` (the wardrobe intro screen), `MusicButton` (mute / play for the music), `GuideButton` (the play button in the masthead, shown twice for phones and laptops, and `GuideSheet`, the one "How it works" sheet with the video and the Español / English switch, rendered once by `Navigation`), `UpdateBar` (checks for a new
   version and reloads, or offers Update while a form is open).
 - `src/views/`: the three pages: `ClosetView`, `LooksView`,
   `LookbookView`.

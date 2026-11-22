@@ -68,7 +68,10 @@ export function startMusic(data: Promise<ArrayBuffer | null>) {
 /** Moves to a new volume (the app's softer level after the intro), unless she muted it. */
 export function setMusicVolume(level: number, seconds: number) {
   volume = level
-  if (state === 'on') rampTo(level, seconds)
+  if (state !== 'on' || !sound) return
+  // iPhone can pause the music while a video with sound plays: pick it back up.
+  if (level > 0) void sound.context.resume()
+  rampTo(level, seconds)
 }
 
 /** Her mute / play button, in the intro and in the masthead. */

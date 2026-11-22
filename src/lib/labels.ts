@@ -141,6 +141,7 @@ export const GUIDE_LABELS = {
   title: 'How it works',
   spanish: 'Español',
   english: 'English',
+  language: 'Language',
   offline: 'The guide needs an internet connection. Everything else works without one.',
 } as const
 

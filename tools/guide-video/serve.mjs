@@ -12,7 +12,8 @@ http.createServer((req, res) => {
   const url = new URL(req.url, 'http://x')
   const send = () => {
     if (!url.pathname.startsWith(BASE)) { res.statusCode = 404; return res.end() }
-    let file = path.join(root, url.pathname.slice(BASE.length))
+    let file = path.join(root, path.normalize(decodeURIComponent(url.pathname.slice(BASE.length))).replace(/^(\.\.[\/\\])+/, ''))
+    if (!file.startsWith(root)) { res.statusCode = 403; return res.end() }
     if (file.endsWith('/') || url.pathname === BASE) file = path.join(file, 'index.html')
     fs.readFile(file, (err, data) => {
       if (err) { res.statusCode = 404; return res.end() }
@@ -21,4 +22,4 @@ http.createServer((req, res) => {
     })
   }
   send()
-}).listen(4173, () => console.log('Serving', root, 'at http://localhost:4173' + BASE))
+}).listen(4173, '127.0.0.1', () => console.log('Serving', root, 'at http://localhost:4173' + BASE))
