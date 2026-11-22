@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import type { Route } from '../lib/useRoute'
 import { Icon, type IconName } from './Icon'
+import { GuideButton } from './GuideButton'
 import { MusicButton } from './MusicButton'
 
 const LINKS: { route: Route; label: string; icon: IconName }[] = [
@@ -18,6 +19,8 @@ export function Navigation({ route }: { route: Route }) {
       <header className="relative mx-auto max-w-6xl px-4 sm:px-8">
         {/* The intro's music, still playing: a mute button top right on phones. */}
         <MusicButton className="absolute top-3 right-4 sm:right-8 md:hidden" />
+        {/* The video guide: top left on phones, opposite the music. */}
+        <GuideButton className="absolute top-3 left-4 sm:left-8 md:hidden" />
         <div className="grid grid-cols-1 items-center gap-1 border-b border-line pt-5 pb-3 text-center md:grid-cols-[1fr_auto_1fr] md:pt-7 md:pb-4">
           <p className="hidden text-eyebrow text-muted uppercase md:block md:text-left">The {EDITION} edit</p>
           <a href="#/closet" className="font-serif text-[2rem] leading-none tracking-tight italic md:text-[2.5rem]">
@@ -47,6 +50,7 @@ export function Navigation({ route }: { route: Route }) {
                 </a>
               )
             })}
+            <GuideButton className="-my-2" />
             <MusicButton className="-my-2" />
           </nav>
         </div>

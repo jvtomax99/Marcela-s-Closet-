@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install guide</title>
+<style>
+  @font-face { font-family: 'Cormorant'; font-style: normal; font-weight: 300 700; src: url(assets/cormorant-garamond-latin-wght-normal-CUoBjw-S.woff2) format('woff2'); }
+  @font-face { font-family: 'Cormorant'; font-style: italic; font-weight: 300 700; src: url(assets/cormorant-garamond-latin-wght-italic-C-nL33vl.woff2) format('woff2'); }
+  :root { --canvas: #fbf3ea; --ink: #2b1a22; --muted: #6e5a63; --accent: #c2255c; --line: #eedfd3; --soft: #fbe3ec; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: radial-gradient(60% 32rem at 8% 0%, rgb(249 201 217 / .75), transparent 70%), radial-gradient(50% 28rem at 100% 10%, rgb(253 214 160 / .55), transparent 70%), var(--canvas);
+    color: var(--ink); font-family: Inter, system-ui, sans-serif; width: 390px; height: 844px; overflow: hidden; }
+  header { padding: 64px 28px 0; }
+  .kicker { display: flex; align-items: center; gap: 10px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+  .kicker::before { content: ''; width: 24px; height: 1px; background: var(--accent); }
+  h1 { margin-top: 14px; font-family: Cormorant, serif; font-weight: 300; font-size: 46px; line-height: 1.02; letter-spacing: -.02em; }
+  h1 em { color: var(--accent); }
+  .stage { position: relative; margin: 34px 22px 0; height: 470px; }
+  .screen { position: absolute; inset: 0; opacity: 0; transform: translateY(14px); transition: opacity .45s ease, transform .45s cubic-bezier(.22,1,.36,1); }
+  body[data-step="1"] .s1, body[data-step="2"] .s2, body[data-step="3"] .s3, body[data-step="4"] .s4, body[data-step="5"] .s5, body[data-step="6"] .s5 { opacity: 1; transform: none; }
+  .num { font-family: Cormorant, serif; font-style: italic; font-size: 44px; color: var(--accent); line-height: 1; }
+  .say { margin-top: 6px; font-size: 17px; line-height: 1.4; color: var(--muted); }
+  .say b { color: var(--ink); font-weight: 600; }
+  .card { margin-top: 22px; background: #fff; border-radius: 22px; box-shadow: 0 1px 2px rgb(43 16 30 / .06), 0 12px 30px -10px rgb(43 16 30 / .2); padding: 18px; }
+  .bar { display: flex; align-items: center; gap: 10px; }
+  .addr { flex: 1; height: 46px; border-radius: 23px; background: #f2ece6; display: flex; align-items: center; padding: 0 16px; font-size: 14px; color: var(--muted); }
+  .round { width: 46px; height: 46px; border-radius: 50%; background: #f2ece6; display: grid; place-items: center; font-size: 20px; letter-spacing: 1px; color: var(--ink); position: relative; }
+  .row { display: flex; align-items: center; gap: 14px; height: 54px; padding: 0 14px; border-radius: 14px; font-size: 16px; position: relative; }
+  .row + .row { margin-top: 4px; }
+  .row.dim { color: #b5a7ad; }
+  .hl { background: var(--soft); color: var(--ink); font-weight: 600; }
+  .ring::after { content: ''; position: absolute; inset: -6px; border-radius: inherit; border: 2.5px solid var(--accent); animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 50% { transform: scale(1.04); opacity: .45; } }
+  svg { width: 24px; height: 24px; flex: none; }
+  .confirm { display: flex; align-items: center; gap: 14px; }
+  .confirm img { width: 64px; height: 64px; border-radius: 15px; }
+  .confirm .name { font-family: Cormorant, serif; font-size: 28px; }
+  .toggle { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding: 14px 4px; border-top: 1px solid var(--line); font-size: 16px; }
+  .switch { width: 51px; height: 31px; border-radius: 16px; background: #34c759; position: relative; }
+  .switch::after { content: ''; position: absolute; right: 2px; top: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 2px 4px rgb(0 0 0 / .2); }
+  .add { margin-top: 10px; height: 50px; border-radius: 25px; background: var(--ink); color: var(--canvas); display: grid; place-items: center; font-weight: 600; font-size: 16px; position: relative; }
+  .home { margin-top: 22px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px 14px; padding: 22px 18px; border-radius: 26px; background: linear-gradient(160deg, #e9d6cf, #d7c0c9); }
+  .app { aspect-ratio: 1; border-radius: 16px; background: rgb(255 255 255 / .45); }
+  .closet { text-align: center; font-size: 12px; color: var(--ink); }
+  .closet img { width: 100%; aspect-ratio: 1; border-radius: 16px; display: block; box-shadow: 0 6px 14px rgb(43 16 30 / .25); transform: scale(0); transition: transform .6s cubic-bezier(.34,1.56,.64,1) .25s; }
+  body[data-step="5"] .closet img, body[data-step="6"] .closet img { transform: scale(1); }
+  .closet span { display: block; margin-top: 6px; }
+  .warn { margin-top: 22px; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 18px; background: var(--ink); color: var(--canvas); font-size: 15px; line-height: 1.35;
+    opacity: 0; transform: translateY(10px); transition: opacity .45s ease, transform .45s ease; }
+  body[data-step="6"] .warn { opacity: 1; transform: none; }
+  .warn svg { width: 26px; height: 26px; }
+</style>
+</head>
+<body data-step="0">
+  <header>
+    <p class="kicker" data-t="kicker"></p>
+    <h1 data-t="title"></h1>
+  </header>
+  <div class="stage">
+    <section class="screen s1">
+      <p class="num">1</p><p class="say" data-t="s1"></p>
+      <div class="card"><div class="bar"><div class="addr">jvtomax99.github.io</div><div class="round ring">•••</div></div></div>
+    </section>
+    <section class="screen s2">
+      <p class="num">2</p><p class="say" data-t="s2"></p>
+      <div class="card">
+        <div class="row dim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg><span data-t="newtab"></span></div>
+        <div class="row hl ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 11v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8"/></svg><span data-t="share"></span></div>
+        <div class="row dim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4h12v16l-6-4-6 4z"/></svg><span data-t="bookmark"></span></div>
+      </div>
+    </section>
+    <section class="screen s3">
+      <p class="num">3</p><p class="say" data-t="s3"></p>
+      <div class="card">
+        <div class="row dim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span data-t="copy"></span></div>
+        <div class="row hl ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M12 8v8M8 12h8"/></svg><span data-t="ahs"></span></div>
+        <div class="row dim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg><span data-t="find"></span></div>
+      </div>
+    </section>
+    <section class="screen s4">
+      <p class="num">4</p><p class="say" data-t="s4"></p>
+      <div class="card">
+        <div class="confirm"><img src="apple-touch-icon.png" alt=""><div><p class="name">Closet</p><p style="font-size:13px;color:var(--muted)">jvtomax99.github.io</p></div></div>
+        <div class="toggle"><span data-t="webapp"></span><span class="switch"></span></div>
+        <div class="add ring" data-t="add"></div>
+      </div>
+    </section>
+    <section class="screen s5">
+      <p class="num">5</p><p class="say" data-t="s5"></p>
+      <div class="home">
+        <div class="app"></div><div class="app"></div><div class="app"></div><div class="app"></div>
+        <div class="app"></div><div class="app"></div><div class="closet"><img src="apple-touch-icon.png" alt=""><span>Closet</span></div><div class="app"></div>
+      </div>
+      <div class="warn"><svg viewBox="0 0 24 24" fill="none" stroke="#f06a98" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/><path d="M3 3l18 18"/></svg><span data-t="warn"></span></div>
+    </section>
+  </div>
+<script>
+  const T = {
+    en: { kicker: 'Before you start', title: 'Put Closet on your <em>home screen</em>',
+      s1: 'In <b>Safari</b>, open the link and tap the <b>three dots</b>.', s2: 'Tap <b>Share</b>.', s3: 'Tap <b>Add to Home Screen</b>.',
+      s4: 'Keep <b>Open as Web App</b> on, and tap <b>Add</b>.', s5: 'Open Closet from its <b>icon</b> from now on.',
+      newtab: 'New Tab', share: 'Share', bookmark: 'Add Bookmark', copy: 'Copy', ahs: 'Add to Home Screen', find: 'Find on Page',
+      webapp: 'Open as Web App', add: 'Add', warn: 'It updates itself. Never delete it: that deletes your closet too.' },
+    es: { kicker: 'Antes de empezar', title: 'Pon Closet en tu <em>pantalla de inicio</em>',
+      s1: 'En <b>Safari</b>, abre el enlace y toca los <b>tres puntos</b>.', s2: 'Toca <b>Compartir</b>.', s3: 'Toca la opción de <b>agregar a la pantalla de inicio</b>.',
+      s4: 'Deja activado <b>abrir como app web</b> y toca <b>Agregar</b>.', s5: 'Desde ahora, abre Closet desde su <b>ícono</b>.',
+      newtab: 'Nueva pestaña', share: 'Compartir', bookmark: 'Agregar marcador', copy: 'Copiar', ahs: 'Agregar a pantalla de inicio', find: 'Buscar en la página',
+      webapp: 'Abrir como app web', add: 'Agregar', warn: 'Se actualiza sola. Nunca la borres: borrarías tu closet.' },
+  }
+  const lang = new URLSearchParams(location.search).get('lang') === 'es' ? 'es' : 'en'
+  document.documentElement.lang = lang
+  for (const el of document.querySelectorAll('[data-t]')) el.innerHTML = T[lang][el.dataset.t]
+  window.go = (n) => { document.body.dataset.step = String(n) }
+</script>
+</body>
+</html>

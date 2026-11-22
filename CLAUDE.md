@@ -46,6 +46,11 @@ Jose (`SPEC.md`, Later).
   first, the copy when there's none or after 4 s on a weak signal; the
   versioned `assets/` files straight from the copy) in the cache
   `closet-app:/Marcela-s-Closet-/`. It never holds the closet itself.
+- **Video guide.** `public/guide/` holds the narrated "How it works"
+  guides (Spanish first, under 5 MB each), played from the play button in
+  the masthead. When a screen they show changes, re-make them with
+  `tools/guide-video/` (its README). They stream: the offline worker skips
+  `guide/`.
 - **Updates itself.** `src/components/UpdateBar.tsx` spots a new published
   version and reloads (or asks while a form is open). Never tell anyone to
   delete and re-add the home-screen app to update it: on iPhone that
@@ -55,8 +60,9 @@ Jose (`SPEC.md`, Later).
   anything personal of hers. One exception: the intro's AI-made scenes
   of her (`public/intro/`), which Marce approved on 2026-11-20, and the
   app icon made from the clip's last frame (`assets/icons/cover-photo.jpg`
-  and the icons in `public/`), approved 2026-11-21; her original photos
-  still never go in. Paid raw files
+  and the icons in `public/`), approved 2026-11-21; the video guides in
+  `public/guide/` show only those, plus a closet drawn in code; her
+  original photos still never go in. Paid raw files
   (fonts, models) can't be committed either (`docs/assets.md`, section 9).
   The fonts are free and bundled from npm (`@fontsource-variable/...`).
 - **Design tokens.** Every color, font, shadow and display size is defined

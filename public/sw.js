@@ -18,6 +18,9 @@ self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim(
 self.addEventListener('fetch', (event) => {
   const { request } = event
   if (request.method !== 'GET' || !request.url.startsWith(SCOPE)) return
+  // The video guide (guide/) streams from the internet and is never kept in the offline copy:
+  // about 9 MB she doesn't need on the phone, and iPhone asks for videos in pieces anyway.
+  if (new URL(request.url).pathname.startsWith(`${new URL(SCOPE).pathname}guide/`)) return
 
   // The built files (assets/) get a new name with every version, so a saved copy is never
   // out of date: it answers at once, and only a file not saved yet goes to the internet.
