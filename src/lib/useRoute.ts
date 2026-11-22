@@ -3,9 +3,10 @@ import { useSyncExternalStore } from 'react'
 const ROUTES = ['closet', 'looks', 'lookbook'] as const
 export type Route = (typeof ROUTES)[number]
 
+/** With no page in the address, the app opens on Looks, where Today's look is. */
 function currentRoute(): Route {
   const hash = window.location.hash.replace('#/', '')
-  return ROUTES.find((route) => route === hash) ?? 'closet'
+  return ROUTES.find((route) => route === hash) ?? 'looks'
 }
 
 function subscribe(listener: () => void) {

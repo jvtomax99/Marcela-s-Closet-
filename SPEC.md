@@ -70,6 +70,40 @@ the zip's HANDOFF.md, section 7, and in `src/engine/score.ts`.
   shows outfits made only of her pieces, each with a reason; a filter
   changes the list; "build around" shows only looks with that piece.
 
+### Today's look (Jose, 2026-11-22)
+The app opens on Looks, and the first thing under "Hola, Marce" and the
+daily saying is one big outfit for today: the moodboard, the "why it
+works" line, the pieces, and "Wore it", "Another" and Save. It stays the
+same all day, even when she adds a piece, rates a look or hides another
+one; it only moves on if that look is hidden or loses a piece. It changes
+the next day, even if she logs nothing: the 7 best looks for today's
+season take turns, one a day, and the new day never opens on the last
+day's look. An app left open overnight switches at midnight or when she
+comes back to it. "Another" walks to the next one (it isn't a dislike;
+skips last until midnight, then the round starts again). The season
+comes from the month, northern hemisphere (Dec to Feb winter, Mar to May
+spring, Jun to Aug summer, Sep to Nov fall); pieces with no season always
+qualify, a coat joins in fall and winter by the usual rule, and if no
+look fits the season it falls back to any season. It's scored with what
+she wore before today, so once she logs anything for today the card
+turns into "Wearing today" with those pieces. It stays above the filters
+while she browses and hides only in "Build around a piece"; the list
+below leaves out today's pick when no filter is on. Built only from her
+pieces, like every look. Compared with Cladwell, Whering and Acloset
+(plan, 2026-11-22): one pick with a reason, the same all day, no limit on
+"Another", no account, no weather.
+- Done when: on her iPhone, opening the app lands on Looks and shows one
+  Today's look within a second, with a reason; reopening it the same day
+  shows the same look; tomorrow shows a different one; "Another" shows a
+  new look each tap; "Wore it" turns the card into "Wearing today" and
+  still offers Undo; nothing in it is a piece she doesn't own; in December
+  a coat appears when she has one, in July none does.
+- Weak spot: if she logs nothing and changes nothing, the same 7 looks
+  come round every week. Logging "Wore it" is what makes it learn.
+- Not in v1: weather or location, a home-screen widget or morning
+  notification, planning ahead or packing, weekday vs weekend, pinning a
+  piece and shuffling the rest, AI.
+
 ### Lookbook
 Save a look, name it and rate it 1 to 5 stars; hide looks she doesn't
 like. Favorite pieces (Phase 3): a heart on every piece in the Closet
@@ -90,7 +124,8 @@ with every piece, photo and look; "Restore a backup" reads one back
 Backup reminder (Jose, 2026-11-22): the Backup section says "Last backup
 today", "yesterday" or "on November 2", or "No backup from this device
 yet". When a backup is due, a note at the top of the Closet says so, with
-"Back up now" (one tap, the same as the button below); it goes away once
+"Back up now" (one tap, the same as the button below; since Today's
+look, the same note also shows on Looks, under the card); it goes away once
 she backs up. Due means: never backed up on this device and the closet
 has something in it, or the last backup is 14 days old and a piece, look
 or wear was added since. A closet that hasn't changed never nags. Edits to
@@ -189,7 +224,7 @@ Runway, music with ElevenLabs (`CREDITS.md`).
   icon, cropped from the clip's last frame.
 - Done when: in the iPhone home-screen app, every launch shows the closed
   wardrobe within a second; "Open with sound" plays the clip with music
-  and lands on the Closet page; "Open quietly" does the same silently;
+  and lands on Looks (Today's look, since 2026-11-22); "Open quietly" does the same silently;
   a tap anywhere while waiting opens with sound; Skip, Escape or a tap
   while it plays goes straight in; if the phone won't play the clip it
   goes in within a second; in airplane mode (after one visit) it still
@@ -287,4 +322,15 @@ Runway, music with ElevenLabs (`CREDITS.md`).
     try at this went blank; a reviewer caught it); reminder screenshots at
     390 px light and dark and 1440 px.
   - [ ] Live, and Marce has backed up from the note on her iPhone.
+- [ ] Phase 5: Today's look (Jose approved the plan, 2026-11-22).
+  - [x] Built and checked: 96 tests; preview with a stand-in closet at
+    390 px light and dark and 1440 px: opens on Looks; same pick after a
+    reload; a different one the next day; "Another" changes it and stays
+    after a reload; "Wore it" shows "Wearing today" and Undo brings the
+    pick back; hiding a look in the list leaves the card alone; left open
+    overnight it switches to the new day; the card stays while filtering;
+    a coat in January, none in July; the list below doesn't repeat it.
+    A reviewer caught that the first version could change the pick during
+    the day and repeat yesterday's; fixed with tests.
+  - [ ] Live, and Marce has used it on her iPhone for a week.
 - [ ] Phase next: to decide with Jose.

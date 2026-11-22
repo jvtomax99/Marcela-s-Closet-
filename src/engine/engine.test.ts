@@ -3,7 +3,17 @@ import type { Garment, Outfit, Wear } from '../types'
 import { colorsClash, harmonyOf } from './color'
 import { scoreOutfit } from './score'
 import { outfitAllowed } from './rules'
-import { forgottenPieces, wearStats, outfitSignature, suggestOutfits, toDay } from './index'
+import {
+  forgottenPieces,
+  wearStats,
+  outfitSignature,
+  passOn,
+  seasonOf,
+  suggestOutfits,
+  toDay,
+  todaysLooks,
+  todaysPick,
+} from './index'
 import { daysBetween } from './wear'
 
 let nextId = 0
@@ -472,5 +482,154 @@ describe('reason wording', () => {
     const taste = { ratedLooks: new Map(), itemRatings: new Map(), hiddenPairs: new Map() }
     const texts = scoreOutfit(items, taste).reasons.map((reason) => reason.text)
     expect(texts).toContain('A quiet palette of white, black and beige')
+  })
+})
+
+describe("today's look", () => {
+  const wardrobe = () => [
+    piece({ category: 'top', colors: ['white'] }),
+    piece({ category: 'top', colors: ['navy'] }),
+    piece({ category: 'top', colors: ['grey'] }),
+    piece({ category: 'bottom', colors: ['black'] }),
+    piece({ category: 'bottom', colors: ['beige'] }),
+    piece({ category: 'bottom', colors: ['denim'] }),
+    piece({ category: 'shoes', colors: ['camel'] }),
+  ]
+  const pick = (closet: Garment[], day: string, history: Outfit[] = [], wears: Wear[] = []) =>
+    todaysLooks(closet, history, wears, day)[0]
+
+  it('takes the season from the month, northern hemisphere', () => {
+    expect(seasonOf('2026-12-01')).toBe('winter')
+    expect(seasonOf('2027-01-15')).toBe('winter')
+    expect(seasonOf('2027-02-28')).toBe('winter')
+    expect(seasonOf('2027-03-01')).toBe('spring')
+    expect(seasonOf('2027-06-01')).toBe('summer')
+    expect(seasonOf('2027-08-31')).toBe('summer')
+    expect(seasonOf('2027-09-01')).toBe('fall')
+    expect(seasonOf('2027-11-30')).toBe('fall')
+  })
+
+  it('keeps the same pick all day and changes it tomorrow', () => {
+    const closet = wardrobe()
+    expect(pick(closet, '2026-11-22')?.signature).toBe(pick(closet, '2026-11-22')?.signature)
+    expect(pick(closet, '2026-11-23')?.signature).not.toBe(pick(closet, '2026-11-22')?.signature)
+  })
+
+  it('offers up to a week of different looks, one after another', () => {
+    const looks = todaysLooks(wardrobe(), [], [], '2026-11-22')
+    expect(looks.length).toBeGreaterThan(1)
+    expect(looks.length).toBeLessThanOrEqual(7)
+    expect(new Set(looks.map((look) => look.signature)).size).toBe(looks.length)
+  })
+
+  it('does not reshuffle when she logs what she wore today', () => {
+    const closet = wardrobe()
+    const before = pick(closet, '2026-11-22')!
+    const wore: Wear = { id: 'w', date: '2026-11-22', itemIds: before.items.map((item) => item.id), createdAt: 0 }
+    expect(pick(closet, '2026-11-22', [], [wore])?.signature).toBe(before.signature)
+  })
+
+  it('never shows a hidden look', () => {
+    const closet = wardrobe()
+    const looks = todaysLooks(closet, [], [], '2026-11-22')
+    const hidden = hiddenLook(looks[0].items)
+    expect(todaysLooks(closet, [hidden], [], '2026-11-22').map((look) => look.signature)).not.toContain(
+      hidden.signature,
+    )
+  })
+
+  it('only uses her own pieces', () => {
+    const closet = wardrobe()
+    const ids = new Set(closet.map((item) => item.id))
+    for (const look of todaysLooks(closet, [], [], '2026-11-22')) {
+      expect(look.items.every((item) => ids.has(item.id))).toBe(true)
+    }
+  })
+
+  it('picks pieces for the season, and falls back when nothing fits it', () => {
+    const summerTop = piece({ category: 'top', colors: ['white'], seasons: ['summer'] })
+    const winterTop = piece({ category: 'top', colors: ['grey'], seasons: ['winter'] })
+    const closet = [summerTop, winterTop, piece({ category: 'bottom' }), piece({ category: 'shoes' })]
+    expect(pick(closet, '2027-07-10')?.items).toContain(summerTop)
+    expect(pick(closet, '2027-01-10')?.items).toContain(winterTop)
+    const onlySummer = [summerTop, piece({ category: 'bottom' }), piece({ category: 'shoes' })]
+    expect(pick(onlySummer, '2027-01-10')?.items).toContain(summerTop)
+  })
+
+  it('adds a coat in winter but not in summer', () => {
+    const coat = piece({ category: 'outerwear', colors: ['camel'] })
+    const closet = [...wardrobe(), coat]
+    expect(categories(pick(closet, '2027-01-10')!.items)).toContain('outerwear')
+    expect(categories(pick(closet, '2027-07-10')!.items)).not.toContain('outerwear')
+  })
+
+  it('shows nothing when no outfit can be made', () => {
+    expect(todaysLooks([piece({ category: 'top' })], [], [], '2026-11-22')).toEqual([])
+    expect(todaysPick([piece({ category: 'top' })], [], [], '2026-11-22', null).look).toBeUndefined()
+  })
+
+  it('keeps the same pick all day when she adds a piece, hides another look or rates one', () => {
+    const closet = wardrobe()
+    const first = todaysPick(closet, [], [], '2026-11-22', null)
+    const other = todaysLooks(closet, [], [], '2026-11-22').find((look) => look.signature !== first.look!.signature)!
+    const changed = [...closet, piece({ category: 'top', colors: ['white'], favorite: true })]
+    const history = [hiddenLook(other.items), savedLook(closet.slice(3, 5), 5)]
+    expect(todaysPick(changed, history, [], '2026-11-22', first.memory).look?.signature).toBe(first.look!.signature)
+  })
+
+  it('moves on when today\'s pick is hidden or one of its pieces is deleted', () => {
+    const closet = wardrobe()
+    const first = todaysPick(closet, [], [], '2026-11-22', null)
+    const hidden = todaysPick(closet, [hiddenLook(first.look!.items)], [], '2026-11-22', first.memory)
+    expect(hidden.look?.signature).not.toBe(first.look!.signature)
+    const gone = first.look!.items[0]
+    const deleted = todaysPick(closet.filter((item) => item !== gone), [], [], '2026-11-22', first.memory)
+    expect(deleted.look?.items).not.toContain(gone)
+  })
+
+  it('walks through the looks with Another, and starts over after the last', () => {
+    const closet = wardrobe()
+    let state = todaysPick(closet, [], [], '2026-11-22', null)
+    const seen = [state.look!.signature]
+    for (let i = 1; i < state.choices; i++) {
+      state = todaysPick(closet, [], [], '2026-11-22', passOn(state.memory))
+      seen.push(state.look!.signature)
+    }
+    expect(new Set(seen).size).toBe(state.choices)
+    state = todaysPick(closet, [], [], '2026-11-22', passOn(state.memory))
+    expect(seen).toContain(state.look!.signature)
+  })
+
+  it('never opens tomorrow on the look she was shown today', () => {
+    const closet = wardrobe()
+    let state = todaysPick(closet, [], [], '2026-11-22', null)
+    const wears: Wear[] = []
+    let yesterday = '2026-11-22'
+    for (const day of ['2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26', '2026-11-27', '2026-11-28']) {
+      // She wore each day's pick, which reorders the looks from one day to the next.
+      wears.push({ id: yesterday, date: yesterday, itemIds: state.look!.items.map((item) => item.id), createdAt: 0 })
+      const next = todaysPick(closet, [], wears, day, state.memory)
+      expect(next.look?.signature).not.toBe(state.memory.pick)
+      state = next
+      yesterday = day
+    }
+  })
+
+  it('picks today\'s look quickly from a large closet', () => {
+    const closet = [
+      ...Array.from({ length: 80 }, () => piece({ category: 'top' })),
+      ...Array.from({ length: 50 }, () => piece({ category: 'bottom' })),
+      ...Array.from({ length: 30 }, () => piece({ category: 'shoes' })),
+      ...Array.from({ length: 20 }, () => piece({ category: 'accessory' })),
+    ]
+    const wears: Wear[] = closet.slice(0, 60).map((item, i) => ({
+      id: `w${i}`,
+      date: `2026-11-${String(1 + (i % 21)).padStart(2, '0')}`,
+      itemIds: [item.id],
+      createdAt: 0,
+    }))
+    const start = performance.now()
+    todaysPick(closet, [], wears, '2026-11-22', null)
+    expect(performance.now() - start).toBeLessThan(1000)
   })
 })

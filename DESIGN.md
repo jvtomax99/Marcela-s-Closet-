@@ -164,9 +164,24 @@ Big serif numbers ("Nº 07") use old-style figures (`.oldstyle`).
   ... edit" on the left, the italic serif name in the middle); forms in a
   centered panel.
 
+## Today's look (`src/components/TodaysLook.tsx`)
+
+The first thing on Looks, right under the daily saying and above "A look
+for ...". One large white card (`rounded-card`, `bg-surface`,
+`shadow-card`): the moodboard on top on phones, on the left on laptops
+(two equal columns). Then the kicker as an eyebrow in accent with the
+short accent rule ("Today's look · Wednesday, Nov 25", the date never
+breaks), the "why" line in the serif at `text-title`, the piece names in
+small muted sans, and the buttons: "Wore it" as the dark pill (`bg-ink`,
+`text-canvas`, `shadow-print`), "Another" as the outline pill with the
+arrow, and Save as on every look card. Once something is logged for
+today, the kicker reads "Wearing today" and the piece names take the
+serif title size, with no buttons. No new values.
+
 ## Backup note (`src/components/BackupReminder.tsx`)
 
-At the top of the Closet, under the header, only when a backup is due: a
+At the top of the Closet, under the header, and on Looks under Today's
+look (same width as the card), only when a backup is due: a
 white card like the others (`rounded-card`, `bg-surface`, `shadow-card`,
 `px-5 py-4`), the first words in the italic serif at `text-lg` in ink,
 the rest in small sans, muted, and "Back up now" as the dark pill (`bg-ink`,

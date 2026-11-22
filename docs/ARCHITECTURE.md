@@ -40,25 +40,27 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
     pieces, `toDay` (her phone's local date).
   - `suggest.ts`: building, finishing (outerwear, bag, accessories) and
     picking outfits.
-  - `index.ts`: what the rest of the app may use; `engine.test.ts`: 51
+  - `today.ts`: Today's look: the season from the month (northern
+    hemisphere) and the 7 best looks for it, taking turns by day.
+  - `index.ts`: what the rest of the app may use; `engine.test.ts`: 66
     tests.
 - `src/db/`: storage.
   - `index.ts`: the Dexie database and every read and write.
   - `backup.ts`: Back up / Restore to a `.json` file.
   - `db.test.ts`, `backup.test.ts`, `upgrade.test.ts` (a version-1
     closet opens intact): 14 tests (with `fake-indexeddb`).
-- `src/lib/`: `labels.ts` (all the words shown for options, the backup reminder's words (`BACKUP_LABELS`), plus the
+- `src/lib/`: `labels.ts` (all the words shown for options, the backup reminder's words (`BACKUP_LABELS`), Today's look's words (`TODAY_LABELS`), plus the
   greeting's name, the daily Cali sayings, `DICHOS`, the intro's words, and the shared `capitalize` and `joinWithAnd` text helpers, which the engine uses too), `intro.ts` (when and how the
   intro plays; `intro.test.ts`, 4 tests), `music.ts` (the intro music, which carries on into the app), `update.ts` (spotting a new
   version; `update.test.ts`, 3 tests), `image.ts`
   (photo shrinking), `photoColor.ts` (reads a photo's main color on the
-  phone; `photoColor.test.ts`, 4 tests), `id.ts`, `useRoute.ts` (the `#/` routing), `backupReminder.ts` (when a backup is due and the last-backup date; `backupReminder.test.ts`, 5 tests).
-- `src/components/`: building blocks: `OutfitCollage` (the moodboard),
+  phone; `photoColor.test.ts`, 4 tests), `id.ts`, `useRoute.ts` (the `#/` routing), `useToday.ts` (today's date, kept current past midnight), `backupReminder.ts` (when a backup is due and the last-backup date; `backupReminder.test.ts`, 5 tests).
+- `src/components/`: building blocks: `OutfitCollage` (the moodboard), `TodaysLook` (the big card at the top of Looks, and `useTodaysPick`, which holds today's pick and "Another"),
   `LookCard`, `ItemForm`, `ItemPhoto`, `PieceCard` (a piece in a grid,
   with its one-tap favorite heart; used by the Closet and the Lookbook's
   Pieces tab), `Sheet`, `Navigation`, `Chips`,
   `ColorPicker`, `StarRating`, `PageHeader`, `EmptyState`,
-  `BackupControls` (also `backUpCloset`, shared with the reminder), `BackupReminder` (the "No backup yet" note at the top of the Closet), `Icon` (the sticker icons and three line icons), `WornToast` (logs a look as worn, with the
+  `BackupControls` (also `backUpCloset`, shared with the reminder), `BackupReminder` (the "No backup yet" note at the top of the Closet, and on Looks under Today's look), `Icon` (the sticker icons and three line icons), `WornToast` (logs a look as worn, with the
   change-day and undo bar), `Intro` (the wardrobe intro screen), `MusicButton` (mute / play for the music), `UpdateBar` (checks for a new
   version and reloads, or offers Update while a form is open).
 - `src/views/`: the three pages: `ClosetView`, `LooksView`,
@@ -95,6 +97,16 @@ analytics.
     or pieces logged one by one).
   - Deleting a piece deletes every look that used it and takes it out of
     the days she wore it (a day left empty goes), in one step.
+- **Today's look** (`engine/today.ts`, `todaysPick`): the best looks for
+  today's season (any season if none fits), scored with what she wore
+  before today, so logging today doesn't reshuffle them. The first 7 take
+  turns by day (day number mod 7 picks the first), skipping the last
+  day's pick, and "Another" (`passOn`) walks down them. Once picked, the
+  look stays all day (it is remembered) unless it is hidden or loses a
+  piece; it may slip to 40th place and still stay. `src/lib/useToday.ts`
+  keeps the date current in an app left open overnight.
+  Once anything is logged for today, the card shows those pieces instead.
+  The plain list below leaves out today's pick unless a filter is on.
 - **Suggestions** are worked out fresh from `items`, `outfits` and
   `wears` each time Looks opens: the engine builds every valid
   combination, scores it (ratings, favorites, hidden looks and what she
@@ -106,7 +118,7 @@ analytics.
   older copy of the app ignores it), each
   photo inside as base64 text. Restore merges: a piece or look in both is replaced by the
   backup's copy.
-- **Pages**: `#/closet` (the default), `#/looks`, `#/lookbook`. Refresh
+- **Pages**: `#/looks` (the default, with Today's look on top), `#/closet`, `#/lookbook`. Refresh
   and the back gesture keep the page.
 - **Intro**: starts downloading the clip and music when it shows, as
   whole files played from memory (Safari fetches videos in pieces, which
@@ -123,10 +135,14 @@ analytics.
   each version once per visit (`sessionStorage` key
   `closet-update-tried`), so it can't loop. The offline worker fetches the
   page itself past the browser's 10-minute copy (`cache: 'no-cache'`).
-- **`localStorage`**: one key only, `marcelas-closet:last-backup` (when
-  she last backed up on this device, for the reminder;
-  `src/lib/backupReminder.ts`). The whole `jvtomax99.github.io` address
-  shares `localStorage`, hence the long name. Never the closet itself.
+- **`localStorage`**: two small keys, never the closet itself. The whole
+  `jvtomax99.github.io` address shares `localStorage`, hence the long
+  names.
+  - `marcelas-closet:last-backup`: when she last backed up on this device,
+    for the reminder (`src/lib/backupReminder.ts`).
+  - `marcelas-closet:today`: `{ day, pick, skipped, previous }` for
+    Today's look (`src/components/TodaysLook.tsx`): today's pick, the looks
+    she passed on today with "Another", and the last day's pick.
 - **Offline copy** (`public/sw.js`): registered from the app's folder, so
   it only sees that folder. Every request inside it goes to the internet
   first and the answer is saved in the cache `closet-app:<folder path>`
