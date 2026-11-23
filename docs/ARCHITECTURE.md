@@ -59,14 +59,14 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   - `backup.ts`: Back up / Restore to a `.json` file.
   - `db.test.ts`, `backup.test.ts`, `upgrade.test.ts` (a version-1
     closet opens intact): 14 tests (with `fake-indexeddb`).
-- `src/lib/`: `labels.ts` (all the words shown for options, the backup reminder's words (`BACKUP_LABELS`), Today's look's words (`TODAY_LABELS`), the guide's words (`GUIDE_LABELS`), plus the
+- `src/lib/`: `labels.ts` (all the words shown for options, the backup reminder's words (`BACKUP_LABELS`), Today's look's words (`TODAY_LABELS`), the guide's words (`GUIDE_LABELS`), "Add several" words and the shared `autoName` ("Navy top", `BATCH_LABELS`), plus the
   greeting's name, the daily Cali sayings, `DICHOS`, the intro's words, and the shared `capitalize` and `joinWithAnd` text helpers, which the engine uses too), `intro.ts` (when and how the
   intro plays; `intro.test.ts`, 4 tests), `music.ts` (the sound itself: the intro piece once, then the songs, pause, next, the guide's fade), `playlist.ts` (the songs, their files and their order; `playlist.test.ts`, 5 tests), `update.ts` (spotting a new
   version; `update.test.ts`, 3 tests), `image.ts`
-  (photo shrinking), `photoColor.ts` (reads a photo's main color on the
+  (photo shrinking), `batch.ts` ("Add several": the tray's rules and the quick-add defaults; `batch.test.ts`, 4 tests), `photoColor.ts` (reads a photo's main color on the
   phone; `photoColor.test.ts`, 4 tests), `id.ts`, `useRoute.ts` (the `#/` routing), `useToday.ts` (today's date, kept current past midnight), `backupReminder.ts` (when a backup is due and the last-backup date; `backupReminder.test.ts`, 5 tests).
 - `src/components/`: building blocks: `OutfitCollage` (the moodboard), `TodaysLook` (the big card at the top of Looks, and `useTodaysPick`, which holds today's pick and "Another"),
-  `LookCard`, `ItemForm`, `ItemPhoto`, `PieceCard` (a piece in a grid,
+  `LookCard`, `ItemForm`, `BatchAdd` ("Add several": many photos at once, typed and saved together), `ItemPhoto`, `PieceCard` (a piece in a grid,
   with its one-tap favorite heart; used by the Closet and the Lookbook's
   Pieces tab), `Sheet`, `Navigation`, `Chips`,
   `ColorPicker`, `StarRating`, `PageHeader`, `EmptyState`,

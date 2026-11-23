@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { BackupControls } from '../components/BackupControls'
+import { BatchAdd, PhotosInput } from '../components/BatchAdd'
 import { BackupReminder } from '../components/BackupReminder'
 import { EmptyState } from '../components/EmptyState'
 import { Icon } from '../components/Icon'
@@ -8,7 +9,7 @@ import { PieceCard } from '../components/PieceCard'
 import { PageHeader } from '../components/PageHeader'
 import { Sheet } from '../components/Sheet'
 import { FORGOTTEN_DAYS, forgottenPieces, toDay } from '../engine'
-import { CATEGORY_PLURALS } from '../lib/labels'
+import { BATCH_LABELS, CATEGORY_PLURALS } from '../lib/labels'
 import { CATEGORIES, type Category, type ClothingItem, type Outfit, type Wear } from '../types'
 
 interface ClosetViewProps {
@@ -19,7 +20,11 @@ interface ClosetViewProps {
 }
 
 /** `added` counts pieces saved with "Add and take another" in a row. */
-type Editing = { kind: 'new'; added: number } | { kind: 'existing'; item: ClothingItem } | null
+type Editing =
+  | { kind: 'new'; added: number }
+  | { kind: 'existing'; item: ClothingItem }
+  | { kind: 'batch'; files: File[] }
+  | null
 
 type Shelf = Category | 'all' | 'forgotten'
 
@@ -47,6 +52,17 @@ export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) 
     </button>
   )
 
+  // "Add several" (Jose, 2026-11-23): opens her photo library to pick many at once.
+  const severalButton = (
+    <PhotosInput
+      onFiles={(files) => setEditing({ kind: 'batch', files })}
+      className="key flex min-h-11 items-center gap-2.5 rounded-full py-3.5 pr-5 pl-4 text-eyebrow uppercase"
+    >
+      <Icon name="plus" className="size-4" />
+      {BATCH_LABELS.button}
+    </PhotosInput>
+  )
+
   return (
     <>
       <PageHeader
@@ -60,11 +76,14 @@ export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) 
       />
 
       {items.length === 0 ? (
-        <EmptyState title="An empty rail, for now" action={<div className="flex justify-center">{addButton}</div>}>
+        <EmptyState title="An empty rail, for now" action={<div className="flex flex-wrap items-center justify-center gap-3">{addButton}{severalButton}</div>}>
           Photograph a few pieces you love. With a top, a bottom and a pair of shoes, the first looks appear.
         </EmptyState>
       ) : (
         <>
+          {/* Up here, not floating, so it never covers her photos. */}
+          <div className="-mt-2 mb-8 flex">{severalButton}</div>
+
           <BackupReminder items={items} outfits={outfits} wears={wears} />
 
           <div className="no-scrollbar -mx-4 mb-8 flex gap-7 overflow-x-auto border-b border-line px-4 sm:mx-0 sm:px-0">
@@ -120,12 +139,15 @@ export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) 
         title={
           editing?.kind === 'existing'
             ? 'Edit piece'
+            : editing?.kind === 'batch'
+              ? BATCH_LABELS.title
             : editing && editing.added > 0
               ? `Next piece · ${editing.added} added`
               : 'New piece'
         }
       >
-        {editing && (
+        {editing?.kind === 'batch' && <BatchAdd files={editing.files} onDone={close} />}
+        {editing && editing.kind !== 'batch' && (
           <ItemForm
             key={editing.kind === 'new' ? `new-${editing.added}` : editing.item.id}
             item={editing.kind === 'existing' ? editing.item : undefined}

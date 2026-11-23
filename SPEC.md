@@ -56,6 +56,23 @@ category is not guessed (that needs cloud AI or a large model).
   saves, with the right main color most of the time, and adds three
   pieces in a row without closing the form.
 
+### Add several (Phase 6, Jose, 2026-11-23)
+"Add several", under the Closet title (and next to "Add a piece" in an
+empty closet), opens her photo library to pick up to 20 photos at once.
+Each becomes a card with its main color read on the phone and a name made
+from it ("Navy top"). She gives each card a type, or taps one type under
+"All of them are…" for all of them, removes any she picked by mistake, and
+saves them together ("Save 5 pieces"; all saved or none). The rest of the
+details get the quick-add defaults, the same as a single add, and can be
+changed later. A photo that can't be opened says "Add it on its own" and
+is left out. Like Stylebook's bulk filing; unlike Acloset, nothing leaves
+her phone and the type is not guessed. Not in v1: type guessing,
+background removal, details in the tray, taking several camera shots in a
+row (the single form's "Add and take another" covers that).
+- Done when: on her iPhone, Marce picks 6 photos, sets "All of them are…
+  Top", changes one to Bottom, removes one, saves, and sees 5 new pieces
+  with the right types and mostly right colors.
+
 ### Looks (suggestions)
 The app builds outfits from her pieces only: (top and bottom) or a dress,
 plus shoes; outerwear (fall or winter only), a bag and up to 2 accessories
@@ -424,4 +441,10 @@ Runway, music with ElevenLabs (`CREDITS.md`).
     2026-11-23).
   - [ ] Heard on her iPhone (only a phone can prove the sound and the
     silent switch).
+- [ ] Phase 6: Add several (Jose approved the plan, 2026-11-23).
+  - [x] Built: `BatchAdd`, `src/lib/batch.ts` (4 tests), one shared
+    naming rule and quick-add defaults with the single form. Checked in
+    Chromium at 390 and 1440 px with 6 stand-in photos and a broken file:
+    5 saved, right types, no errors.
+  - [ ] Marce has used it on her iPhone.
 - [ ] Phase next: to decide with Jose.
