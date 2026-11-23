@@ -413,6 +413,10 @@ Runway, music with ElevenLabs (`CREDITS.md`).
     signal could wait a minute, and that two quick Next taps skipped one
     song; fixed, and checked: 20 s paused loads nothing and keeps the
     title, two taps skip two.
+  - [x] Video guides re-made with the new look from the Nov 22 narration
+    takes in Jose's ElevenLabs history (no new credits); Spanish 4.64 MB,
+    English 4.30 MB (the small copy's compression went from crf 30 to 31
+    to stay under 5 MB).
   - [ ] Heard on her iPhone (only a phone can prove the sound and the
     silent switch).
 - [ ] Phase next: to decide with Jose.
