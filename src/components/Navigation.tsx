@@ -66,7 +66,7 @@ export function Navigation({ route }: { route: Route }) {
         className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] z-40 flex justify-center md:hidden"
       >
         {/* The deck: dark in both modes, the current page lit by a hibiscus light (Jose, 2026-11-23). */}
-        <div className="deck flex gap-1 rounded-full p-1.5 shadow-[0_14px_30px_-10px_rgb(43_16_30/0.6),inset_0_1px_0_rgb(255_255_255/0.12)]">
+        <div className="deck flex gap-1 rounded-full p-1.5 shadow-deck">
           {LINKS.map((link) => {
             const active = link.route === route
             return (
@@ -81,7 +81,7 @@ export function Navigation({ route }: { route: Route }) {
                 {active && (
                   <motion.span
                     layoutId="nav-bottom"
-                    className="absolute inset-x-0 bottom-1 mx-auto h-[3px] w-6 rounded-full bg-accent shadow-[0_0_10px_var(--accent)]"
+                    className="absolute inset-x-0 bottom-1 mx-auto h-[3px] w-6 rounded-full bg-accent shadow-glow"
                     transition={{ type: 'spring', stiffness: 420, damping: 36 }}
                   />
                 )}

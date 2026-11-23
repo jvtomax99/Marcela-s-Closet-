@@ -50,6 +50,10 @@ Dark mode follows the phone's setting (`prefers-color-scheme`).
 | `--deck` | `#34222b` to `#1f1218` | `#2a1a22` to `#120b0f` | the tab bar and the radio ticker, dark in both modes |
 | `--on-deck` | `#fbf3ea` | `#fbf3ea` | words and icon outlines on the deck |
 
+The deck has its own shadow, `--deck-shadow` (`shadow-deck`: a long plum
+drop and a faint light top edge), and the current tab's light glows with
+`--deck-glow` (`shadow-glow`, 10 px of `--accent`).
+
 Shadows and glow:
 
 - `--card-shadow` (`shadow-card`): a bright inner top edge, then a small

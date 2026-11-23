@@ -42,6 +42,9 @@
   /* The deck: the tab bar and the ticker, dark in both modes, with cream words on it. */
   --deck: linear-gradient(#34222b, #1f1218);
   --on-deck: #fbf3ea;
+  --deck-shadow: 0 14px 30px -10px rgb(43 16 30 / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.12);
+  /* The hibiscus light under the current tab. */
+  --deck-glow: 0 0 10px var(--accent);
   /* The enamel pin on each print: a shine top left, a shade bottom right, a small drop. */
   --pin-shadow: 0 3px 4px rgb(0 0 0 / 0.3), inset -2px -3px 0 rgb(0 0 0 / 0.18), inset 2px 2px 0 rgb(255 255 255 / 0.45);
   /* Fine paper grain, drawn by the browser so there's no image to download. */
@@ -103,6 +106,8 @@
 
   --shadow-print: var(--print-shadow);
   --shadow-card: var(--card-shadow);
+  --shadow-deck: var(--deck-shadow);
+  --shadow-glow: var(--deck-glow);
 
   --font-serif: 'Cormorant Garamond Variable', 'Iowan Old Style', Georgia, serif;
   --font-sans: 'Inter Variable', system-ui, -apple-system, sans-serif;

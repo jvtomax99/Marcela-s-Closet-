@@ -162,6 +162,12 @@ export const TODAY_LABELS = {
  * masthead. The song titles are Spanish on purpose, like the sayings (Jose, 2026-11-23):
  * Cali places (Juanchito, San Antonio, La Sexta) and the Pacific coast.
  */
+/** A look's number on its round record label. */
+export const TRACK_LABELS = {
+  track: 'Track',
+  name: (number: string) => `Track ${number}`,
+} as const
+
 export const MUSIC_LABELS = {
   songs: ['Salsa en Juanchito', 'Bolero de San Antonio', 'Marimba del Pacífico', 'Boogaloo en la Sexta'],
   station: 'Closet radio',

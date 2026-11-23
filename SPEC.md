@@ -405,8 +405,14 @@ Runway, music with ElevenLabs (`CREDITS.md`).
   - [x] Built and checked: 101 tests, typecheck and build pass; in
     Chromium: quiet open shows the record, Play starts Salsa en
     Juanchito, Next moves on, Pause stops it, a new "Open with sound"
-    plays the intro piece and then the song after the last one heard; no
-    console errors; screenshots at 390 px light and dark and 1440 px.
+    plays the intro piece and then the song after the last one heard; a
+    song left alone hands over to the next at about 86 s; no console
+    errors; screenshots at 390 px light and dark and 1440 px. A reviewer
+    caught that a pause kept loading songs and moving the title on the
+    wall clock (up to 200 MB on a long pause), that a song on one bar of
+    signal could wait a minute, and that two quick Next taps skipped one
+    song; fixed, and checked: 20 s paused loads nothing and keeps the
+    title, two taps skip two.
   - [ ] Heard on her iPhone (only a phone can prove the sound and the
     silent switch).
 - [ ] Phase next: to decide with Jose.

@@ -143,9 +143,12 @@ analytics.
   it.
 - **Music** (`src/lib/music.ts`, `playlist.ts`): the intro piece plays
   once, then the songs in `public/music/` take turns. Each song is
-  fetched whole and unpacked about 8 s before it is due, then lined up on
-  the sound clock to start 2.5 s before the last one ends, which fades
-  out (only two songs are ever held in memory). Next fades everything out
+  fetched whole (given up after 6 s on a weak signal) and unpacked about
+  8 s before it is due, then lined up on the sound clock to start 2.5 s
+  before the last one ends, which fades out (only two songs are ever held
+  in memory). Every "at this moment" step runs off the sound clock, which
+  stands still while paused, so a long pause loads nothing and moves no
+  title. Next fades everything out
   in 0.4 s and starts the following song; Pause suspends the sound clock.
   A song that can't be fetched (offline, never heard) is skipped; if none
   can, the last one plays again. The offline worker keeps each song once

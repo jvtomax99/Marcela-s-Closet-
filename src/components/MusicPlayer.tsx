@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useId, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { MUSIC_LABELS } from '../lib/labels'
 import { nextMusic, toggleMusic, useMusic, useSong } from '../lib/music'
@@ -16,12 +16,17 @@ export function MusicPlayer({ className = '' }: { className?: string }) {
   const song = useSong()
   const [open, setOpen] = useState(false)
   const box = useRef<HTMLDivElement>(null)
+  const button = useRef<HTMLButtonElement>(null)
+  const cardId = useId()
 
   useEffect(() => {
     if (!open) return
     const close = (event: Event) => {
-      if (event instanceof KeyboardEvent ? event.key === 'Escape' : !box.current?.contains(event.target as Node))
+      if (event instanceof KeyboardEvent) {
+        if (event.key !== 'Escape') return
         setOpen(false)
+        button.current?.focus()
+      } else if (!box.current?.contains(event.target as Node)) setOpen(false)
     }
     document.addEventListener('pointerdown', close)
     document.addEventListener('keydown', close)
@@ -44,6 +49,8 @@ export function MusicPlayer({ className = '' }: { className?: string }) {
         type="button"
         aria-label={`${MUSIC_LABELS.open}: ${title}`}
         aria-expanded={open}
+        aria-controls={cardId}
+        ref={button}
         onClick={() => setOpen((value) => !value)}
         className="key grid h-11 w-11 place-items-center rounded-full"
       >
@@ -52,6 +59,7 @@ export function MusicPlayer({ className = '' }: { className?: string }) {
       <AnimatePresence>
         {open && (
           <motion.div
+            id={cardId}
             role="group"
             aria-label={MUSIC_LABELS.open}
             initial={{ opacity: 0, y: -6, scale: 0.97 }}

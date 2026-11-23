@@ -30,7 +30,13 @@ let current: Playing | null = null
 const live = new Set<Playing>()
 // Skipping a song bumps this, so a song still downloading for the old order is dropped.
 let order = 0
-let timers: number[] = []
+// Where quick taps on Next have aimed, before that song is heard: two taps skip two songs.
+let aimed: number | null = null
+// Things to do at a moment on the sound clock, which stands still while paused, so nothing
+// runs ahead during a pause (a wall-clock timer would keep loading songs and moving titles).
+let cues: { at: number; run: () => void }[] = []
+/** How long a song may take to download before it is skipped (one bar of signal). */
+const FETCH_WAIT_MS = 6000
 const listeners = new Set<() => void>()
 
 const emit = () => listeners.forEach((listener) => listener())
@@ -66,9 +72,18 @@ const rampTo = (level: number, seconds: number) => {
   master.gain.linearRampToValueAtTime(level, now + seconds)
 }
 
-// A phone pauses the sound when she leaves the app; pick it back up when she returns.
+// A phone pauses the sound when she leaves the app (or for a call); pick it back up when she returns.
 const onVisible = () => {
   if (document.visibilityState === 'visible' && sound && state === 'on') void sound.context.resume()
+}
+
+const checkCues = () => {
+  if (!sound) return
+  const now = sound.context.currentTime
+  const due = cues.filter((cue) => cue.at <= now)
+  if (!due.length) return
+  cues = cues.filter((cue) => cue.at > now)
+  due.forEach((cue) => cue.run())
 }
 
 /** Makes the sound system. Must happen inside her tap, or the phone won't let it play. */
@@ -87,6 +102,8 @@ function makeSound() {
   master.connect(context.destination)
   sound = { context, master }
   document.addEventListener('visibilitychange', onVisible)
+  context.onstatechange = onVisible
+  window.setInterval(checkCues, 250)
   return sound
 }
 
@@ -95,11 +112,15 @@ const decode = async (bytes: ArrayBuffer | null) => {
   return sound.context.decodeAudioData(bytes.slice(0)).catch(() => null)
 }
 
-const loadSong = (index: number) =>
-  fetch(songFile(index, canPlayAac()))
+const loadSong = (index: number) => {
+  const controller = new AbortController()
+  const timer = window.setTimeout(() => controller.abort(), FETCH_WAIT_MS)
+  return fetch(songFile(index, canPlayAac()), { signal: controller.signal })
     .then((response) => (response.ok ? response.arrayBuffer() : null))
     .catch(() => null)
+    .finally(() => clearTimeout(timer))
     .then(decode)
+}
 
 /**
  * The next song that can be played, starting at `index`. Offline, a song she hasn't heard yet
@@ -115,8 +136,9 @@ async function loadFrom(index: number, fallback: Playing | null) {
   return fallback ? { buffer: fallback.buffer, song: fallback.song } : null
 }
 
-const later = (seconds: number, run: () => void) => {
-  timers.push(window.setTimeout(run, Math.max(0, seconds) * 1000))
+/** Runs `run` when the sound clock reaches `at`. */
+const onClock = (time: number, run: () => void) => {
+  cues.push({ at: time, run })
 }
 
 /** Plays a piece at `at` (the sound system's clock), fading out whatever played before it. */
@@ -147,9 +169,10 @@ function play(buffer: AudioBuffer, at: number, index: number | null, mine: numbe
   current = playing
 
   // The title changes when the song is actually heard.
-  later(start - context.currentTime, () => {
+  onClock(start, () => {
     if (mine !== order) return
     song = index
+    if (index === aimed) aimed = null
     if (index !== null) rememberSong(index)
     emit()
   })
@@ -157,7 +180,7 @@ function play(buffer: AudioBuffer, at: number, index: number | null, mine: numbe
   // Get the next one ready a little before the switch, then line it up to the moment.
   const switchAt = start + buffer.duration - CROSSFADE
   const next = index === null ? firstSong(savedSong()) : nextSong(index)
-  later(switchAt - PREPARE_AHEAD - context.currentTime, () => {
+  onClock(switchAt - PREPARE_AHEAD, () => {
     if (mine !== order) return
     void loadFrom(next, playing).then((loaded) => {
       if (loaded) play(loaded.buffer, switchAt, loaded.song, mine)
@@ -227,8 +250,7 @@ export function nextMusic() {
     return
   }
   order += 1
-  timers.forEach((timer) => clearTimeout(timer))
-  timers = []
+  cues = []
   const mine = order
   const from = current
   // A quick fade for everything playing or lined up, then the next song with nothing to cross.
@@ -249,7 +271,9 @@ export function nextMusic() {
     rampTo(volume, 0.3)
     setState('on')
   }
-  const index = song === null ? firstSong(savedSong()) : nextSong(song)
+  const last = aimed ?? song
+  const index = last === null ? firstSong(savedSong()) : nextSong(last)
+  aimed = index
   void loadFrom(index, from).then((loaded) => {
     if (loaded && sound) play(loaded.buffer, sound.context.currentTime, loaded.song, mine)
   })
