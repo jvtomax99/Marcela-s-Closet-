@@ -97,6 +97,27 @@ export const COLOR_SWATCHES: Record<ColorName, string> = {
 /** "Black" from "black". */
 export const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 
+/** A new piece's name when she doesn't type one: "Navy top". */
+export const autoName = (category: Category, color: ColorName) =>
+  `${capitalize(color)} ${CATEGORY_LABELS[category].toLowerCase()}`
+
+/** The "Add several" tray (Jose, 2026-11-23). */
+export const BATCH_LABELS = {
+  button: 'Add several',
+  title: 'Add several',
+  allAre: 'All of them are…',
+  type: 'Type',
+  pickType: 'Type…',
+  reading: 'Reading…',
+  remove: 'Remove this photo',
+  addMore: 'Add more photos',
+  unreadable: "Couldn't open this one. Add it on its own.",
+  tooMany: (max: number) => `Only the first ${max} photos fit in one round. Add the rest after.`,
+  needType: (count: number) => `Pick a type for ${count} more.`,
+  save: (count: number) => `Save ${count} ${count === 1 ? 'piece' : 'pieces'}`,
+  intro: 'Give each photo a type. Colors and names come from the photos; change anything later.',
+} as const
+
 /** "a, b and c": the one place a list's "and" lives, for the Spanish dictionary later. */
 export function joinWithAnd(list: string[]): string {
   if (list.length <= 1) return list[0] ?? ''

@@ -214,6 +214,18 @@ Asked for because the details looked too plain. All values above.
   ... edit" on the left, the italic serif name in the middle); forms in a
   centered panel.
 
+## Add several (`src/components/BatchAdd.tsx`)
+
+- The button is a light `key` pill with a plus, under the Closet page
+  title (not floating, so it never covers photos); in an empty closet it
+  sits next to "Add a piece".
+- In the usual sheet: a muted intro line, "All of them are…" as the
+  standard chips, then cards in 2 columns on phones and 3 on wide screens:
+  the photo at 3:4 on `bg-sand` with a 44 px round `key` remove button,
+  a color dot and the name in the serif, then a native type menu shaped
+  like a chip (ink when chosen). The `key-ink` Save button and any warning
+  stay pinned at the bottom of the sheet. No new tokens.
+
 ## Today's look (`src/components/TodaysLook.tsx`)
 
 The first thing on Looks, right under the daily saying and above "A look

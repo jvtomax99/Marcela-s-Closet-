@@ -2,9 +2,11 @@ import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { deleteItem, saveItem, unwearPiece, wearPiece } from '../db'
 import { toDay, wearStats } from '../engine'
 import { newId } from '../lib/id'
+import { QUICK_DEFAULTS } from '../lib/batch'
 import { photoUrl, preparePhoto } from '../lib/image'
 import { colorFromPhoto as readPhotoColor } from '../lib/photoColor'
 import {
+  autoName,
   capitalize,
   CATEGORY_LABELS,
   FORMALITY_LABELS,
@@ -81,13 +83,13 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
   const [name, setName] = useState(item?.name ?? '')
   const [category, setCategory] = useState<Category | null>(item?.category ?? null)
   const [colors, setColors] = useState<ColorName[]>(item?.colors ?? [])
-  const [pattern, setPattern] = useState<Pattern>(item?.pattern ?? 'solid')
-  const [fabric, setFabric] = useState<Fabric | null>(item?.fabric ?? null)
-  const [formality, setFormality] = useState<Formality>(item?.formality ?? 2)
+  const [pattern, setPattern] = useState<Pattern>(item?.pattern ?? QUICK_DEFAULTS.pattern)
+  const [fabric, setFabric] = useState<Fabric | null>(item?.fabric ?? QUICK_DEFAULTS.fabric)
+  const [formality, setFormality] = useState<Formality>(item?.formality ?? QUICK_DEFAULTS.formality)
   const [seasons, setSeasons] = useState<Season[]>(item?.seasons ?? [])
   const [occasions, setOccasions] = useState<Occasion[]>(item?.occasions ?? [])
   const [tags, setTags] = useState((item?.tags ?? []).join(', '))
-  const [favorite, setFavorite] = useState(item?.favorite ?? false)
+  const [favorite, setFavorite] = useState(item?.favorite ?? QUICK_DEFAULTS.favorite)
   const [message, setMessage] = useState('')
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [preparing, setPreparing] = useState(false)
@@ -97,7 +99,7 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
   const pickedColors = useRef(Boolean(item))
   const [saving, setSaving] = useState(false)
   const savingNow = useRef(false)
-  const autoName = category && colors[0] ? `${capitalize(colors[0])} ${CATEGORY_LABELS[category].toLowerCase()}` : null
+  const suggestedName = category && colors[0] ? autoName(category, colors[0]) : null
 
   const pickPhoto = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -134,7 +136,7 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
 
     await saveItem({
       id: item?.id ?? newId(),
-      name: name.trim() || autoName || CATEGORY_LABELS[category],
+      name: name.trim() || suggestedName || CATEGORY_LABELS[category],
       category,
       colors,
       pattern,
@@ -206,7 +208,7 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
           <input
             value={name}
             onChange={(event) => setName(event.target.value)}
-            placeholder={autoName ?? 'Silk slip dress'}
+            placeholder={suggestedName ?? 'Silk slip dress'}
             className="mt-1 w-full border-b border-line bg-transparent py-2 font-serif text-2xl outline-none placeholder:text-muted/60 focus:border-accent"
           />
         </label>

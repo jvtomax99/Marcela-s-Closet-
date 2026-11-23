@@ -25,6 +25,8 @@ class ClosetDatabase extends Dexie {
 export const db = new ClosetDatabase()
 
 export const saveItem = (item: ClothingItem) => db.items.put(item)
+/** Several new pieces at once: all saved, or none. */
+export const saveItems = (items: ClothingItem[]) => db.transaction('rw', db.items, () => db.items.bulkPut(items))
 export const setFavorite = (id: string, favorite: boolean) => db.items.update(id, { favorite })
 
 /**
