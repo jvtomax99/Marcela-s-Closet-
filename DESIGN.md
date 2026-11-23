@@ -20,7 +20,8 @@ accent and a soft pink and mango glow, big serif headlines, smooth but
 quick motion, no clutter. The Latina flavor lives in color, a script
 "Hola, Marce" and real Cali sayings, never in costume props (no papel
 picado, maracas or flags). Music lives in a few words and marks: looks are
-"tracks", Looks has a "Now playing" pill, the Lookbook is a playlist with a
+"tracks", Looks has an "On the board" pill (it said "Now playing" until the
+playlist, 2026-11-23), the Lookbook is a playlist with a
 record for its icon.
 
 ## Colors (`:root` in `src/index.css`)
@@ -44,7 +45,7 @@ Dark mode follows the phone's setting (`prefers-color-scheme`).
 | `--icon-line` | `#2b1a22` | `#f6eaf0` | the sticker icons' outline |
 | `--vinyl` | `#2b1a22` | `#120b0f` | the record icon's body |
 | `--accent-soft` | `#fbe3ec` | `#3d1a2a` | behind a chosen chip ("Saved"), hibiscus text on it is 4.7:1 |
-| `--glass` | white at 72% | `#251a20` at 72% | the "Now playing" pill, over a blur |
+| `--glass` | white at 72% | `#251a20` at 72% | the "On the board" pill, over a blur |
 | `--key-face`, `--key-edge` | `#ffffff` to `#f6ece3`, `#e6d5c8` | `#33252c` to `#271b21`, `#46353e` | the hi-fi key (every light pill button) |
 | `--key-ink-face`, `--key-ink-edge` | `#3b2630` to `#22141b`, `#1a0f14` | `#fff8fb` to `#eadbe2`, `#f6eaf0` | the dark key (Wore it on Today's look, Back up now, Add a piece, Save on the form) |
 | `--deck` | `#34222b` to `#1f1218` | `#2a1a22` to `#120b0f` | the tab bar and the radio ticker, dark in both modes |
@@ -192,7 +193,7 @@ Asked for because the details looked too plain. All values above.
   icons, 1.75 px. Tab icons are 28 px, button icons 22 px.
 - Looks: "Hola, Marce" in script, the day's Cali saying in serif italic
   with its source in small caps (`DICHOS` in `src/lib/labels.ts`), then
-  the filter sentence. Above the looks a `--glass` "Now playing" pill with
+  the filter sentence. Above the looks a `--glass` "On the board" pill with
   four small hibiscus bars that bob (still for reduced motion) and the
   count of "tracks". Each look is a white card: the board, "Track" in
   small caps over the italic number, the note, the pieces, then pill

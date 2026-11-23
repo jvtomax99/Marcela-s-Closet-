@@ -190,7 +190,7 @@ select {
   font-variant-numeric: oldstyle-nums proportional-nums;
 }
 
-/* The "Now playing" bars: they dance gently, and stand still for reduced motion. */
+/* The bars on the "On the board" pill: they dance gently, and stand still for reduced motion. */
 @keyframes eq {
   0%,
   100% {

@@ -231,8 +231,8 @@ once. Before, one bar of signal could leave it blank for a minute or more.
 ### Look and feel
 Magazine design with a Cali, Colombia and music flavor ("Salsa caleña",
 Phase 4): hibiscus pink, mango and palm green on warm cream; "Hola, Marce"
-in script with a daily Cali saying; looks numbered as tracks, a "Now
-playing" pill and a record for the Lookbook. "Record shop" details (Jose
+in script with a daily Cali saying; looks numbered as tracks, an "On the
+board" pill and a record for the Lookbook. "Record shop" details (Jose
 picked B of three mockups, 2026-11-23, because the details looked too
 plain): each print held by an enamel pin in the palette, Today's look as
 a record sleeve with the record sliding out (it turns with the music),

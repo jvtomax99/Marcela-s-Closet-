@@ -279,7 +279,7 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
                   />
                 ))}
               </span>
-              Now playing · {filtered ? 'your picks' : todaysLook ? TODAY_LABELS.moreLooks : "today's looks"}
+              {TODAY_LABELS.onTheBoard} · {filtered ? 'your picks' : todaysLook ? TODAY_LABELS.moreLooks : "today's looks"}
               <span className="ml-auto pl-4 text-xs text-muted">
                 {looks.length} {looks.length === 1 ? 'track' : 'tracks'}
               </span>
