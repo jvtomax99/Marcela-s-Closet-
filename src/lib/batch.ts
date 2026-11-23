@@ -36,7 +36,7 @@ export function sharedType(drafts: Draft[]): Category | null {
  * The pieces to save, in the order she picked them. Closet shows the newest first, so the
  * first photo gets the latest time and stays first.
  */
-export function toPieces(drafts: Draft[], now: number, newId: () => string): ClothingItem[] {
+export function toPieces(drafts: Draft[], now: number): ClothingItem[] {
   return savable(drafts).flatMap((draft, index) => {
     if (!draft.photo || !draft.color || !draft.category) return []
     return [
@@ -45,7 +45,8 @@ export function toPieces(drafts: Draft[], now: number, newId: () => string): Clo
         seasons: [],
         occasions: [],
         tags: [],
-        id: newId(),
+        // The card's own id, so the closet reuses the photo link the tray already made.
+        id: draft.key,
         name: autoName(draft.category, draft.color),
         category: draft.category,
         colors: [draft.color],

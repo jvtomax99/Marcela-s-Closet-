@@ -37,18 +37,16 @@ describe('Add several', () => {
   })
 
   it('makes pieces in picked order with quick-add defaults, skipping unreadable photos', () => {
-    let n = 0
     const pieces = toPieces(
       [
-        draft({ category: 'top', color: 'white' }),
+        draft({ key: 'a', category: 'top', color: 'white' }),
         draft({ status: 'failed', photo: null, color: null, category: 'bag' }),
-        draft({ category: 'bottom', color: 'black' }),
+        draft({ key: 'b', category: 'bottom', color: 'black' }),
       ],
       1000,
-      () => `id-${++n}`,
     )
     expect(pieces.map((piece) => piece.name)).toEqual(['White top', 'Black bottom'])
-    expect(pieces.map((piece) => piece.id)).toEqual(['id-1', 'id-2'])
+    expect(pieces.map((piece) => piece.id)).toEqual(['a', 'b'])
     // Newest first in the closet, so the first photo gets the later time.
     expect(pieces[0].createdAt).toBeGreaterThan(pieces[1].createdAt)
     expect(pieces[0]).toMatchObject({ pattern: 'solid', formality: 2, seasons: [], favorite: false, colors: ['white'] })

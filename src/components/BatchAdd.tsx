@@ -92,8 +92,11 @@ export function BatchAdd({ files, onDone }: { files: File[]; onDone: () => void 
     setDrafts((current) => current.filter((draft) => draft.key !== key))
   }
 
-  const setAll = (category: Category) =>
-    setDrafts((current) => current.map((draft) => (draft.status === 'ready' ? { ...draft, category } : draft)))
+  // Cards still reading get it too, so tapping it early types every photo.
+  const setAll = (category: Category) => {
+    setMessage('')
+    setDrafts((current) => current.map((draft) => (draft.status !== 'failed' ? { ...draft, category } : draft)))
+  }
 
   const ready = savable(drafts)
   const reading = drafts.some((draft) => draft.status === 'reading')
@@ -103,8 +106,14 @@ export function BatchAdd({ files, onDone }: { files: File[]; onDone: () => void 
     if (missing > 0) return setMessage(BATCH_LABELS.needType(missing))
     if (saving || reading || ready.length === 0) return
     setSaving(true)
-    await saveItems(toPieces(drafts, Date.now(), newId))
-    onDone()
+    try {
+      await saveItems(toPieces(drafts, Date.now()))
+      onDone()
+    } catch {
+      // Nothing was saved (all or none): she can free space and tap Save again.
+      setSaving(false)
+      setMessage(BATCH_LABELS.saveFailed)
+    }
   }
 
   return (
@@ -129,7 +138,7 @@ export function BatchAdd({ files, onDone }: { files: File[]; onDone: () => void 
               <button
                 type="button"
                 onClick={() => remove(draft.key)}
-                aria-label={`${BATCH_LABELS.remove} ${index + 1}`}
+                aria-label={BATCH_LABELS.remove(index + 1)}
                 className="key absolute top-2 right-2 grid size-11 place-items-center rounded-full"
               >
                 <Icon name="close" className="size-4" />
@@ -148,12 +157,13 @@ export function BatchAdd({ files, onDone }: { files: File[]; onDone: () => void 
                   </span>
                 </p>
                 <label className="mt-2 block">
-                  <span className="sr-only">
-                    {BATCH_LABELS.type} {index + 1}
-                  </span>
+                  <span className="sr-only">{BATCH_LABELS.typeOf(index + 1)}</span>
                   <select
                     value={draft.category ?? ''}
-                    onChange={(event) => update(draft.key, { category: event.target.value as Category })}
+                    onChange={(event) => {
+                      setMessage('')
+                      update(draft.key, { category: event.target.value as Category })
+                    }}
                     className={`min-h-11 w-full appearance-none rounded-full border px-4 text-sm ${
                       draft.category ? 'border-ink bg-ink text-canvas' : 'border-line bg-surface/60 text-ink'
                     }`}
@@ -177,7 +187,7 @@ export function BatchAdd({ files, onDone }: { files: File[]; onDone: () => void 
       {drafts.length < MAX_BATCH && (
         <PhotosInput
           onFiles={add}
-          className="mt-7 flex items-center gap-2 py-2 text-eyebrow text-ink uppercase hover:text-accent"
+          className="mt-5 flex min-h-11 items-center gap-2 py-3 text-eyebrow text-ink uppercase hover:text-accent"
         >
           <Icon name="plus" className="size-4" />
           {BATCH_LABELS.addMore}

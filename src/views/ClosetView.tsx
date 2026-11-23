@@ -56,7 +56,7 @@ export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) 
   const severalButton = (
     <PhotosInput
       onFiles={(files) => setEditing({ kind: 'batch', files })}
-      className="key flex items-center gap-2.5 rounded-full py-3 pr-5 pl-4 text-eyebrow uppercase"
+      className="key flex min-h-11 items-center gap-2.5 rounded-full py-3.5 pr-5 pl-4 text-eyebrow uppercase"
     >
       <Icon name="plus" className="size-4" />
       {BATCH_LABELS.button}
