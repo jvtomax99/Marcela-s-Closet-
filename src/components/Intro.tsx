@@ -173,7 +173,7 @@ export function Intro({ onDone }: { onDone: () => void }) {
       <button
         ref={openButton}
         type="button"
-        className="w-full max-w-xs rounded-full bg-ink py-4 text-eyebrow text-canvas uppercase shadow-print transition-transform duration-300 hover:-translate-y-0.5"
+        className="key-ink w-full max-w-xs rounded-full py-4 text-eyebrow uppercase"
         onClick={(event) => {
           event.stopPropagation()
           open(true)

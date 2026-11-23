@@ -40,7 +40,7 @@ export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) 
     <button
       type="button"
       onClick={() => setEditing({ kind: 'new', added: 0 })}
-      className="flex items-center gap-2.5 rounded-full bg-ink py-3.5 pr-6 pl-5 text-eyebrow text-canvas uppercase shadow-print transition-transform duration-300 hover:-translate-y-0.5"
+      className="key-ink flex items-center gap-2.5 rounded-full py-3.5 pr-6 pl-5 text-eyebrow uppercase"
     >
       <Icon name="plus" className="size-4" />
       Add a piece

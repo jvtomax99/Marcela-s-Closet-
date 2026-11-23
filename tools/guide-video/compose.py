@@ -93,7 +93,7 @@ print(out, f'{dur(out):.1f}s', f'{out.stat().st_size / 1e6:.1f} MB')
 name = 'guia-es' if LANG == 'es' else 'guide-en'
 small = REPO / 'public' / 'guide' / f'{name}.mp4'
 small.parent.mkdir(exist_ok=True)
-subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', str(out), '-c:v', 'libx264', '-crf', '30', '-preset', 'slow',
+subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', str(out), '-c:v', 'libx264', '-crf', '31', '-preset', 'slow',
                 '-tune', 'stillimage', '-profile:v', 'high', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '96k',
                 '-ac', '1', '-movflags', '+faststart', str(small)], check=True)
 subprocess.run(['ffmpeg', '-v', 'error', '-y', '-ss', '1.2', '-i', str(small), '-frames:v', '1', '-vf', 'scale=586:-1',

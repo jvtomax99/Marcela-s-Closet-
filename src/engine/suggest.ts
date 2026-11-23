@@ -143,8 +143,10 @@ export function suggestOutfits(
     .filter((items) => !anchor || anchorIsOptional || items.includes(anchor))
     .map((items) => (anchor && anchorIsOptional ? [...items, anchor] : items))
     .filter((items) => outfitAllowed(items) && outfitMatchesFilters(items, filters))
-    .map((items) => ({ items, score: scoreOutfit(items, taste, wear).score }))
-    .sort((a, b) => b.score - a.score || signatureOf(a.items).localeCompare(signatureOf(b.items)))
+    // Each look's signature is built once here, not inside every comparison of the sort: with a
+    // big closet that is over 100,000 looks, and rebuilding it took most of the time.
+    .map((items) => ({ items, score: scoreOutfit(items, taste, wear).score, signature: signatureOf(items) }))
+    .sort((a, b) => b.score - a.score || a.signature.localeCompare(b.signature))
     .slice(0, MAX_FINISHED)
 
   const seen = new Set<string>()

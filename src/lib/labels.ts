@@ -147,6 +147,7 @@ export const GUIDE_LABELS = {
 
 /** The Today's look card at the top of Looks. */
 export const TODAY_LABELS = {
+  side: 'Side A',
   kicker: "Today's look",
   wearing: 'Wearing today',
   woreIt: 'Wore it',
@@ -154,6 +155,32 @@ export const TODAY_LABELS = {
   save: 'Save',
   saved: 'Saved',
   moreLooks: 'more looks',
+  /** The pill above the list of looks ("Now playing" is the music's, Jose 2026-11-23). */
+  onTheBoard: 'On the board',
+} as const
+
+/**
+ * The music: the masthead's record button, its "Now playing" card and the ticker under the
+ * masthead. The song titles are Spanish on purpose, like the sayings (Jose, 2026-11-23):
+ * Cali places (Juanchito, San Antonio, La Sexta) and the Pacific coast.
+ */
+/** A look's number on its round record label. */
+export const TRACK_LABELS = {
+  track: 'Track',
+  name: (number: string) => `Track ${number}`,
+} as const
+
+export const MUSIC_LABELS = {
+  songs: ['Salsa en Juanchito', 'Bolero de San Antonio', 'Marimba del Pacífico', 'Boogaloo en la Sexta'],
+  station: 'Closet radio',
+  nowPlaying: 'Now playing',
+  upNext: 'Up next',
+  of: (place: number, count: number) => `${place} of ${count}`,
+  songCount: (count: number) => `${count} songs`,
+  open: 'Music',
+  play: 'Play music',
+  pause: 'Pause music',
+  next: 'Next song',
 } as const
 
 /** The backup reminder and the Backup section's last-backup line. */

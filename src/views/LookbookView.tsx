@@ -6,6 +6,7 @@ import { OutfitCollage } from '../components/OutfitCollage'
 import { PageHeader } from '../components/PageHeader'
 import { PieceCard } from '../components/PieceCard'
 import { StarRating } from '../components/StarRating'
+import { TrackLabel } from '../components/TrackLabel'
 import { dayLabel, useWornLog } from '../components/WornToast'
 import { rateLook, removeLook, renameLook, restoreHiddenLooks } from '../db'
 import { toDay, wearStats } from '../engine'
@@ -35,14 +36,15 @@ function SavedLook({ track, look, items, wears, onWore }: SavedLookProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className="group rounded-card bg-surface p-3 shadow-card"
+      className="group relative rounded-card bg-surface p-3 shadow-card"
     >
-      <div className="overflow-hidden rounded-2xl">
+      <TrackLabel number={track} />
+      <div className="overflow-hidden rounded-board">
         <OutfitCollage items={items} />
       </div>
       <div className="px-1.5">
         <p className="mt-4 text-[0.625rem] tracking-[0.18em] text-muted uppercase">
-          <span className="text-accent">Track {String(track).padStart(2, '0')}</span> · Saved{' '}
+          Saved{' '}
           {SAVED_ON.format(look.createdAt)}
           {worn.last && (
             <>
@@ -64,7 +66,7 @@ function SavedLook({ track, look, items, wears, onWore }: SavedLookProps) {
             <button
               type="button"
               onClick={onWore}
-              className="flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface pr-4 pl-3 text-button font-medium whitespace-nowrap text-ink transition-colors hover:border-muted active:scale-[0.97]"
+              className="key flex h-11 shrink-0 items-center gap-1.5 rounded-full pr-4 pl-3 text-button font-semibold whitespace-nowrap"
             >
               <Icon name="hanger" className="size-[1.375rem]" />
               Wore it
@@ -153,7 +155,7 @@ export function LookbookView({ items, outfits, wears, onStyle }: LookbookViewPro
               <button
                 type="button"
                 onClick={() => goTo('closet')}
-                className="rounded-full bg-ink px-6 py-3.5 text-eyebrow text-canvas uppercase shadow-print"
+                className="key-ink rounded-full px-6 py-3.5 text-eyebrow uppercase"
               >
                 Go to the closet
               </button>
@@ -180,7 +182,7 @@ export function LookbookView({ items, outfits, wears, onStyle }: LookbookViewPro
             <button
               type="button"
               onClick={() => goTo('looks')}
-              className="rounded-full bg-ink px-6 py-3.5 text-eyebrow text-canvas uppercase shadow-print"
+              className="key-ink rounded-full px-6 py-3.5 text-eyebrow uppercase"
             >
               See your looks
             </button>
