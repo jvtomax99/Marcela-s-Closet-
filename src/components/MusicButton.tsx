@@ -1,7 +1,7 @@
 import { INTRO_LABELS } from '../lib/labels'
 import { toggleMusic, useMusic } from '../lib/music'
 
-/** The round mute / play button for the music. Shows only once the music has started. */
+/** The intro's round pause / play button for the music. Shows only once the music has started. */
 export function MusicButton({ className = '' }: { className?: string }) {
   const music = useMusic()
   if (music === 'off') return null
@@ -9,8 +9,8 @@ export function MusicButton({ className = '' }: { className?: string }) {
     <button
       type="button"
       aria-label={music === 'on' ? INTRO_LABELS.mute : INTRO_LABELS.unmute}
-      aria-pressed={music === 'muted'}
-      className={`grid h-11 w-11 place-items-center rounded-full bg-surface/80 text-ink shadow-print ${className}`}
+      aria-pressed={music === 'paused'}
+      className={`key grid h-11 w-11 place-items-center rounded-full ${className}`}
       onClick={(event) => {
         event.stopPropagation()
         toggleMusic()
