@@ -417,6 +417,11 @@ Runway, music with ElevenLabs (`CREDITS.md`).
     takes in Jose's ElevenLabs history (no new credits); Spanish 4.64 MB,
     English 4.30 MB (the small copy's compression went from crf 30 to 31
     to stay under 5 MB).
+  - [x] The engine's "stays fast" test ran at about 1 s against its 1 s
+    limit (on `main` too), so App checks failed once at random; each
+    look's signature is now built once before sorting instead of in every
+    comparison: same looks, same order, about 0.5 to 0.75 s (Jose,
+    2026-11-23).
   - [ ] Heard on her iPhone (only a phone can prove the sound and the
     silent switch).
 - [ ] Phase next: to decide with Jose.
