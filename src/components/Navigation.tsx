@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import type { Route } from '../lib/useRoute'
 import { Icon, type IconName } from './Icon'
 import { GuideButton, GuideSheet } from './GuideButton'
-import { MusicButton } from './MusicButton'
+import { MusicPlayer, RadioTicker } from './MusicPlayer'
 
 const LINKS: { route: Route; label: string; icon: IconName }[] = [
   { route: 'closet', label: 'Closet', icon: 'hanger' },
@@ -21,16 +21,15 @@ export function Navigation({ route }: { route: Route }) {
     <>
       <GuideSheet open={guide} onClose={() => setGuide(false)} />
       <header className="relative mx-auto max-w-6xl px-4 sm:px-8">
-        {/* The intro's music, still playing: a mute button top right on phones. */}
-        <MusicButton className="absolute top-3 right-4 sm:right-8 md:hidden" />
+        {/* The music: a record top right on phones (Jose, 2026-11-23). */}
+        <MusicPlayer className="absolute top-3 right-4 sm:right-8 md:hidden" />
         {/* The video guide: top left on phones, opposite the music. */}
         <GuideButton onOpen={openGuide} className="absolute top-3 left-4 sm:left-8 md:hidden" />
-        <div className="grid grid-cols-1 items-center gap-1 border-b border-line pt-5 pb-3 text-center md:grid-cols-[1fr_auto_1fr] md:pt-7 md:pb-4">
+        <div className="grid grid-cols-1 items-center gap-1 pt-5 pb-4 text-center md:grid-cols-[1fr_auto_1fr] md:pt-7 md:pb-5">
           <p className="hidden text-eyebrow text-muted uppercase md:block md:text-left">The {EDITION} edit</p>
           <a href="#/closet" className="font-serif text-[2rem] leading-none tracking-tight italic md:text-[2.5rem]">
             Closet
           </a>
-          <p className="text-[0.625rem] tracking-[0.24em] text-muted uppercase md:hidden">{EDITION}</p>
           <nav aria-label="Main" className="hidden justify-end gap-8 md:flex">
             {LINKS.map((link) => {
               const active = link.route === route
@@ -55,17 +54,19 @@ export function Navigation({ route }: { route: Route }) {
               )
             })}
             <GuideButton onOpen={openGuide} className="-my-2" />
-            <MusicButton className="-my-2" />
+            <MusicPlayer className="relative -my-2" />
           </nav>
         </div>
       </header>
+      <RadioTicker />
 
       {/* Phone: a floating capsule under the thumb, with a pill behind the current page (after Interpreter Hub). */}
       <nav
         aria-label="Main"
         className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] z-40 flex justify-center md:hidden"
       >
-        <div className="flex gap-1 rounded-full bg-glass p-1.5 shadow-card backdrop-blur-xl backdrop-saturate-150">
+        {/* The deck: dark in both modes, the current page lit by a hibiscus light (Jose, 2026-11-23). */}
+        <div className="deck flex gap-1 rounded-full p-1.5 shadow-[0_14px_30px_-10px_rgb(43_16_30/0.6),inset_0_1px_0_rgb(255_255_255/0.12)]">
           {LINKS.map((link) => {
             const active = link.route === route
             return (
@@ -73,14 +74,14 @@ export function Navigation({ route }: { route: Route }) {
                 key={link.route}
                 href={`#/${link.route}`}
                 aria-current={active ? 'page' : undefined}
-                className={`relative flex w-[5.75rem] flex-col items-center gap-0.5 rounded-full pt-2 pb-1.5 text-[0.6875rem] font-medium transition-colors ${
-                  active ? 'text-ink' : 'text-muted'
+                className={`relative flex w-[5.75rem] flex-col items-center gap-0.5 rounded-full pt-2 pb-2.5 text-[0.6875rem] font-medium transition-colors ${
+                  active ? 'text-on-deck' : 'text-on-deck/65'
                 }`}
               >
                 {active && (
                   <motion.span
                     layoutId="nav-bottom"
-                    className="absolute inset-0 rounded-full bg-surface shadow-card"
+                    className="absolute inset-x-0 bottom-1 mx-auto h-[3px] w-6 rounded-full bg-accent shadow-[0_0_10px_var(--accent)]"
                     transition={{ type: 'spring', stiffness: 420, damping: 36 }}
                   />
                 )}

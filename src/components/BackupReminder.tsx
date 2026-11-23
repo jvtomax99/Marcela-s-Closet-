@@ -46,7 +46,7 @@ export function BackupReminder({ className = 'mb-8', items, outfits, wears }: Ba
         type="button"
         onClick={backUp}
         disabled={busy}
-        className="shrink-0 rounded-full bg-ink px-5 py-2.5 text-eyebrow text-canvas uppercase shadow-print transition-transform duration-300 hover:-translate-y-0.5 disabled:opacity-50"
+        className="key-ink shrink-0 rounded-full px-5 py-2.5 text-eyebrow uppercase disabled:opacity-50"
       >
         {BACKUP_LABELS.backUpNow}
       </button>

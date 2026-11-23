@@ -17,7 +17,7 @@ export function GuideButton({ onOpen, className = '' }: { onOpen: () => void; cl
     <button
       type="button"
       aria-label={GUIDE_LABELS.open}
-      className={`grid h-11 w-11 place-items-center rounded-full bg-surface/80 text-ink shadow-print ${className}`}
+      className={`key grid h-11 w-11 place-items-center rounded-full ${className}`}
       onClick={onOpen}
     >
       <Icon name="play" className="h-5 w-5 translate-x-px" />

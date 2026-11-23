@@ -30,6 +30,20 @@
   --mesh: radial-gradient(60% 32rem at 8% 0%, rgb(249 201 217 / 0.75), transparent 70%),
     radial-gradient(50% 28rem at 100% 6%, rgb(252 224 180 / 0.7), transparent 70%);
   --glass: rgb(255 255 255 / 0.72);
+  /* "Record shop" details (Jose, 2026-11-23). Hi-fi keys: a glossy face, a bright top edge, a short drop. */
+  --key-face: linear-gradient(#ffffff, #f6ece3);
+  --key-edge: #e6d5c8;
+  --key-shadow: inset 0 1px 0 #ffffff, 0 1px 0 rgb(43 16 30 / 0.06), 0 3px 8px -3px rgb(43 16 30 / 0.25);
+  --key-pressed: inset 0 2px 4px rgb(43 16 30 / 0.14);
+  /* The dark key (Wore it, Back up now, Add a piece): ink with a sheen. */
+  --key-ink-face: linear-gradient(#3b2630, #22141b);
+  --key-ink-edge: #1a0f14;
+  --key-ink-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18), 0 4px 10px -3px rgb(43 16 30 / 0.5);
+  /* The deck: the tab bar and the ticker, dark in both modes, with cream words on it. */
+  --deck: linear-gradient(#34222b, #1f1218);
+  --on-deck: #fbf3ea;
+  /* The enamel pin on each print: a shine top left, a shade bottom right, a small drop. */
+  --pin-shadow: 0 3px 4px rgb(0 0 0 / 0.3), inset -2px -3px 0 rgb(0 0 0 / 0.18), inset 2px 2px 0 rgb(255 255 255 / 0.45);
   /* Fine paper grain, drawn by the browser so there's no image to download. */
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .27 0 0 0 0 .18 0 0 0 .11 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
@@ -58,6 +72,14 @@
     --mesh: radial-gradient(60% 32rem at 8% 0%, rgb(194 37 92 / 0.22), transparent 70%),
       radial-gradient(50% 28rem at 100% 6%, rgb(244 166 58 / 0.12), transparent 70%);
     --glass: rgb(37 26 32 / 0.72);
+    --key-face: linear-gradient(#33252c, #271b21);
+    --key-edge: #46353e;
+    --key-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 3px 8px -3px rgb(0 0 0 / 0.6);
+    --key-pressed: inset 0 2px 4px rgb(0 0 0 / 0.4);
+    --key-ink-face: linear-gradient(#fff8fb, #eadbe2);
+    --key-ink-edge: #f6eaf0;
+    --key-ink-shadow: inset 0 1px 0 #ffffff, 0 4px 12px -3px rgb(0 0 0 / 0.6);
+    --deck: linear-gradient(#2a1a22, #120b0f);
     --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .95 0 0 0 0 .88 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 }
@@ -77,6 +99,7 @@
   --color-palm: var(--palm);
   --color-accent-soft: var(--accent-soft);
   --color-glass: var(--glass);
+  --color-on-deck: var(--on-deck);
 
   --shadow-print: var(--print-shadow);
   --shadow-card: var(--card-shadow);
@@ -105,7 +128,9 @@
   --text-quote--line-height: 1.35;
   /* Pill buttons and chips. */
   --text-button: 0.8125rem;
-  --radius-card: 1.375rem;
+  /* Cards are record sleeves (Jose, 2026-11-23): firmer corners, and the board inside them firmer still. */
+  --radius-card: 0.75rem;
+  --radius-board: 0.375rem;
 }
 
 html {
@@ -117,6 +142,8 @@ html {
 
 body {
   background: var(--mesh) no-repeat;
+  /* The record sliding out of Today's look may reach past the edge: never a sideways scroll. */
+  overflow-x: clip;
   min-height: 100dvh;
   color: var(--ink);
   font-family: var(--font-sans);
@@ -176,6 +203,114 @@ select {
 
 @media (prefers-reduced-motion: reduce) {
   .eq-bar {
+    animation: none;
+  }
+}
+
+/* "Record shop" details (Jose, 2026-11-23): see DESIGN.md. */
+@layer components {
+  /* A hi-fi key: every light pill button. Saved (aria-pressed) stays pressed in, in hibiscus. */
+  .key {
+    background: var(--key-face);
+    border: 1px solid var(--key-edge);
+    color: var(--ink);
+    box-shadow: var(--key-shadow);
+    transition:
+      transform 0.15s ease-out,
+      box-shadow 0.15s ease-out;
+  }
+
+  .key[aria-pressed='true'] {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: var(--key-pressed);
+  }
+
+  /* The dark key: the main action on a screen. */
+  .key-ink {
+    background: var(--key-ink-face);
+    border: 1px solid var(--key-ink-edge);
+    color: var(--canvas);
+    box-shadow: var(--key-ink-shadow);
+    transition:
+      transform 0.15s ease-out,
+      box-shadow 0.15s ease-out;
+  }
+
+  .key:active,
+  .key-ink:active {
+    transform: translateY(1px);
+    box-shadow: var(--key-pressed);
+  }
+
+  /* The little mango light on the dark key. */
+  .led {
+    width: 0.4375rem;
+    height: 0.4375rem;
+    border-radius: 999px;
+    background: var(--mango);
+    box-shadow: 0 0 6px var(--mango);
+  }
+
+  /* The deck: the tab bar and the ticker. */
+  .deck {
+    background: var(--deck);
+    color: var(--on-deck);
+    /* The sticker icons on it take a cream outline. */
+    --icon-line: var(--on-deck);
+  }
+
+  /* An enamel pin holding a print to the board. */
+  .pin {
+    border-radius: 999px;
+    box-shadow: var(--pin-shadow);
+  }
+
+  /* A record: grooves, a sheen and a hibiscus label with a cream spindle hole. */
+  .record {
+    position: relative;
+    border-radius: 999px;
+    background: radial-gradient(circle, var(--mat) 0 2.2%, var(--accent) 2.6% 30%, var(--vinyl) 30.6% 100%);
+    box-shadow: var(--print-shadow);
+  }
+
+  .record::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background:
+      repeating-radial-gradient(circle, transparent 0 3px, rgb(255 255 255 / 0.05) 3px 4px),
+      conic-gradient(from 30deg, transparent 0 10%, rgb(255 255 255 / 0.16) 14%, transparent 20% 60%, rgb(255 255 255 / 0.1) 64%, transparent 70%);
+  }
+}
+
+/* A record turns while the music plays; it stands still when paused or for reduced motion. */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinning {
+  animation: spin 6s linear infinite;
+}
+
+/* The ticker under the masthead slides along while the music plays. */
+@keyframes ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.ticker-run {
+  animation: ticker 40s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinning,
+  .ticker-run {
     animation: none;
   }
 }

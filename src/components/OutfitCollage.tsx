@@ -14,6 +14,9 @@ const MAX_OVERLAP = 0.25
 const MAIN_ORDER: Category[] = ['dress', 'top', 'bottom']
 const SIDE_ORDER: Category[] = ['outerwear', 'accessory', 'bag', 'shoes']
 
+// Each print is held by an enamel pin in the palette (Jose, 2026-11-23), taking turns.
+const PINS = ['var(--accent)', 'var(--mango)', 'var(--palm)']
+
 const MAIN_TILT = [-2.2, 1.8, -1.2]
 const SIDE_TILT = [2.4, -2, 1.6, -2.6, 2]
 
@@ -94,8 +97,8 @@ export function OutfitCollage({ items }: { items: ClothingItem[] }) {
   ]
 
   return (
-    <div className="grain relative aspect-[4/5] overflow-hidden bg-board shadow-[inset_0_0_90px_rgb(60_45_30/0.07)]">
-      {placements.map(({ item, x, y, w, tilt, z }) => (
+    <div className="grain @container relative aspect-[4/5] overflow-hidden bg-board shadow-[inset_0_0_90px_rgb(60_45_30/0.07)]">
+      {placements.map(({ item, x, y, w, tilt, z }, index) => (
         <div
           key={item.id}
           style={
@@ -112,6 +115,11 @@ export function OutfitCollage({ items }: { items: ClothingItem[] }) {
           <div className="aspect-[3/4] overflow-hidden bg-mat">
             <ItemPhoto item={item} />
           </div>
+          <span
+            aria-hidden="true"
+            style={{ background: PINS[index % PINS.length] }}
+            className="pin absolute top-[-0.3rem] left-1/2 size-[clamp(0.6rem,3.2cqw,1rem)] -translate-x-1/2"
+          />
         </div>
       ))}
     </div>

@@ -42,6 +42,10 @@ Jose (`SPEC.md`, Later).
   iPhone the home-screen app all keep separate closets. Moving the site to
   a new address, or changing the hosting, gives her an empty app there:
   warn Jose first, and plan the Back up / Restore step with her.
+- **Music.** `public/music/` holds the four playlist songs (Eleven
+  Music, `CREDITS.md`); `src/lib/playlist.ts` lists them. A new song
+  needs both an `.m4a` and a `.webm`, a fade at the end and about
+  -14.5 LUFS, like the others. The music only ever starts from a tap.
 - **Offline worker.** `public/sw.js` keeps a copy of the app (internet
   first, the copy when there's none or after 4 s on a weak signal; the
   versioned `assets/` files straight from the copy) in the cache
@@ -82,7 +86,7 @@ Jose (`SPEC.md`, Later).
 
 ## Commands
 
-- `npm install`, then `npm test` (96 tests), `npm run typecheck`,
+- `npm install`, then `npm test` (101 tests), `npm run typecheck`,
   `npm run build` (into `dist/`).
 - `npm run dev` for working, `npm run preview` (port 4173) to see the built
   app; offline support only runs in `preview`.

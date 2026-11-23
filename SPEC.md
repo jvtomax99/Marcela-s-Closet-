@@ -128,6 +128,33 @@ in her language and accent, no YouTube or account.
   playing by itself on first launch, the app's words in Spanish,
   re-recording by itself.
 
+### Music playlist (Jose, 2026-11-23)
+The intro's 12 seconds no longer loop for ever. "Open with sound" plays
+the intro piece once, then four instrumental songs take turns at half
+volume, about six minutes before they come round again: Salsa en
+Juanchito, Bolero de San Antonio, Marimba del Pacífico and Boogaloo en la
+Sexta (90 s each, Eleven Music; Spanish titles on purpose, like the
+sayings). A new visit starts on the song after the last one she heard.
+The masthead's music button is now a small record that turns while the
+music plays; a tap shows "Now playing · 2 of 4", the title, pause / play
+and next. It shows even after "Open quietly", so one more tap starts the
+music. A dark ticker under the masthead shows what's playing and what's
+next (or the station's songs while it's quiet), sliding only while the
+music plays. The music still fades for the video guide. Offline, a song
+she has heard once plays from the saved copy; one she hasn't is skipped.
+Compared with Spotify and Apple Music (a player bar above the tabs on
+every screen, about 70 px over the content) and Calm (background sound
+with only a mute): the player lives in the masthead, so nothing covers
+her outfits, and the song's name is one tap away. No account.
+- Done when: on her iPhone, "Open with sound" plays the intro piece and
+  then a song with no gap or jump; the record turns and its card names
+  the song; Next changes it; Pause stops it and the record stands still;
+  after "Open quietly" the record shows and Play starts the music; the
+  next launch starts on the following song; the guide still quiets it.
+- Not in v1: choosing or reordering songs, shuffle, a volume slider,
+  lyrics, playing with the phone locked or the app in the background,
+  more than four songs.
+
 ### Lookbook
 Save a look, name it and rate it 1 to 5 stars; hide looks she doesn't
 like. Favorite pieces (Phase 3): a heart on every piece in the Closet
@@ -205,7 +232,14 @@ once. Before, one bar of signal could leave it blank for a minute or more.
 Magazine design with a Cali, Colombia and music flavor ("Salsa caleña",
 Phase 4): hibiscus pink, mango and palm green on warm cream; "Hola, Marce"
 in script with a daily Cali saying; looks numbered as tracks, a "Now
-playing" pill and a record for the Lookbook. Structure after Jose's
+playing" pill and a record for the Lookbook. "Record shop" details (Jose
+picked B of three mockups, 2026-11-23, because the details looked too
+plain): each print held by an enamel pin in the palette, Today's look as
+a record sleeve with the record sliding out (it turns with the music),
+looks numbered on a round hibiscus record label, glossy hi-fi buttons
+(Saved stays pressed in), a dark tab bar with the current page lit in
+hibiscus, the radio ticker under the masthead, and the saying behind a
+big hibiscus quote mark. Cards have firmer corners, like sleeves. Structure after Jose's
 Interpreter Hub: floating capsule tab bar, white lifted cards, two-tone
 icons. Dark mode that follows the phone, a masthead on laptops, forms in sheets,
 calmer motion when the phone asks for reduced motion. Values in
@@ -364,4 +398,15 @@ Runway, music with ElevenLabs (`CREDITS.md`).
     nothing from `guide/` in the offline copy; both files under 5 MB; the
     guides re-made with `tools/guide-video/` from the repo.
   - [ ] Live, and Marce has watched it on her iPhone.
+- [ ] Music playlist and "Record shop" details (Jose, 2026-11-23: more
+  music in the loop, and details that looked too plain).
+  - [x] Jose picked: a short playlist, mockup B of three, all four songs,
+    the record shown after "Open quietly", the Spanish titles.
+  - [x] Built and checked: 101 tests, typecheck and build pass; in
+    Chromium: quiet open shows the record, Play starts Salsa en
+    Juanchito, Next moves on, Pause stops it, a new "Open with sound"
+    plays the intro piece and then the song after the last one heard; no
+    console errors; screenshots at 390 px light and dark and 1440 px.
+  - [ ] Heard on her iPhone (only a phone can prove the sound and the
+    silent switch).
 - [ ] Phase next: to decide with Jose.

@@ -264,7 +264,7 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
       <button
         type="submit"
         disabled={preparing || saving}
-        className="mt-8 w-full rounded-full bg-ink py-4 text-eyebrow text-canvas uppercase shadow-print transition-opacity hover:opacity-90 disabled:opacity-50"
+        className="key-ink mt-8 w-full rounded-full py-4 text-eyebrow uppercase disabled:opacity-50"
       >
         {preparing ? 'Preparing photo…' : item ? 'Save changes' : 'Add to closet'}
       </button>
@@ -274,7 +274,7 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
           type="button"
           disabled={preparing || saving}
           onClick={(event) => submit(event, true)}
-          className="mt-3 w-full rounded-full border border-ink py-3.5 text-eyebrow uppercase transition-colors hover:bg-ink hover:text-canvas disabled:opacity-50"
+          className="key mt-3 w-full rounded-full py-3.5 text-eyebrow uppercase disabled:opacity-50"
         >
           Add and take another
         </button>

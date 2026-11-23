@@ -137,12 +137,13 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
         <h1 lang="es" className="font-script text-greeting text-accent">
           Hola, {OWNER_NAME}
         </h1>
-        <figure lang="es" className="mt-2">
-          <blockquote className="font-serif text-quote italic">“{dicho.text}”</blockquote>
-          <figcaption className="mt-2 flex items-center gap-2.5 text-eyebrow text-ink/80 uppercase">
-            <span aria-hidden="true" className="h-px w-6 bg-ink/60" />
-            {dicho.source}
-          </figcaption>
+        {/* The saying behind a big hibiscus quote mark (Jose, 2026-11-23). */}
+        <figure lang="es" className="relative mt-2 pl-9">
+          <span aria-hidden="true" className="absolute -top-3 left-0 font-serif text-[4.5rem] leading-none font-semibold text-accent italic">
+            “
+          </span>
+          <blockquote className="font-serif text-quote italic">{dicho.text}</blockquote>
+          <figcaption className="mt-2 text-eyebrow text-ink/80 uppercase">{dicho.source}</figcaption>
         </figure>
       </div>
 
@@ -251,7 +252,7 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
             <button
               type="button"
               onClick={() => goTo('closet')}
-              className="rounded-full bg-ink px-6 py-3.5 text-eyebrow text-canvas uppercase shadow-print"
+              className="key-ink rounded-full px-6 py-3.5 text-eyebrow uppercase"
             >
               Go to the closet
             </button>
@@ -311,7 +312,7 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
               <button
                 type="button"
                 onClick={() => setLimit(limit + PAGE_SIZE)}
-                className="rounded-full border border-ink px-7 py-3.5 text-eyebrow uppercase transition-colors hover:bg-ink hover:text-canvas"
+                className="key rounded-full px-7 py-3.5 text-eyebrow uppercase"
               >
                 More looks
               </button>
