@@ -76,8 +76,9 @@ export function BackupControls() {
     if (!file) return
     setBusy(true)
     try {
-      const { items, outfits, wears } = await importCloset(file)
-      const worn = wears > 0 ? ', plus what you wore' : ''
+      const { items, outfits, wears, onMe } = await importCloset(file)
+      const extras = [wears > 0 && 'what you wore', onMe > 0 && `${onMe} ${onMe === 1 ? 'photo' : 'photos'} of you`].filter(Boolean)
+      const worn = extras.length > 0 ? `, plus ${extras.join(' and ')}` : ''
       setStatus(
         `Restored ${items} ${items === 1 ? 'piece' : 'pieces'} and ${outfits} ${outfits === 1 ? 'look' : 'looks'}${worn}.`,
       )

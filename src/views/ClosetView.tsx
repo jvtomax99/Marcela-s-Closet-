@@ -9,12 +9,13 @@ import { PageHeader } from '../components/PageHeader'
 import { Sheet } from '../components/Sheet'
 import { FORGOTTEN_DAYS, forgottenPieces, toDay } from '../engine'
 import { CATEGORY_PLURALS } from '../lib/labels'
-import { CATEGORIES, type Category, type ClothingItem, type Outfit, type Wear } from '../types'
+import { CATEGORIES, type Category, type ClothingItem, type OnMePhoto, type Outfit, type Wear } from '../types'
 
 interface ClosetViewProps {
   items: ClothingItem[]
   outfits: Outfit[]
   wears: Wear[]
+  onMe: OnMePhoto[]
   onStyle: (id: string) => void
 }
 
@@ -23,7 +24,7 @@ type Editing = { kind: 'new'; added: number } | { kind: 'existing'; item: Clothi
 
 type Shelf = Category | 'all' | 'forgotten'
 
-export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) {
+export function ClosetView({ items, outfits, wears, onMe, onStyle }: ClosetViewProps) {
   const [category, setCategory] = useState<Shelf>('all')
   const [editing, setEditing] = useState<Editing>(null)
   /** The full-size photo she picked last while adding pieces, for "Same photo, next piece". In memory only. */
@@ -33,6 +34,7 @@ export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) 
     setLastPhoto(null)
   }, [])
 
+  const byId = new Map(items.map((item) => [item.id, item]))
   const present = CATEGORIES.filter((option) => items.some((item) => item.category === option))
   const forgotten = forgottenPieces(items, wears, toDay(Date.now()))
   const shelves: Shelf[] = ['all', ...present, ...(forgotten.length > 0 ? ['forgotten' as const] : [])]
@@ -70,7 +72,7 @@ export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) 
         </EmptyState>
       ) : (
         <>
-          <BackupReminder items={items} outfits={outfits} wears={wears} />
+          <BackupReminder items={items} outfits={outfits} wears={wears} onMe={onMe} />
 
           <div className="no-scrollbar -mx-4 mb-8 flex gap-7 overflow-x-auto border-b border-line px-4 sm:mx-0 sm:px-0">
             {shelves.map((option) => {
@@ -140,6 +142,12 @@ export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) 
                 : 0
             }
             wears={wears}
+            onYou={
+              editing.kind === 'existing'
+                ? onMe.filter((photo) => photo.itemIds.includes(editing.item.id)).sort((a, b) => b.createdAt - a.createdAt)
+                : []
+            }
+            byId={byId}
             samePhoto={editing.kind === 'new' && editing.added > 0 ? lastPhoto : null}
             onOriginal={setLastPhoto}
             onDone={close}

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { backupDue, lastAdded, useLastBackup } from '../lib/backupReminder'
 import { BACKUP_LABELS } from '../lib/labels'
-import type { ClothingItem, Outfit, Wear } from '../types'
+import type { ClothingItem, OnMePhoto, Outfit, Wear } from '../types'
 import { backUpCloset, lastBackupWords } from './BackupControls'
 
 interface BackupReminderProps {
@@ -10,17 +10,18 @@ interface BackupReminderProps {
   items: ClothingItem[]
   outfits: Outfit[]
   wears: Wear[]
+  onMe: OnMePhoto[]
 }
 
 /**
  * A note on the Closet and Looks pages when a backup is due: never made on this device, or
  * two weeks old with something added since. One tap backs up; then the note goes away.
  */
-export function BackupReminder({ className = 'mb-8', items, outfits, wears }: BackupReminderProps) {
+export function BackupReminder({ className = 'mb-8', items, outfits, wears, onMe }: BackupReminderProps) {
   const lastBackup = useLastBackup()
   const [busy, setBusy] = useState(false)
   const [unsure, setUnsure] = useState(false)
-  if (!backupDue(lastBackup, lastAdded(items, outfits, wears), Date.now())) return null
+  if (!backupDue(lastBackup, lastAdded(items, outfits, wears, onMe), Date.now())) return null
 
   const backUp = async () => {
     setBusy(true)

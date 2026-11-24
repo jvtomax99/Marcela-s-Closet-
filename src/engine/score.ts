@@ -3,6 +3,7 @@ import { harmonyOf, isNeutral, type Harmony } from './color'
 import { CORE_CATEGORIES, isBold, sharedOccasions, sharedSeasons } from './rules'
 import { daysUnworn, FORGOTTEN_DAYS, RECENT_DAYS, REPEAT_LOOK_DAYS, spanOfDays, type WearHistory } from './wear'
 import { capitalize, joinWithAnd } from '../lib/labels'
+import { baseSignature, type FitMemory } from './fit'
 
 const BASE_SCORE = 50
 
@@ -218,10 +219,41 @@ function scoreWear(items: Garment[], wear: WearContext | undefined): Scored['rea
   return reasons
 }
 
+/** Points off for a piece she said is "Not on me", and for a base she said doesn't work together. */
+export const OFF_PIECE_PENALTY = 25
+export const OFF_COMBO_PENALTY = 25
+/** Points for a base she has seen on herself and said "Fits me". */
+export const FITS_BONUS = 8
+
+/**
+ * Her "On me" verdicts. Strong, never a ban: a piece she marked off can still show up, and
+ * the piece she asked to build around is never pushed down.
+ */
+/** Her "On me" verdicts, as the scoring sees them. */
+export interface FitContext {
+  memory: FitMemory
+  /** The piece she asked to build around: never pushed down for being "Not on me". */
+  exemptId?: string
+}
+
+function scoreFit(items: Garment[], context: FitContext | undefined): Scored['reasons'] {
+  if (!context) return []
+  const { memory: fit, exemptId } = context
+  const reasons: Scored['reasons'] = []
+  const off = items.filter((item) => item.id !== exemptId && fit.offPieces.has(item.id)).length
+  if (off > 0) reasons.push({ weight: -off * OFF_PIECE_PENALTY, text: '' })
+  const base = baseSignature(items)
+  if (base && fit.offBases.has(base)) reasons.push({ weight: -OFF_COMBO_PENALTY, text: '' })
+  else if (base && fit.goodBases.has(base)) {
+    reasons.push({ weight: FITS_BONUS, text: "You've seen it on you, and it works", lead: true })
+  }
+  return reasons
+}
+
 const lowerFirst = (text: string) => text.charAt(0).toLowerCase() + text.slice(1)
 
 /** Scores an outfit that already passed the hard rules. */
-export function scoreOutfit(items: Garment[], taste: Taste, wear?: WearContext): Scored {
+export function scoreOutfit(items: Garment[], taste: Taste, wear?: WearContext, fit?: FitContext): Scored {
   const reasons = [
     ...scoreColor(items),
     ...scorePattern(items),
@@ -230,6 +262,7 @@ export function scoreOutfit(items: Garment[], taste: Taste, wear?: WearContext):
     ...scoreFavorites(items),
     ...scoreTaste(items, taste),
     ...scoreWear(items, wear),
+    ...scoreFit(items, fit),
   ]
   const score = reasons.reduce((total, reason) => total + reason.weight, BASE_SCORE)
   return { score, reasons }

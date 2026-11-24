@@ -10,6 +10,7 @@ import {
   restoreHiddenLooks,
   saveItem,
   saveLook,
+  saveOnMe,
   unwearPiece,
   wearPiece,
 } from './index'
@@ -34,6 +35,7 @@ beforeEach(async () => {
   await db.items.clear()
   await db.outfits.clear()
   await db.wears.clear()
+  await db.onMe.clear()
 })
 
 describe('looks', () => {
@@ -108,5 +110,23 @@ describe('what she wore', () => {
     const wears = await db.wears.toArray()
     expect(wears).toHaveLength(1)
     expect(wears[0].itemIds).toEqual(['b'])
+  })
+})
+
+describe('photos of her wearing looks', () => {
+  it('keeps the photo when a piece in it is deleted, with the piece untagged', async () => {
+    await saveItem(piece('a'))
+    await saveItem(piece('b'))
+    await saveOnMe({
+      id: 'p',
+      photo: new Blob(['me']),
+      itemIds: ['a', 'b'],
+      verdict: 'off',
+      offItemIds: ['a'],
+      offCombo: false,
+      createdAt: 1,
+    })
+    await deleteItem('a')
+    expect(await db.onMe.get('p')).toMatchObject({ itemIds: ['b'], offItemIds: [] })
   })
 })

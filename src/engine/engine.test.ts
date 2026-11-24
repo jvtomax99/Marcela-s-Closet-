@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Garment, Outfit, Wear } from '../types'
+import type { FitNote, Garment, Outfit, Wear } from '../types'
 import { colorsClash, harmonyOf } from './color'
 import { scoreOutfit } from './score'
 import { outfitAllowed } from './rules'
@@ -15,6 +15,7 @@ import {
   todaysPick,
 } from './index'
 import { daysBetween } from './wear'
+import { baseSignature, buildFit } from './fit'
 
 let nextId = 0
 
@@ -631,5 +632,112 @@ describe("today's look", () => {
     const start = performance.now()
     todaysPick(closet, [], wears, '2026-11-22', null)
     expect(performance.now() - start).toBeLessThan(1000)
+  })
+})
+
+describe('on me: how looks sit on her', () => {
+  const pink = piece({ category: 'top', colors: ['pink'] })
+  const white = piece({ category: 'top', colors: ['white'] })
+  const jeans = piece({ category: 'bottom', colors: ['denim'] })
+  const flats = piece({ category: 'shoes' })
+  const closet = [pink, white, jeans, flats]
+
+  let at = 0
+  function photo(items: Garment[], verdict: FitNote['verdict'], off: Partial<Pick<FitNote, 'offItemIds' | 'offCombo'>> = {}): FitNote {
+    at += 1
+    return { itemIds: items.map((item) => item.id), verdict, offItemIds: [], offCombo: false, createdAt: at, ...off }
+  }
+  const scoreOf = (looks: ReturnType<typeof suggestOutfits>, top: Garment) =>
+    looks.find((look) => look.items.includes(top))!.score
+
+  it('changes nothing without photos, or with photos not judged yet', () => {
+    const plain = suggestOutfits(closet)
+    expect(suggestOutfits(closet, {}, [], 12, undefined, [])).toEqual(plain)
+    expect(suggestOutfits(closet, {}, [], 12, undefined, [photo([pink, jeans], null)])).toEqual(plain)
+  })
+
+  it('pushes a piece marked "Not on me" far down, but never bans it', () => {
+    const plain = suggestOutfits(closet)
+    const looks = suggestOutfits(closet, {}, [], 12, undefined, [photo([pink, jeans], 'off', { offItemIds: [pink.id] })])
+    expect(looks[0].items).not.toContain(pink)
+    expect(looks.some((look) => look.items.includes(pink))).toBe(true)
+    expect(scoreOf(plain, pink) - scoreOf(looks, pink)).toBe(25)
+    // Only the piece she named is off: the jeans keep their score with the other top.
+    expect(scoreOf(looks, white)).toBe(scoreOf(plain, white))
+  })
+
+  it('pushes down a combination marked off, not the pieces on their own', () => {
+    const black = piece({ category: 'bottom' })
+    const wider = [...closet, black]
+    const plain = suggestOutfits(wider, {}, [], 50)
+    const looks = suggestOutfits(wider, {}, [], 50, undefined, [photo([pink, jeans], 'off', { offCombo: true })])
+    const find = (list: typeof looks, a: Garment, b: Garment) =>
+      list.find((look) => look.items.includes(a) && look.items.includes(b))!.score
+    expect(find(plain, pink, jeans) - find(looks, pink, jeans)).toBe(25)
+    expect(find(looks, pink, black)).toBe(find(plain, pink, black))
+  })
+
+  it('lifts a base she said fits, and says why', () => {
+    const plain = suggestOutfits(closet)
+    const looks = suggestOutfits(closet, {}, [], 12, undefined, [photo([white, jeans, flats], 'fits')])
+    expect(scoreOf(looks, white) - scoreOf(plain, white)).toBe(8)
+    const look = looks.find((each) => each.items.includes(white))!
+    expect(look.why).toContain("You've seen it on you")
+  })
+
+  it('never pushes down the piece she builds around', () => {
+    const note = photo([pink, jeans], 'off', { offItemIds: [pink.id] })
+    const plain = suggestOutfits(closet, { anchorId: pink.id })
+    const looks = suggestOutfits(closet, { anchorId: pink.id }, [], 12, undefined, [note])
+    expect(looks.map((look) => look.score)).toEqual(plain.map((look) => look.score))
+  })
+
+  it('lets the newest judged photo decide', () => {
+    const old = photo([pink, jeans], 'off', { offItemIds: [pink.id], offCombo: true })
+    const now = photo([pink, jeans], 'fits')
+    const memory = buildFit([now, old], closet)
+    expect(memory.offPieces.has(pink.id)).toBe(false)
+    expect(memory.offBases.size).toBe(0)
+    expect(memory.goodBases.has(baseSignature([pink, jeans])!)).toBe(true)
+    // A newer photo with no verdict yet doesn't undo an older verdict.
+    const later = buildFit([old, photo([pink, jeans], null)], closet)
+    expect(later.offPieces.has(pink.id)).toBe(true)
+  })
+
+  it('judges the base: shoes and extras in the photo do not change it', () => {
+    const coat = piece({ category: 'outerwear' })
+    expect(baseSignature([white, jeans, flats, coat])).toBe(baseSignature([jeans, white]))
+    const dress = piece({ category: 'dress' })
+    expect(baseSignature([dress, flats])).toBe(dress.id)
+    expect(baseSignature([flats])).toBeNull()
+  })
+
+  it('a re-judged older photo beats a newer photo judged before it', () => {
+    const a = photo([pink, jeans], null)
+    const b = photo([pink, jeans], 'off', { offItemIds: [pink.id] })
+    b.judgedAt = b.createdAt
+    // Later she judges photo A: it fits now.
+    const rejudged = { ...a, verdict: 'fits' as const, judgedAt: b.createdAt + 10 }
+    expect(buildFit([rejudged, b], closet).offPieces.has(pink.id)).toBe(false)
+  })
+
+  it('reads a "Not on me" that names nothing as no verdict', () => {
+    const old = photo([pink, jeans], 'off', { offItemIds: [pink.id] })
+    const empty = photo([pink, jeans], 'off')
+    expect(buildFit([old, empty], closet).offPieces.has(pink.id)).toBe(true)
+  })
+
+  it('only marks a combination when two base pieces are in it', () => {
+    const dress = piece({ category: 'dress' })
+    const memory = buildFit([photo([dress, flats], 'off', { offCombo: true })], [...closet, dress])
+    expect(memory.offBases.size).toBe(0)
+    expect(memory.offPieces.has(dress.id)).toBe(false)
+  })
+
+  it("moves Today's look away from a piece marked off", () => {
+    const note = photo([pink, jeans], 'off', { offItemIds: [pink.id] })
+    const looks = todaysLooks(closet, [], [], '2026-11-24', [note])
+    expect(looks.filter((look) => look.items.includes(pink)).length).toBeLessThanOrEqual(1)
+    expect(todaysLooks(closet, [], [], '2026-11-24', [note])[0]).toBeDefined()
   })
 })

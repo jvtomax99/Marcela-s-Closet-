@@ -90,3 +90,30 @@ export interface Wear {
   itemIds: string[]
   createdAt: number
 }
+
+/** Her verdict on a photo of herself wearing a look: "Fits me" or "Not on me". */
+export type FitVerdict = 'fits' | 'off'
+
+/** What the suggestion engine reads from a photo of her wearing a look (no photo, so it stays pure). */
+export interface FitNote {
+  /** The closet pieces she has on in the photo. */
+  itemIds: string[]
+  /** Null until she says how it looks on her. */
+  verdict: FitVerdict | null
+  /** On "Not on me": the pieces that are off. */
+  offItemIds: string[]
+  /** On "Not on me": the pieces may be fine, but not together. */
+  offCombo: boolean
+  createdAt: number
+  /** When she last gave or changed the verdict (photos from before this have none: then createdAt). */
+  judgedAt?: number
+}
+
+/**
+ * A photo of her wearing a look (the Lookbook's "On me"). Kept apart from what she wore:
+ * an old album photo never counts as "Wore it".
+ */
+export interface OnMePhoto extends FitNote {
+  id: string
+  photo: Blob
+}
