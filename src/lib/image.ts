@@ -49,8 +49,9 @@ export function cropPlan(area: CropArea, natural: { width: number; height: numbe
   return { width, height, source, target }
 }
 
-/** Behind a photo framed wider than itself: the light `--sand` of the cards (`index.css`). */
-const FILL = '#f3e4d8'
+/** Behind a photo framed wider than itself: `--photo-fill` in `index.css` (the light sand). */
+const fillColor = () =>
+  getComputedStyle(document.documentElement).getPropertyValue('--photo-fill').trim() || '#f3e4d8'
 
 /**
  * Shrinks a phone photo before storing it, after cutting out the part she framed (if any).
@@ -72,7 +73,7 @@ export async function preparePhoto(file: Blob, area?: CropArea): Promise<Blob> {
     const type = file.type === 'image/png' ? 'image/png' : 'image/jpeg'
     if (context) {
       if (type === 'image/jpeg') {
-        context.fillStyle = FILL
+        context.fillStyle = fillColor()
         context.fillRect(0, 0, plan.width, plan.height)
       }
       if (plan.source && plan.target) {

@@ -63,7 +63,7 @@ move them. Now picking or taking a photo opens "Frame it", full screen:
 the photo behind a 3:4 frame, the shape of every card and print. She
 pinches to zoom and drags to move (a Zoom slider too, for laptops), and
 can zoom out until the whole photo fits; any gap is filled with the
-cards' sand color. "Use this" keeps what's in the frame; when the middle
+cards' sand color (a PNG keeps its see-through background there). "Use this" keeps what's in the frame; when the middle
 is right, that's one tap. The framed part is cut from the full-size
 original before shrinking to 1200 px, so a top taken from a full-length
 photo stays sharp, and the color is read from the framed part, not from
@@ -71,8 +71,9 @@ whatever was at her waist. After "Add and take another", "Same photo,
 next piece" frames the next piece from the same photo, so one photo
 gives the top, then the pants, then the shoes. "Frame" on a piece's
 photo frames it again: in the same form from the original she picked,
-on a saved piece from its saved copy (it can only zoom further in; to
-start over she picks the original from her camera roll). Nothing new is
+on a saved piece from its saved copy, which was already cut down (to
+start over she picks the original from her camera roll; each re-frame
+of a saved copy loses a little quality, like saving a JPEG again). Nothing new is
 stored; the database, backups and suggestions don't change. Built with
 react-easy-crop (MIT).
 Compared with Stylebook and Acloset (several pieces from one photo, both
@@ -485,8 +486,14 @@ Runway, music with ElevenLabs (`CREDITS.md`).
     at 390 px light and dark and 1440 px. Video guides re-recorded (the
     add-a-piece scene now taps Use this; same narration): Spanish 4.67 MB,
     English 4.38 MB.
-  - [ ] On her iPhone: pinch and drag feel right, and a real
-    full-length photo gives a sharp top.
+  - [x] A reviewer who hadn't seen the work caught: "Use this" did
+    nothing, silently, on a photo the phone can't open; Change then
+    Cancel left the cancelled photo behind "Frame" and "Same photo";
+    two framings could be cut at once; a pinch beside the photo zoomed
+    the page; two colors weren't tokens. Fixed.
+  - [ ] On her iPhone: pinch and drag feel right; a real full-length
+    photo gives a sharp top; an off-center frame of a portrait photo
+    comes out the right way up; a big photo doesn't stall the phone.
 - [ ] Photos of her wearing looks, with "fits me / doesn't" (Marce's
   feedback; Jose: now, after crop): a full plan first.
 - [ ] Phase next: to decide with Jose.

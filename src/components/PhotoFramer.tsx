@@ -10,6 +10,8 @@ interface PhotoFramerProps {
   source: Blob
   onDone: (area: CropArea) => void
   onCancel: () => void
+  /** The phone couldn't open the photo (say, a HEIC on a Windows PC). */
+  onError: () => void
 }
 
 const MAX_ZOOM = 5
@@ -28,13 +30,15 @@ export function fitZoom(media: { width: number; height: number }) {
  * 3:4 frame, the shape of every card; she pinches to zoom and drags to move, so a full-length
  * photo can give just the top, or just the pants. One tap on "Use this" keeps the middle.
  */
-export function PhotoFramer({ source, onDone, onCancel }: PhotoFramerProps) {
+export function PhotoFramer({ source, onDone, onCancel, onError }: PhotoFramerProps) {
   const url = useMemo(() => URL.createObjectURL(source), [source])
   useEffect(() => () => URL.revokeObjectURL(url), [url])
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
   const [minZoom, setMinZoom] = useState(1)
   const area = useRef<Area | null>(null)
+  // "Use this" waits until the photo is showing and the frame has a place on it.
+  const [ready, setReady] = useState(false)
   const panel = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -61,7 +65,8 @@ export function PhotoFramer({ source, onDone, onCancel }: PhotoFramerProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}
-      className="deck fixed inset-0 z-[70] flex flex-col outline-none"
+      // No page zoom from a pinch beside the photo: only the photo zooms.
+      className="deck fixed inset-0 z-[70] flex touch-none flex-col outline-none"
     >
       <div className="px-5 pt-[calc(env(safe-area-inset-top)+1rem)] pb-3 text-center">
         <h2 className="font-serif text-[1.75rem] italic">{FRAME_LABELS.title}</h2>
@@ -85,13 +90,14 @@ export function PhotoFramer({ source, onDone, onCancel }: PhotoFramerProps) {
           onZoomChange={setZoom}
           onCropComplete={(_, pixels) => {
             area.current = pixels
+            setReady(true)
           }}
           onMediaLoaded={(media: MediaSize) => setMinZoom(fitZoom({ width: media.naturalWidth, height: media.naturalHeight }))}
           style={{
             containerStyle: { background: 'transparent' },
-            cropAreaStyle: { border: '2px solid var(--on-deck)', borderRadius: '6px', color: 'rgb(20 10 16 / 0.62)' },
+            cropAreaStyle: { border: '2px solid var(--on-deck)', borderRadius: '6px', color: 'var(--frame-dim)' },
           }}
-          mediaProps={{ alt: '' }}
+          mediaProps={{ alt: '', onError }}
         />
       </div>
 
@@ -114,8 +120,9 @@ export function PhotoFramer({ source, onDone, onCancel }: PhotoFramerProps) {
           </button>
           <button
             type="button"
+            disabled={!ready}
             onClick={() => area.current && onDone(area.current)}
-            className="key-ink flex-[2] rounded-full py-3.5 text-eyebrow uppercase"
+            className="key-ink flex-[2] rounded-full py-3.5 text-eyebrow uppercase disabled:opacity-50"
           >
             {FRAME_LABELS.done}
           </button>

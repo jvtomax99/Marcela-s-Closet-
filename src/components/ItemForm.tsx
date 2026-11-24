@@ -101,6 +101,8 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
   const [framing, setFraming] = useState<Blob | null>(null)
   /** The full-size photo picked in this form, so "Frame" can still zoom back out. Not saved. */
   const [original, setOriginal] = useState<Blob | null>(null)
+  /** A ref, not state: two framings must never be cut at once (the older one could win). */
+  const preparingNow = useRef(false)
   /** True while the colors are the app's guess from the photo, not her choice. */
   const [colorFromPhoto, setColorFromPhoto] = useState(false)
   /** Set the moment she taps a color herself; a photo guess never overrides that. */
@@ -114,20 +116,31 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
     // Lets her pick the same photo again later (the browser skips a change to the same file).
     event.target.value = ''
     if (!file) return
-    onOriginal?.(file)
-    setOriginal(file)
+    // Becomes this form's original only once she taps "Use this" (Cancel keeps the old photo).
     setFraming(file)
+  }
+
+  const cannotOpen = () => {
+    setFraming(null)
+    setMessage("That photo couldn't be opened here. Try a JPEG or PNG.")
   }
 
   /** She tapped "Use this": cut the framed part from the photo, then read its color. */
   const useFramed = async (area: CropArea) => {
     const source = framing
     setFraming(null)
-    if (!source) return
+    if (!source || preparingNow.current) return
+    preparingNow.current = true
     setPreparing(true)
     try {
       const prepared = await preparePhoto(source, area)
       setPhoto(prepared)
+      // A photo she picked (not this piece's saved copy): "Frame" goes back to it, and the
+      // next piece may be framed from it too.
+      if (source !== photo) {
+        setOriginal(source)
+        onOriginal?.(source)
+      }
       setMessage('')
       // Guess the main color, unless she already chose colors herself.
       if (!pickedColors.current) {
@@ -140,6 +153,7 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
     } catch {
       setMessage("That photo couldn't be opened here. Try a JPEG or PNG.")
     } finally {
+      preparingNow.current = false
       setPreparing(false)
     }
   }
@@ -182,7 +196,9 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
 
   return (
     <form onSubmit={submit} noValidate>
-      {framing && <PhotoFramer source={framing} onDone={useFramed} onCancel={() => setFraming(null)} />}
+      {framing && (
+        <PhotoFramer source={framing} onDone={useFramed} onCancel={() => setFraming(null)} onError={cannotOpen} />
+      )}
       <div className="relative">
         <label className="relative block aspect-[3/4] w-full cursor-pointer overflow-hidden bg-sand">
           {photo ? (
@@ -202,13 +218,21 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
               Change
             </span>
           )}
-          <input type="file" accept="image/*" onChange={pickPhoto} className="sr-only" aria-label="Photo" />
+          <input
+          type="file"
+          accept="image/*"
+          onChange={pickPhoto}
+          disabled={preparing}
+          className="sr-only"
+          aria-label="Photo"
+        />
         </label>
         {photo && (
           // Outside the label, so it doesn't open the photo picker. Re-frames the photo: the
           // original she picked in this form if there is one, otherwise the saved copy.
           <button
             type="button"
+            disabled={preparing}
             onClick={() => setFraming(original ?? photo)}
             className="absolute bottom-3 left-3 rounded-full bg-mat/90 px-3.5 py-2 text-eyebrow uppercase shadow-print"
           >
@@ -221,10 +245,7 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
           <button
             type="button"
             disabled={preparing}
-            onClick={() => {
-              setOriginal(samePhoto)
-              setFraming(samePhoto)
-            }}
+            onClick={() => setFraming(samePhoto)}
             className="key w-full rounded-full py-3.5 text-eyebrow uppercase disabled:opacity-50"
           >
             {FRAME_LABELS.samePhoto}

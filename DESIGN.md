@@ -44,6 +44,8 @@ Dark mode follows the phone's setting (`prefers-color-scheme`).
 | `--mat` | `#fffdf8` | `#f3e9ec` | the white border of each photo print |
 | `--icon-line` | `#2b1a22` | `#f6eaf0` | the sticker icons' outline |
 | `--vinyl` | `#2b1a22` | `#120b0f` | the record icon's body |
+| `--photo-fill` | `#f3e4d8` | `#f3e4d8` (the same: it becomes part of the stored photo) | behind a photo framed wider than itself |
+| `--frame-dim` | `rgb(20 10 16 / 0.62)` | the same | Frame it: the photo outside the frame |
 | `--accent-soft` | `#fbe3ec` | `#3d1a2a` | behind a chosen chip ("Saved"), hibiscus text on it is 4.7:1 |
 | `--glass` | white at 72% | `#251a20` at 72% | the "On the board" pill, over a blur |
 | `--key-face`, `--key-edge` | `#ffffff` to `#f6ece3`, `#e6d5c8` | `#33252c` to `#271b21`, `#46353e` | the hi-fi key (every light pill button) |
@@ -157,11 +159,12 @@ Full screen over the piece's form, on the dark deck (`.deck`, cream
 words): "Frame it" in italic serif at 1.75 rem and a 14 px hint at 70%
 cream on top; the photo in the middle, 16 px in from the sides, behind
 a 3:4 frame with a 2 px cream border and 6 px corners, the photo outside
-the frame dimmed to 62% plum; at the bottom a Zoom slider (eyebrow label,
+the frame dimmed (`--frame-dim`, 62% plum); at the bottom a Zoom slider (eyebrow label,
 hibiscus thumb through `accent-color`) and two keys, Cancel (`.key`) and
 the wider "Use this" (`.key-ink`). A frame zoomed out past the photo is
-filled with the light `--sand` (`#f3e4d8`), whatever the phone's mode,
-since it becomes part of the stored photo. On the form, "Frame" is a
+filled with `--photo-fill` (the light sand) whatever the phone's mode,
+since it becomes part of the stored photo; a PNG keeps its transparency
+there instead. On the form, "Frame" is a
 small cream pill (`bg-mat/90`, eyebrow type) bottom left of the photo,
 opposite "Change"; "Same photo, next piece" is a full-width `.key` under
 the empty photo with a muted line under it. No new tokens.
