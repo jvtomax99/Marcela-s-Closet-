@@ -155,7 +155,7 @@ export const TODAY_LABELS = {
   save: 'Save',
   saved: 'Saved',
   moreLooks: 'more looks',
-  /** The pill above the list of looks ("Now playing" is the music's, Jose 2026-11-23). */
+  /** The pill above the list of looks (Jose, 2026-11-23). */
   onTheBoard: 'On the board',
 } as const
 

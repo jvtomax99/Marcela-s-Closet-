@@ -239,10 +239,11 @@ in script with a daily Cali saying; looks numbered as tracks, an "On the
 board" pill and a record for the Lookbook. "Record shop" details (Jose
 picked B of three mockups, 2026-11-23, because the details looked too
 plain): each print held by an enamel pin in the palette, Today's look as
-a record sleeve with the record sliding out (it turns with the music),
+a record sleeve with the record sliding out (it turns while the intro's
+music plays),
 looks numbered on a round hibiscus record label, glossy hi-fi buttons
 (Saved stays pressed in), a dark tab bar with the current page lit in
-hibiscus, the radio ticker under the masthead, and the saying behind a
+hibiscus, and the saying behind a
 big hibiscus quote mark. Cards have firmer corners, like sleeves. Structure after Jose's
 Interpreter Hub: floating capsule tab bar, white lifted cards, two-tone
 icons. Dark mode that follows the phone, a masthead on laptops, forms in sheets,

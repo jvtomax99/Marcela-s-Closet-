@@ -9,16 +9,21 @@ const KINDS = ['playlist', 'album', 'artist'] as const
 const ID = /^[A-Za-z0-9]{10,40}$/
 
 /**
- * Turns whatever she pastes into a clean `https://open.spotify.com/<kind>/<id>` link, or null.
- * Takes a share link (with or without `intl-xx/` and `?si=`), a `spotify:playlist:ID` code, or
- * a share text with the link somewhere in it.
+ * Turns whatever she pastes into a clean `https://open.spotify.com/<kind>/<id>` link (or a
+ * `https://spotify.link/<id>` short link), or null. Takes a share link (with or without
+ * `intl-xx/` and `?si=`), a `spotify:playlist:ID` code, or a share text with the link in it.
  */
 export function parseSpotifyLink(text: string): string | null {
   const trimmed = text.trim()
   const code = trimmed.match(/spotify:(playlist|album|artist):([A-Za-z0-9]+)/)
   if (code) return clean(code[1], code[2])
 
-  const found = trimmed.match(/https?:\/\/open\.spotify\.com\/\S+/i)?.[0] ?? (/^open\.spotify\.com\//i.test(trimmed) ? `https://${trimmed}` : null)
+  // Spotify's share sheet sometimes gives a short link; it leads to the same playlist.
+  const short = trimmed.match(/(?:^|\s)(?:https:\/\/)?spotify\.link\/([A-Za-z0-9]{6,40})(?=$|[\s?])/i)
+  if (short) return `https://spotify.link/${short[1]}`
+
+  const bare = trimmed.match(/(?:^|\s)(open\.spotify\.com\/\S+)/i)?.[1]
+  const found = trimmed.match(/https?:\/\/open\.spotify\.com\/\S+/i)?.[0] ?? (bare ? `https://${bare}` : null)
   if (!found) return null
   let url: URL
   try {

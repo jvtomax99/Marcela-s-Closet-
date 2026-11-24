@@ -48,7 +48,7 @@ Dark mode follows the phone's setting (`prefers-color-scheme`).
 | `--glass` | white at 72% | `#251a20` at 72% | the "On the board" pill, over a blur |
 | `--key-face`, `--key-edge` | `#ffffff` to `#f6ece3`, `#e6d5c8` | `#33252c` to `#271b21`, `#46353e` | the hi-fi key (every light pill button) |
 | `--key-ink-face`, `--key-ink-edge` | `#3b2630` to `#22141b`, `#1a0f14` | `#fff8fb` to `#eadbe2`, `#f6eaf0` | the dark key (Wore it on Today's look, Back up now, Add a piece, Save on the form) |
-| `--deck` | `#34222b` to `#1f1218` | `#2a1a22` to `#120b0f` | the tab bar and the radio ticker, dark in both modes |
+| `--deck` | `#34222b` to `#1f1218` | `#2a1a22` to `#120b0f` | the tab bar, dark in both modes |
 | `--on-deck` | `#fbf3ea` | `#fbf3ea` | words and icon outlines on the deck |
 
 The deck has its own shadow, `--deck-shadow` (`shadow-deck`: a long plum

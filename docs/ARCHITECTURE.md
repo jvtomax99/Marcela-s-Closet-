@@ -160,7 +160,8 @@ analytics.
   - `marcelas-closet:last-backup`: when she last backed up on this device,
     for the reminder (`src/lib/backupReminder.ts`).
   - `marcelas-closet:spotify-link`: her Spotify playlist link, cleaned
-    to `https://open.spotify.com/<playlist|album|artist>/<id>`
+    to `https://open.spotify.com/<playlist|album|artist>/<id>` (or a
+    `https://spotify.link/<id>` short link)
     (`src/lib/spotify.ts`). Not in backups: on a new device she pastes it
     again. (The old `marcelas-closet:music-song` is removed once.)
   - `marcelas-closet:today`: `{ day, pick, skipped, previous }` for

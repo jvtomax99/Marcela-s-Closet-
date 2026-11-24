@@ -21,6 +21,9 @@ let state: MusicState = 'off'
 let volume = INTRO_VOLUME
 const listeners = new Set<() => void>()
 
+/** How long after her tap the intro's piece may take to arrive before the app stays quiet. */
+const PIECE_WAIT_MS = 4000
+
 const emit = () => listeners.forEach((listener) => listener())
 const setState = (next: MusicState) => {
   state = next
@@ -42,6 +45,21 @@ const rampTo = (level: number, seconds: number) => {
   master.gain.linearRampToValueAtTime(level, now + seconds)
 }
 
+type Session = { type: string }
+const audioSession = () => (navigator as Navigator & { audioSession?: Session }).audioSession
+
+/** Back to the phone's usual sound rules once the piece is over, so the video guide is heard. */
+const releaseSession = () => {
+  const session = audioSession()
+  if (session) session.type = 'auto'
+}
+
+const finish = () => {
+  source = null
+  releaseSession()
+  setState('off')
+}
+
 // A phone pauses the sound when she leaves the app (or for a call); pick it back up when she returns.
 const onVisible = () => {
   if (document.visibilityState === 'visible' && sound && state === 'on') void sound.context.resume()
@@ -55,7 +73,7 @@ function makeSound() {
   if (!Context) return null
   // On iPhone, mix with whatever else plays (her Spotify) instead of stopping it. The cost:
   // with the silent switch on, the intro is silent too.
-  const session = (navigator as Navigator & { audioSession?: { type: string } }).audioSession
+  const session = audioSession()
   if (session) session.type = 'ambient'
   const context = new Context()
   void context.resume()
@@ -76,11 +94,13 @@ export function startMusic(data: Promise<ArrayBuffer | null>) {
   setState('on')
   // Stopped before the piece arrived (she opened Spotify first): nothing more to do.
   const stopped = () => !sound || state === 'off'
-  void data.then(async (bytes) => {
+  // A first visit on one bar of signal: rather quiet than the piece starting late in the app.
+  const late = new Promise<null>((resolve) => setTimeout(() => resolve(null), PIECE_WAIT_MS))
+  void Promise.race([data, late]).then(async (bytes) => {
     if (!sound || stopped()) return
     const buffer = bytes ? await sound.context.decodeAudioData(bytes.slice(0)).catch(() => null) : null
     if (!buffer || stopped()) {
-      setState('off')
+      if (!stopped()) finish()
       return
     }
     const piece = sound.context.createBufferSource()
@@ -88,10 +108,7 @@ export function startMusic(data: Promise<ArrayBuffer | null>) {
     piece.connect(sound.master)
     piece.onended = () => {
       piece.disconnect()
-      if (source === piece) {
-        source = null
-        setState('off')
-      }
+      if (source === piece) finish()
     }
     source = piece
     piece.start()
@@ -115,8 +132,7 @@ export function toggleMusic() {
 export function stopMusic() {
   if (state === 'off' || !sound) return
   const playing = source
-  source = null
-  setState('off')
+  finish()
   void sound.context.resume()
   rampTo(0, 0.3)
   try {

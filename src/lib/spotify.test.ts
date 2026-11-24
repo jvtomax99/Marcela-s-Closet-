@@ -16,6 +16,14 @@ describe('Spotify link', () => {
     expect(parseSpotifyLink(`Salsa para el closet ${CLEAN}?si=zz via Spotify`)).toBe(CLEAN)
   })
 
+  it("takes Spotify's short share link and a bare link inside share text", () => {
+    expect(parseSpotifyLink('https://spotify.link/AbC123xyZ')).toBe('https://spotify.link/AbC123xyZ')
+    expect(parseSpotifyLink('Mi salsa spotify.link/AbC123xyZ')).toBe('https://spotify.link/AbC123xyZ')
+    expect(parseSpotifyLink(`Mi salsa open.spotify.com/playlist/${ID}?si=1`)).toBe(CLEAN)
+    expect(parseSpotifyLink('https://evil.example/spotify.link/AbC123xyZ')).toBeNull()
+    expect(parseSpotifyLink('https://spotify.link/AbC123xyZ/../../x')).toBeNull()
+  })
+
   it('takes a spotify: code and albums or artists', () => {
     expect(parseSpotifyLink(`spotify:playlist:${ID}`)).toBe(CLEAN)
     expect(parseSpotifyLink(`https://open.spotify.com/album/${ID}`)).toBe(`https://open.spotify.com/album/${ID}`)

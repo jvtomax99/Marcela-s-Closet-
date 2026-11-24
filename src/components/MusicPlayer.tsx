@@ -18,6 +18,7 @@ export function MusicPlayer({ className = '' }: { className?: string }) {
   const [problem, setProblem] = useState<string | null>(null)
   const box = useRef<HTMLDivElement>(null)
   const button = useRef<HTMLButtonElement>(null)
+  const listen = useRef<HTMLAnchorElement>(null)
   const cardId = useId()
   const inputId = useId()
   const hintId = useId()
@@ -40,6 +41,8 @@ export function MusicPlayer({ className = '' }: { className?: string }) {
   }, [open])
 
   const toggle = () => {
+    // The masthead has two records (phone and laptop layouts): read the link afresh each time.
+    setLink(readSpotifyLink())
     setOpen((value) => !value)
     setEditing(false)
     setProblem(null)
@@ -55,6 +58,8 @@ export function MusicPlayer({ className = '' }: { className?: string }) {
     setEditing(false)
     setProblem(null)
     setDraft('')
+    // The Save button goes away: keep her place on the new Listen button.
+    requestAnimationFrame(() => listen.current?.focus())
   }
 
   const asking = editing || !link
@@ -114,12 +119,19 @@ export function MusicPlayer({ className = '' }: { className?: string }) {
                   aria-invalid={problem ? true : undefined}
                   className="mt-1 w-full border-b border-line bg-transparent py-2 text-base outline-none placeholder:text-muted/60 focus:border-accent"
                 />
-                <p id={hintId} className={`mt-2 text-sm leading-snug ${problem ? 'text-accent' : 'text-muted'}`} role={problem ? 'alert' : undefined}>
+                <p id={hintId} aria-live="polite" className={`mt-2 text-sm leading-snug ${problem ? 'text-accent' : 'text-muted'}`}>
                   {problem ?? MUSIC_LABELS.howTo}
                 </p>
                 <div className="mt-3 flex justify-end gap-2">
                   {link && (
-                    <button type="button" onClick={() => setEditing(false)} className="key rounded-full px-4 py-2.5 text-sm">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditing(false)
+                        requestAnimationFrame(() => listen.current?.focus())
+                      }}
+                      className="key rounded-full px-4 py-2.5 text-sm"
+                    >
                       {MUSIC_LABELS.cancel}
                     </button>
                   )}
@@ -131,6 +143,7 @@ export function MusicPlayer({ className = '' }: { className?: string }) {
             ) : (
               <div className="mt-4 flex flex-col items-stretch gap-2">
                 <a
+                  ref={listen}
                   href={link}
                   target="_blank"
                   rel="noopener noreferrer"
