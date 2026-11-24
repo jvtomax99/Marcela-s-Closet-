@@ -38,7 +38,8 @@ Add a piece with a photo and its details: category (top, bottom, dress,
 outerwear, shoes, bag, accessory), colors (the first is the main one),
 pattern, fabric, dressiness (1 Casual to 5 Formal), seasons, occasions,
 tags, favorite. Edit or delete a piece; deleting one warns first and also
-deletes the looks that used it. Photos are shrunk to at most 1200 px.
+deletes the looks that used it. Photos are framed to 3:4 (below) and
+shrunk to at most 1200 px.
 - Done when: on an iPhone, Marce adds a piece with a photo from her camera
   roll, sees it in her closet, edits it, and deletes it after a warning.
 
@@ -55,6 +56,37 @@ category is not guessed (that needs cloud AI or a large model).
 - Done when: on her iPhone, she photographs a piece, taps a category and
   saves, with the right main color most of the time, and adds three
   pieces in a row without closing the form.
+
+### Frame a photo: crop and zoom (Marce's feedback, Jose 2026-11-24)
+Marce's full-length photos only showed their middle, and she couldn't
+move them. Now picking or taking a photo opens "Frame it", full screen:
+the photo behind a 3:4 frame, the shape of every card and print. She
+pinches to zoom and drags to move (a Zoom slider too, for laptops), and
+can zoom out until the whole photo fits; any gap is filled with the
+cards' sand color (a PNG keeps its see-through background there). "Use this" keeps what's in the frame; when the middle
+is right, that's one tap. The framed part is cut from the full-size
+original before shrinking to 1200 px, so a top taken from a full-length
+photo stays sharp, and the color is read from the framed part, not from
+whatever was at her waist. After "Add and take another", "Same photo,
+next piece" frames the next piece from the same photo, so one photo
+gives the top, then the pants, then the shoes. "Frame" on a piece's
+photo frames it again: in the same form from the original she picked,
+on a saved piece from its saved copy, which was already cut down (to
+start over she picks the original from her camera roll; each re-frame
+of a saved copy loses a little quality, like saving a JPEG again). Nothing new is
+stored; the database, backups and suggestions don't change. Built with
+react-easy-crop (MIT).
+Compared with Stylebook and Acloset (several pieces from one photo, both
+leaning on AI background removal and auto-cropping) and Whering
+(background removal): a frame that shows exactly what the cards show,
+run on her phone with no AI and no upload.
+- Done when: on her iPhone, she picks a full-length photo, frames just
+  the top, saves, and the card shows only the top, sharp, with the top's
+  color picked; "Same photo, next piece" lets her frame the pants from
+  the same photo without picking it again; "Frame" on an old piece
+  frames it again.
+- Not in v1: free-shape crop, rotating, background removal, AI finding
+  the pieces, keeping the uncropped original.
 
 ### Looks (suggestions)
 The app builds outfits from her pieces only: (top and bottom) or a dress,
@@ -442,8 +474,26 @@ Runway, music with ElevenLabs (`CREDITS.md`).
     English 4.33 MB.
   - [ ] On her iPhone: the link opens Spotify, and the intro doesn't
     stop her Spotify.
-- [ ] Crop and zoom when adding a piece (Marce's feedback, Jose approved
-  the plan 2026-11-24): next, in its own pull request.
+- [ ] Frame a photo: crop and zoom (Marce's feedback, Jose approved the
+  plan 2026-11-24).
+  - [x] Built and checked: 106 tests (the framing maths), typecheck and
+    build pass; in Chromium with a stand-in full-length photo drawn in
+    code: picking it opens Frame it; the top framed and saved is 900 x
+    1200 px with pink in the middle and pink picked; "Same photo, next
+    piece" frames the pants from the same photo; a wide photo zoomed all
+    the way out fits whole with sand above and below; Escape closes only
+    the framer; "Frame" on a saved piece; no console errors; screenshots
+    at 390 px light and dark and 1440 px. Video guides re-recorded (the
+    add-a-piece scene now taps Use this; same narration): Spanish 4.67 MB,
+    English 4.38 MB.
+  - [x] A reviewer who hadn't seen the work caught: "Use this" did
+    nothing, silently, on a photo the phone can't open; Change then
+    Cancel left the cancelled photo behind "Frame" and "Same photo";
+    two framings could be cut at once; a pinch beside the photo zoomed
+    the page; two colors weren't tokens. Fixed.
+  - [ ] On her iPhone: pinch and drag feel right; a real full-length
+    photo gives a sharp top; an off-center frame of a portrait photo
+    comes out the right way up; a big photo doesn't stall the phone.
 - [ ] Photos of her wearing looks, with "fits me / doesn't" (Marce's
   feedback; Jose: now, after crop): a full plan first.
 - [ ] Phase next: to decide with Jose.

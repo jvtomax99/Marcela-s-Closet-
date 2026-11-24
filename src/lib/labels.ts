@@ -182,6 +182,19 @@ export const MUSIC_LABELS = {
   newWindow: '(opens Spotify)',
 } as const
 
+/** Framing a piece's photo (Marce, 2026-11-24): pinch and drag to pick just the top or the pants. */
+export const FRAME_LABELS = {
+  title: 'Frame it',
+  hint: 'Pinch to zoom, drag to move. What sits in the frame is what your cards show.',
+  zoom: 'Zoom',
+  done: 'Use this',
+  cancel: 'Cancel',
+  reframe: 'Frame',
+  samePhoto: 'Same photo, next piece',
+  samePhotoHint: 'Frame another piece from the photo you just used.',
+  preparing: 'Preparing your photo…',
+} as const
+
 /** The backup reminder and the Backup section's last-backup line. */
 export const BACKUP_LABELS = {
   today: 'Last backup today',
