@@ -1,34 +1,48 @@
-# Handoff (2026-11-22)
+# Handoff (2026-11-24)
 
-**Goal:** let Marce use Phases 1 to 4 and the intro screen for about a
-week, then pick Phase 6 with Jose from her feedback.
+**Goal:** Marce's three requests from her first week (through Jose,
+2026-11-24): (1) her own Spotify playlist instead of the app's songs,
+(2) crop and zoom when adding a piece, (3) photos of her wearing looks,
+tagged with the pieces, with "fits me / doesn't". Jose picked the order
+1, 2, 3, and "now" for 3.
 
-**Next step (around 2026-11-28):** ask Jose how Marce is getting on:
-wear tracking ("Wore it", Forgotten shelf), adding pieces (color read from
-the photo, auto name), favorites, the Salsa caleña look, the daily Cali
-sayings, the music wording and the intro. Fill the unchecked "Marce has
-used it" boxes in SPEC.md from his answers, then help pick Phase 6.
+**Next step:** once PR #13 is merged, plan (3), worn-look photos, for
+Jose's OK. Rules: compare 2 or 3 apps first (notes below), plan mode,
+wait for his OK. Ideas to carry into the plan, already agreed in chat:
+- The real value is a fit verdict per photo ("me queda bien / no me
+  queda") that the engine uses, not just viewing photos. A guess to
+  check with Jose: judge fit by the top-and-bottom pair; sometimes it's
+  one piece alone.
+- Old album photos must not count as "Wore it" (they'd break Forgotten
+  and the recently-worn scores): store them apart from `wears`.
+- Tag pieces from her closet; a piece she never added she frames out of
+  that same photo (Frame it, PR #13).
+- New stored data: a Dexie `version(3)` with an upgrade, backups still
+  restore version-1 files; about 100 photos add roughly 30 MB to a
+  backup. Engine change needs tests in `src/engine/engine.test.ts`.
+- Comparison found (official pages, 2026-11-24): Whering lets you add an
+  outfit selfie to its planner and tag the pieces, for wear stats
+  (whering.co.uk/thoughts/whats-new-on-Whering); Acloset detects pieces in
+  a full-length photo with AI (acloset.app/support); Stylebook: nothing
+  official found. None rates fit.
 
-**Done (2026-11-22):**
-- PR #7, live: the app opens from its saved copy after 4 s on a weak
-  signal, and a backup reminder at the top of the Closet.
-- Phase 5, Today's look (one big pick at the top of Looks, which is now
-  the opening page): built and checked, in its own pull request.
-  When asking Jose about Marce, also ask whether she uses "Wore it" and
-  "Another", and whether she backed up from the note.
+**Done (2026-11-24):**
+- PR #12, live and checked on the real site: the masthead record opens
+  "Your music" (paste her Spotify link once, then Listen on Spotify); the
+  four songs, ticker and Now playing card are gone; the intro piece plays
+  once and asks iPhone to mix with her Spotify.
+- PR #13, waiting for Jose's push: "Frame it", crop and zoom on a 3:4
+  frame, cut from the full-size original; Same photo, next piece; Frame
+  on a saved piece. Guides re-recorded.
+- Narration takes for the guides are in Jose's ElevenLabs flow of
+  2026-11-22 (the 19-node one); the API key can't read history, so they
+  come from that flow (`tools/guide-video/.work/audio/` is not committed).
 
-**Done before:**
-- PR #2 (Phases 1 to 4) and PR #3 (intro screen) are merged and live at
-  https://jvtomax99.github.io/Marcela-s-Closet-/ (checked at 390 px, no
-  errors, offline worker registered).
-- The site broke right after the merge: GitHub Pages was set to "Deploy
-  from a branch", so it published the raw source over the built app.
-  Jose switched Settings, Pages, Source to "GitHub Actions" and it is
-  fixed. Written into CLAUDE.md.
-- First cleanup audit: `docs/CLEANUP.md` (8 items, nothing changed yet).
+**Left to check on her iPhone:** Spotify link opens the app (or through
+Safari), the intro doesn't stop her Spotify; pinch and drag in Frame it,
+a sharp top from a real full-length photo, portrait photos the right way
+up. Also still open from 2026-11-22: whether she uses Wore it, Another,
+the backup note, the sayings and the intro (SPEC.md phase boxes).
 
-**Phase 6 candidates:** adding many photos at once, background removal
-(free options have license catches), or whatever Marce's feedback points
-to. Cleanup items from `docs/CLEANUP.md` if Jose wants them.
-
-**Read first:** `CLAUDE.md`, `SPEC.md` (Phases), `docs/CLEANUP.md`.
+**Read first:** `CLAUDE.md`, `SPEC.md` (Phases, and "Your music", "Frame
+a photo"), `docs/ARCHITECTURE.md`.
