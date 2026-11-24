@@ -19,12 +19,6 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
     `guide-en.mp4` (each under 5 MB, narrated, captions in the picture) and
     their first frames `poster-es.webp`, `poster-en.webp`. Made with
     `tools/guide-video/`.
-  - `music/`: the four playlist songs (Jose, 2026-11-23), each as
-    `.m4a` for Safari and `.webm` for the rest, 90 s, about 1.1 MB each:
-    `salsa-en-juanchito`, `bolero-de-san-antonio`,
-    `marimba-del-pacifico`, `boogaloo-en-la-sexta`. Made with Eleven
-    Music; the fade-out and loudness (-14.5 LUFS, like the intro piece)
-    were added with ffmpeg.
   - `intro/`: the intro's waiting picture (`closed.webp`, the clip's
     first frame), the doors-open clip (`open.mp4`, 4 s, H.264, no sound)
     and the music (`music.m4a` for Safari, `music.webm`, 12 s).
@@ -61,7 +55,7 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
     closet opens intact): 14 tests (with `fake-indexeddb`).
 - `src/lib/`: `labels.ts` (all the words shown for options, the backup reminder's words (`BACKUP_LABELS`), Today's look's words (`TODAY_LABELS`), the guide's words (`GUIDE_LABELS`), plus the
   greeting's name, the daily Cali sayings, `DICHOS`, the intro's words, and the shared `capitalize` and `joinWithAnd` text helpers, which the engine uses too), `intro.ts` (when and how the
-  intro plays; `intro.test.ts`, 4 tests), `music.ts` (the sound itself: the intro piece once, then the songs, pause, next, the guide's fade), `playlist.ts` (the songs, their files and their order; `playlist.test.ts`, 5 tests), `update.ts` (spotting a new
+  intro plays; `intro.test.ts`, 4 tests), `music.ts` (the sound itself: the intro piece once, pause, stop, the guide's fade), `spotify.ts` (her Spotify playlist link: reading what she pastes, keeping it; `spotify.test.ts`, 4 tests), `update.ts` (spotting a new
   version; `update.test.ts`, 3 tests), `image.ts`
   (photo shrinking), `photoColor.ts` (reads a photo's main color on the
   phone; `photoColor.test.ts`, 4 tests), `id.ts`, `useRoute.ts` (the `#/` routing), `useToday.ts` (today's date, kept current past midnight), `backupReminder.ts` (when a backup is due and the last-backup date; `backupReminder.test.ts`, 5 tests).
@@ -71,7 +65,7 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   Pieces tab), `Sheet`, `Navigation`, `Chips`,
   `ColorPicker`, `StarRating`, `PageHeader`, `EmptyState`,
   `BackupControls` (also `backUpCloset`, shared with the reminder), `BackupReminder` (the "No backup yet" note at the top of the Closet, and on Looks under Today's look), `Icon` (the sticker icons and three line icons), `WornToast` (logs a look as worn, with the
-  change-day and undo bar), `Intro` (the wardrobe intro screen), `MusicButton` (pause / play for the music during the intro), `MusicPlayer` (the record in the masthead with its "Now playing" card, and `RadioTicker`, the dark band under the masthead), `TrackLabel` (a look's number on a round record label), `GuideButton` (the play button in the masthead, shown twice for phones and laptops, and `GuideSheet`, the one "How it works" sheet with the video and the Español / English switch, rendered once by `Navigation`), `UpdateBar` (checks for a new
+  change-day and undo bar), `Intro` (the wardrobe intro screen), `MusicButton` (pause / play for the music during the intro), `MusicPlayer` (the record in the masthead with its "Your music" card: paste her Spotify link once, then "Listen on Spotify"), `TrackLabel` (a look's number on a round record label), `GuideButton` (the play button in the masthead, shown twice for phones and laptops, and `GuideSheet`, the one "How it works" sheet with the video and the Español / English switch, rendered once by `Navigation`), `UpdateBar` (checks for a new
   version and reloads, or offers Update while a form is open).
 - `src/views/`: the three pages: `ClosetView`, `LooksView`,
   `LookbookView`.
@@ -139,22 +133,19 @@ analytics.
   the offline worker can't keep). A missing or slow clip (1.5 s after the
   tap) means a fade straight into the app. Music plays through Web Audio,
   started inside the tap, from `src/lib/music.ts`, which owns it so it
-  carries on in the app at half volume after the intro. `?intro=0` skips
+  finishes in the app at half volume after the intro. `?intro=0` skips
   it.
-- **Music** (`src/lib/music.ts`, `playlist.ts`): the intro piece plays
-  once, then the songs in `public/music/` take turns. Each song is
-  fetched whole (given up after 6 s on a weak signal) and unpacked about
-  8 s before it is due, then lined up on the sound clock to start 2.5 s
-  before the last one ends, which fades out (only two songs are ever held
-  in memory). Every "at this moment" step runs off the sound clock, which
-  stands still while paused, so a long pause loads nothing and moves no
-  title. Next fades everything out
-  in 0.4 s and starts the following song; Pause suspends the sound clock.
-  A song that can't be fetched (offline, never heard) is skipped; if none
-  can, the last one plays again. The offline worker keeps each song once
-  it has been fetched. After "Open quietly" nothing plays until Play in
-  `MusicPlayer` (it must start inside a tap). The guide fades it with
-  `setMusicVolume`.
+- **Music** (`src/lib/music.ts`, `spotify.ts`, 2026-11-24): "Open with
+  sound" plays the intro piece once, then it is quiet. The sound asks
+  iPhone to mix (`navigator.audioSession.type = 'ambient'`), so her
+  Spotify keeps playing under it; with the silent switch on, the intro is
+  silent. The record's card opens her playlist as a plain
+  `https://open.spotify.com/...` link in a new window (Spotify's advice:
+  a web link opens the Spotify app without the "Open in Spotify?" prompt
+  a `spotify:` link brings), and stops the intro piece first. The guide
+  fades the music with `setMusicVolume`. The four songs of 2026-11-23
+  are gone; the offline worker deletes any it kept, from its own cache
+  only.
 - **Updates**: `UpdateBar` fetches the page (`./`, never from a cache)
   when the app opens, when it comes back to the front and every 30
   minutes, and compares its main script name (`assets/index-<hash>.js`)
@@ -168,8 +159,11 @@ analytics.
   names.
   - `marcelas-closet:last-backup`: when she last backed up on this device,
     for the reminder (`src/lib/backupReminder.ts`).
-  - `marcelas-closet:music-song`: the last song she heard (0 to 3), so
-    the next visit starts on the one after (`src/lib/playlist.ts`).
+  - `marcelas-closet:spotify-link`: her Spotify playlist link, cleaned
+    to `https://open.spotify.com/<playlist|album|artist>/<id>` (or a
+    `https://spotify.link/<id>` short link)
+    (`src/lib/spotify.ts`). Not in backups: on a new device she pastes it
+    again. (The old `marcelas-closet:music-song` is removed once.)
   - `marcelas-closet:today`: `{ day, pick, skipped, previous }` for
     Today's look (`src/components/TodaysLook.tsx`): today's pick, the looks
     she passed on today with "Another", and the last day's pick.
@@ -186,8 +180,10 @@ analytics.
   new version that arrives late on a weak signal can't leave a page
   without its scripts (the next open with no signal would be blank). It
   leaves the video guides (`guide/`) to the internet, never saving them.
-  It never reads or deletes any cache, its own or another app's, on the
-  shared `jvtomax99.github.io` address. On the first visit, `main.tsx` fetches the page's
+  It never deletes a whole cache, its own or another app's, on the
+  shared `jvtomax99.github.io` address; the one thing it removes is the
+  old `music/` songs from its own cache, when a new worker starts
+  (2026-11-24). On the first visit, `main.tsx` fetches the page's
   files again once the worker is in charge, so the copy is complete.
 - **Per address**: each address, browser and iPhone home-screen app has
   its own database. On Marce's PC the closet lives in the Edge app window's
