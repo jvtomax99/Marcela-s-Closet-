@@ -88,6 +88,51 @@ run on her phone with no AI and no upload.
 - Not in v1: free-shape crop, rotating, background removal, AI finding
   the pieces, keeping the uncropped original.
 
+### On me: photos of her wearing looks (Marce's feedback, Jose approved the plan 2026-11-24)
+Marce wanted to see how her looks sit on her body, not only hanging. The
+Lookbook has a third tab, "On me": "Add a photo of you" picks a photo,
+frames it in Frame it, then "What are you wearing?" shows her pieces by
+category to tap. A piece she never added: "Not in your closet yet? Frame
+it from this photo" opens Add a piece with "Same photo, next piece" ready,
+and the new piece comes back tagged. Then "How does it look on you?":
+"Fits me" or "Not on me"; on "Not on me", "What's off?" offers the tagged
+pieces and, when a top and a bottom (two base pieces) are tagged, "The
+combination" (Jose, 2026-11-24: one verdict per photo, then what's off);
+"Not on me" needs one of them picked. A photo can wait for its verdict. "I'm wearing it
+today", off by default, also logs it as worn today; otherwise a photo
+never counts as worn, so album photos don't touch Forgotten or the
+recently-worn scores. Tap a photo to change its pieces or verdict, or
+delete it. A look card (Looks, Today's look, Lookbook) whose base (top
+and bottom, or dress) matches a photo shows an "On you" print with its
+verdict; tap it to see the photo big. A piece's sheet shows the photos
+she wears it in. Deleting a piece keeps the photo and drops the tag.
+Looks use it, by rule (`src/engine/fit.ts`, `score.ts`), never as a ban
+(Jose, 2026-11-24): a piece marked "Not on me" costs 25 points, a base
+marked "the combination" 25; a base marked "Fits me" gains 8 and leads
+the why line with "You've seen it on you, and it works". For each piece
+and each base, the newest verdict decides (when she gave or last changed
+it, not when the photo was added), so a piece that
+fits now after an old "Not on me" counts as fitting. "Build around" never
+pushes down the piece she picked. The numbers are a first guess to tune.
+Photos are stored on her phone in their own table and go in the same
+backup file (Jose, 2026-11-24); older backups still restore.
+Compared with Whering (an outfit selfie tagged with pieces, for wear
+stats), Acloset (AI finds the pieces in a full-length photo, on their
+servers) and Stylebook (calendar notes, no tagged photo found): none of
+them rates fit; here the verdict changes her suggestions with a reason
+she can read, old photos never fake "Wore it", and nothing leaves her
+phone.
+- Done when: on her iPhone she adds an album photo of herself, tags the
+  top and pants, taps "Not on me" and the top; looks with that top drop
+  far down in Looks, and the photo doesn't count as worn; a "Fits me"
+  photo shows "On you" on the matching look; a piece she never added is
+  framed from that photo and comes back tagged; a backup with photos
+  restores in another browser; her existing closet opens after the
+  update with nothing lost.
+- Not in v1: AI finding the pieces; background removal; judging fit from
+  the image; sizes or measurements; a calendar; sharing; side-by-side
+  compare; the photo's date read from the file; a video guide scene.
+
 ### Looks (suggestions)
 The app builds outfits from her pieces only: (top and bottom) or a dress,
 plus shoes; outerwear (fall or winter only), a bag and up to 2 accessories
@@ -356,7 +401,7 @@ Runway, music with ElevenLabs (`CREDITS.md`).
   flat-lay).
 - Spanish version of the app.
 - For wear tracking: a calendar page, cost per wear (no prices are
-  stored), outfit selfies (moved to planned, Jose 2026-11-24), planning outfits ahead, a stats dashboard,
+  stored), outfit selfies (built as "On me", 2026-11-24), planning outfits ahead, a stats dashboard,
   reminders.
 - AI styling (an AI describing or ranking looks), and only ever on top of
   the rules.
@@ -494,6 +539,28 @@ Runway, music with ElevenLabs (`CREDITS.md`).
   - [ ] On her iPhone: pinch and drag feel right; a real full-length
     photo gives a sharp top; an off-center frame of a portrait photo
     comes out the right way up; a big photo doesn't stall the phone.
-- [ ] Photos of her wearing looks, with "fits me / doesn't" (Marce's
-  feedback; Jose: now, after crop): a full plan first.
+- [ ] On me: photos of her wearing looks, with "Fits me / Not on me"
+  (Marce's feedback; Jose approved the plan 2026-11-24, after crop).
+  - [x] Built and checked: 120 tests (fit rules, newest verdict wins,
+    build-around exempt, a version-2 closet opens as version 3, backups
+    with and without photos), typecheck and build pass; in Chromium with
+    stand-in pictures drawn in code: a "Not on me" top drops out of the
+    top looks but still shows further down; a "Fits me" look shows "On
+    you" and its reason; a piece framed from the same photo comes back
+    tagged; nothing logged as worn, no Forgotten shelf; backup carries
+    the photos and restores in a fresh browser; a 100-photo, 50 MB
+    backup restored in 0.3 s and saved in 1.3 s on a laptop; screenshots
+    at 390 px light and dark and 1440 px; no console errors. Also fixed:
+    the "Change" and "Frame" labels on a piece's photo were invisible in
+    dark mode.
+  - [x] A reviewer who hadn't seen the work caught: "The combination"
+    on a dress and shoes worked as a ban on the dress, and on a top and
+    shoes did nothing; it stayed saved after untagging; a failed save
+    left the button dead; a verdict given later on an older photo lost to
+    a newer photo; an empty "Not on me" cancelled older verdicts; closing
+    the sheet while adding a missing piece lost the photo and its tags.
+    All fixed, with tests. Also noted: a "Not on me" on a piece in
+    Today's look can move today's pick (intended).
+  - [ ] On her iPhone: the Done when above, and a backup with her real
+    photos saves and restores.
 - [ ] Phase next: to decide with Jose.

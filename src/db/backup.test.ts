@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { ClothingItem } from '../types'
 import { exportCloset, importCloset } from './backup'
-import { db, logWear, saveItem, saveLook } from './index'
+import { db, logWear, saveItem, saveLook, saveOnMe } from './index'
 
 const photoBytes = new Uint8Array(70_000).map((_, i) => (i * 31) % 256)
 
@@ -26,6 +26,7 @@ beforeEach(async () => {
   await db.items.clear()
   await db.outfits.clear()
   await db.wears.clear()
+  await db.onMe.clear()
 })
 
 describe('backup', () => {
@@ -37,7 +38,7 @@ describe('backup', () => {
 
     await db.items.clear()
     await db.outfits.clear()
-    expect(await importCloset(file)).toEqual({ items: 2, outfits: 1, wears: 0 })
+    expect(await importCloset(file)).toEqual({ items: 2, outfits: 1, wears: 0, onMe: 0 })
 
     const restored = await db.items.get('a')
     expect({ ...restored, photo: undefined }).toEqual({ ...piece('a'), photo: undefined })
@@ -76,8 +77,29 @@ describe('backup', () => {
     const old = JSON.parse(await file.text())
     delete old.wears
     await db.items.clear()
-    expect(await importCloset(new Blob([JSON.stringify(old)]))).toEqual({ items: 1, outfits: 0, wears: 0 })
+    expect(await importCloset(new Blob([JSON.stringify(old)]))).toEqual({ items: 1, outfits: 0, wears: 0, onMe: 0 })
     expect(await db.items.count()).toBe(1)
+  })
+
+  it('carries the photos of her wearing looks, with their verdicts', async () => {
+    await saveItem(piece('a'))
+    await saveOnMe({
+      id: 'p',
+      photo: new Blob([photoBytes], { type: 'image/jpeg' }),
+      itemIds: ['a'],
+      verdict: 'off',
+      offItemIds: ['a'],
+      offCombo: false,
+      createdAt: 7,
+    })
+    const file = await exportCloset()
+    await db.onMe.clear()
+    expect((await importCloset(file)).onMe).toBe(1)
+    const restored = await db.onMe.get('p')
+    expect({ ...restored, photo: undefined }).toMatchObject({ itemIds: ['a'], verdict: 'off', offItemIds: ['a'], createdAt: 7 })
+    expect(new Uint8Array(await restored!.photo.arrayBuffer())).toEqual(photoBytes)
+    // Photos never count as worn.
+    expect(await db.wears.count()).toBe(0)
   })
 
   it('rejects a file that is not a closet backup', async () => {

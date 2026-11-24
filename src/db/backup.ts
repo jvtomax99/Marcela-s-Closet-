@@ -1,4 +1,4 @@
-import type { ClothingItem, Outfit, Wear } from '../types'
+import type { ClothingItem, OnMePhoto, Outfit, Wear } from '../types'
 import { db } from './index'
 
 /** Everything in the closet, photos included, as one file that can be saved anywhere. */
@@ -6,10 +6,17 @@ interface BackupFile {
   app: 'closet'
   version: 1
   exportedAt: number
-  items: (Omit<ClothingItem, 'photo'> & { photo: { type: string; base64: string } })[]
+  items: (Omit<ClothingItem, 'photo'> & { photo: EncodedPhoto })[]
   outfits: Outfit[]
   /** Added with wear tracking. Older files have none, and older app versions ignore it. */
   wears?: Wear[]
+  /** Added with the "On me" photos. Older files have none, and older app versions ignore it. */
+  onMe?: (Omit<OnMePhoto, 'photo'> & { photo: EncodedPhoto })[]
+}
+
+interface EncodedPhoto {
+  type: string
+  base64: string
 }
 
 async function toBase64(blob: Blob): Promise<string> {
@@ -30,10 +37,11 @@ function fromBase64(base64: string, type: string): Blob {
 }
 
 export async function exportCloset(): Promise<File> {
-  const [items, outfits, wears] = await Promise.all([
+  const [items, outfits, wears, onMe] = await Promise.all([
     db.items.toArray(),
     db.outfits.toArray(),
     db.wears.toArray(),
+    db.onMe.toArray(),
   ])
   const backup: BackupFile = {
     app: 'closet',
@@ -47,6 +55,12 @@ export async function exportCloset(): Promise<File> {
     ),
     outfits,
     wears,
+    onMe: await Promise.all(
+      onMe.map(async (each) => ({
+        ...each,
+        photo: { type: each.photo.type, base64: await toBase64(each.photo) },
+      })),
+    ),
   }
   const date = new Date().toISOString().slice(0, 10)
   return new File([JSON.stringify(backup)], `closet-backup-${date}.json`, { type: 'application/json' })
@@ -61,7 +75,7 @@ function isBackup(value: unknown): value is BackupFile {
  * Adds a backup's pieces and looks to this closet. Nothing already here is removed;
  * a piece or look that exists in both is replaced by the backup's version.
  */
-export async function importCloset(file: Blob): Promise<{ items: number; outfits: number; wears: number }> {
+export async function importCloset(file: Blob): Promise<{ items: number; outfits: number; wears: number; onMe: number }> {
   let data: unknown
   try {
     data = JSON.parse(await file.text())
@@ -77,8 +91,12 @@ export async function importCloset(file: Blob): Promise<{ items: number; outfits
   }))
 
   const wears = Array.isArray(backup.wears) ? backup.wears : []
+  const onMe: OnMePhoto[] = (Array.isArray(backup.onMe) ? backup.onMe : []).map((each) => ({
+    ...each,
+    photo: fromBase64(each.photo.base64, each.photo.type),
+  }))
 
-  await db.transaction('rw', [db.items, db.outfits, db.wears], async () => {
+  await db.transaction('rw', [db.items, db.outfits, db.wears, db.onMe], async () => {
     await db.items.bulkPut(items)
     for (const outfit of backup.outfits) {
       // The same look may already exist here under another id; keep one copy.
@@ -86,6 +104,7 @@ export async function importCloset(file: Blob): Promise<{ items: number; outfits
       await db.outfits.put({ ...outfit, id: existing?.id ?? outfit.id })
     }
     await db.wears.bulkPut(wears)
+    await db.onMe.bulkPut(onMe)
   })
-  return { items: items.length, outfits: backup.outfits.length, wears: wears.length }
+  return { items: items.length, outfits: backup.outfits.length, wears: wears.length, onMe: onMe.length }
 }

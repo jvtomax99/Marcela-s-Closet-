@@ -4,8 +4,9 @@ import { useMusic } from '../lib/music'
 import { removeLook, saveLook } from '../db'
 import { passOn, todaysPick, type TodayMemory } from '../engine'
 import { TODAY_LABELS } from '../lib/labels'
-import type { ClothingItem, Day, Outfit, Suggestion, Wear } from '../types'
+import type { ClothingItem, Day, FitNote, OnMePhoto, Outfit, Suggestion, Wear } from '../types'
 import { Icon } from './Icon'
+import { OnYouButton } from './OnYou'
 import { OutfitCollage } from './OutfitCollage'
 
 /** Today's pick, what she passed on and the last day's pick, so the card stays put all day. */
@@ -41,9 +42,12 @@ function writeMemory(memory: TodayMemory) {
  * Today's pick and the "Another" button behind it. The pick stays put all day (until it is
  * hidden or loses a piece), "Another" walks to the next look, and tomorrow starts elsewhere.
  */
-export function useTodaysPick(items: ClothingItem[], outfits: Outfit[], wears: Wear[], today: Day) {
+export function useTodaysPick(items: ClothingItem[], outfits: Outfit[], wears: Wear[], today: Day, onMe: FitNote[] = []) {
   const [memory, setMemory] = useState<TodayMemory | null>(readMemory)
-  const result = useMemo(() => todaysPick(items, outfits, wears, today, memory), [items, outfits, wears, today, memory])
+  const result = useMemo(
+    () => todaysPick(items, outfits, wears, today, memory, onMe),
+    [items, outfits, wears, today, memory, onMe],
+  )
 
   // A new pick (first open today, or the old one can't be made any more) is remembered.
   useEffect(() => {
@@ -71,10 +75,23 @@ interface TodaysLookProps {
   today: Day
   onAnother: () => void
   onWore: (itemIds: string[]) => void
+  /** Photos of her wearing today's base, newest first. */
+  onYou?: OnMePhoto[]
 }
 
 /** One look, big, at the top of Looks: the stylist's pick for today. */
-export function TodaysLook({ look, wearing, byId, saved, savedCount, choices, today, onAnother, onWore }: TodaysLookProps) {
+export function TodaysLook({
+  look,
+  wearing,
+  byId,
+  saved,
+  savedCount,
+  choices,
+  today,
+  onAnother,
+  onWore,
+  onYou = [],
+}: TodaysLookProps) {
   const [y, m, d] = today.split('-').map(Number)
   const date = LONG_DAY.format(new Date(y, m - 1, d))
   const isWearing = wearing.length > 0
@@ -115,6 +132,7 @@ export function TodaysLook({ look, wearing, byId, saved, savedCount, choices, to
           <p className={isWearing ? 'mt-4 font-serif text-title text-balance' : 'mt-3 text-sm leading-relaxed text-muted'}>
             {pieces.map((item) => item.name).join(' · ')}
           </p>
+          {!isWearing && <OnYouButton photos={onYou} byId={byId} className="mt-4" />}
           {!isWearing && (
             <div className="mt-6 flex flex-wrap items-center gap-2">
               <button

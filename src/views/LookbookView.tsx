@@ -1,17 +1,23 @@
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { EmptyState } from '../components/EmptyState'
 import { Icon } from '../components/Icon'
+import { OnMeForm } from '../components/OnMeForm'
+import { OnYouButton, VerdictTag } from '../components/OnYou'
 import { OutfitCollage } from '../components/OutfitCollage'
 import { PageHeader } from '../components/PageHeader'
 import { PieceCard } from '../components/PieceCard'
+import { Sheet } from '../components/Sheet'
 import { StarRating } from '../components/StarRating'
 import { TrackLabel } from '../components/TrackLabel'
 import { dayLabel, useWornLog } from '../components/WornToast'
 import { rateLook, removeLook, renameLook, restoreHiddenLooks } from '../db'
 import { toDay, wearStats } from '../engine'
+import { photoUrl } from '../lib/image'
+import { ON_ME_LABELS } from '../lib/labels'
+import { photosByBase, photosOfLook } from '../lib/onMe'
 import { goTo } from '../lib/useRoute'
-import type { ClothingItem, Outfit, Wear } from '../types'
+import type { ClothingItem, OnMePhoto, Outfit, Wear } from '../types'
 
 const SAVED_ON = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' })
 
@@ -21,10 +27,13 @@ interface SavedLookProps {
   look: Outfit
   items: ClothingItem[]
   wears: Wear[]
+  /** Photos of her wearing this look's base, newest first. */
+  onYou: OnMePhoto[]
+  byId: Map<string, ClothingItem>
   onWore: () => void
 }
 
-function SavedLook({ track, look, items, wears, onWore }: SavedLookProps) {
+function SavedLook({ track, look, items, wears, onYou, byId, onWore }: SavedLookProps) {
   const [name, setName] = useState(look.name)
   const today = toDay(Date.now())
   const worn = wearStats(look.itemIds, wears, today)
@@ -60,6 +69,7 @@ function SavedLook({ track, look, items, wears, onWore }: SavedLookProps) {
           className="mt-1 w-full border-b border-transparent bg-transparent py-1 font-serif text-[1.75rem] leading-tight italic outline-none transition-colors hover:border-line focus:border-accent"
         />
         <p className="mt-1.5 text-xs leading-relaxed text-muted">{items.map((item) => item.name).join(' · ')}</p>
+        <OnYouButton photos={onYou} byId={byId} className="mt-3" />
         <div className="mt-2 flex flex-wrap items-center justify-between gap-y-1">
           <StarRating value={look.rating} onChange={(rating) => rateLook(look.id, rating)} />
           <div className="flex items-center gap-1">
@@ -89,15 +99,26 @@ interface LookbookViewProps {
   items: ClothingItem[]
   outfits: Outfit[]
   wears: Wear[]
+  onMe: OnMePhoto[]
   /** Opens Looks built around a favorite piece. */
   onStyle: (id: string) => void
 }
 
-type Tab = 'looks' | 'pieces'
+type Tab = 'looks' | 'pieces' | 'onme'
+/** The "On me" sheet: a new photo, or one she tapped to edit. */
+type Editing = { kind: 'new' } | { kind: 'existing'; photo: OnMePhoto } | null
 /** Remembers the tab while the app is open, so coming back from a favorite's looks lands on Pieces. */
 let lastTab: Tab = 'looks'
 
-export function LookbookView({ items, outfits, wears, onStyle }: LookbookViewProps) {
+export function LookbookView({ items, outfits, wears, onMe, onStyle }: LookbookViewProps) {
+  const [editing, setEditing] = useState<Editing>(null)
+  /** Adding a missing piece inside the photo form: closing the sheet goes back to the photo. */
+  const [addingPiece, setAddingPiece] = useState(false)
+  const closeEditing = useCallback(() => {
+    setEditing(null)
+    setAddingPiece(false)
+  }, [])
+  const closeSheet = useCallback(() => (addingPiece ? setAddingPiece(false) : closeEditing()), [addingPiece, closeEditing])
   const { logLook, toast } = useWornLog()
   const [tab, setTabState] = useState<Tab>(lastTab)
   const setTab = (next: Tab) => {
@@ -105,7 +126,9 @@ export function LookbookView({ items, outfits, wears, onStyle }: LookbookViewPro
     setTabState(next)
   }
   const favorites = items.filter((item) => item.favorite)
-  const byId = new Map(items.map((item) => [item.id, item]))
+  const byId = useMemo(() => new Map(items.map((item) => [item.id, item])), [items])
+  const byBase = useMemo(() => photosByBase(onMe, byId), [onMe, byId])
+  const photos = [...onMe].sort((a, b) => b.createdAt - a.createdAt)
   const saved = outfits
     .filter((outfit) => outfit.status === 'saved')
     .sort((a, b) => b.createdAt - a.createdAt)
@@ -130,6 +153,7 @@ export function LookbookView({ items, outfits, wears, onStyle }: LookbookViewPro
           [
             ['looks', 'Looks', saved.length],
             ['pieces', 'Pieces', favorites.length],
+            ['onme', ON_ME_LABELS.tab, onMe.length],
           ] as const
         ).map(([value, label, count]) => (
           <button
@@ -147,7 +171,64 @@ export function LookbookView({ items, outfits, wears, onStyle }: LookbookViewPro
         ))}
       </div>
 
-      {tab === 'pieces' ? (
+      {tab === 'onme' ? (
+        <>
+          {photos.length === 0 ? (
+            <EmptyState
+              title={ON_ME_LABELS.emptyTitle}
+              action={
+                <button
+                  type="button"
+                  onClick={() => setEditing({ kind: 'new' })}
+                  className="key-ink rounded-full px-6 py-3.5 text-eyebrow uppercase"
+                >
+                  {ON_ME_LABELS.add}
+                </button>
+              }
+            >
+              {ON_ME_LABELS.empty}
+            </EmptyState>
+          ) : (
+            <>
+              <div className="-mt-4 mb-8 flex flex-wrap items-center justify-between gap-4">
+                <p className="max-w-md text-sm leading-relaxed text-muted">{ON_ME_LABELS.intro}</p>
+                <button
+                  type="button"
+                  onClick={() => setEditing({ kind: 'new' })}
+                  className="key-ink flex items-center gap-2.5 rounded-full py-3.5 pr-6 pl-5 text-eyebrow uppercase"
+                >
+                  <Icon name="plus" className="size-4" />
+                  {ON_ME_LABELS.add}
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-9 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 lg:gap-y-12">
+                {photos.map((photo) => (
+                  <button
+                    key={photo.id}
+                    type="button"
+                    onClick={() => setEditing({ kind: 'existing', photo })}
+                    className="group block w-full text-left"
+                  >
+                    <span className="relative block aspect-[3/4] overflow-hidden bg-sand">
+                      <img
+                        src={photoUrl(`onme-${photo.id}`, photo.photo)}
+                        alt=""
+                        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                      />
+                      <span className="absolute bottom-2 left-2">
+                        <VerdictTag photo={photo} />
+                      </span>
+                    </span>
+                    <span className="mt-3 block text-xs leading-relaxed text-muted">
+                      {photo.itemIds.flatMap((id) => byId.get(id)?.name ?? []).join(' · ')}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </>
+      ) : tab === 'pieces' ? (
         favorites.length === 0 ? (
           <EmptyState
             title="No favorite pieces yet"
@@ -200,6 +281,8 @@ export function LookbookView({ items, outfits, wears, onStyle }: LookbookViewPro
                 look={look}
                 items={look.itemIds.flatMap((id) => byId.get(id) ?? [])}
                 wears={wears}
+                onYou={photosOfLook(look.itemIds.flatMap((id) => byId.get(id) ?? []), byBase)}
+                byId={byId}
                 onWore={() => logLook(look.itemIds)}
               />
             ))}
@@ -208,6 +291,24 @@ export function LookbookView({ items, outfits, wears, onStyle }: LookbookViewPro
       )}
 
       {toast}
+
+      <Sheet
+        open={editing !== null}
+        onClose={closeSheet}
+        title={editing?.kind === 'existing' ? ON_ME_LABELS.editTitle : ON_ME_LABELS.newTitle}
+      >
+        {editing && (
+          <OnMeForm
+            key={editing.kind === 'existing' ? editing.photo.id : 'new'}
+            photo={editing.kind === 'existing' ? editing.photo : undefined}
+            items={items}
+            wears={wears}
+            onDone={closeEditing}
+            addingPiece={addingPiece}
+            onAddingPiece={setAddingPiece}
+          />
+        )}
+      </Sheet>
 
       {hiddenCount > 0 && (
         <p className="mt-20 border-t border-line pt-6 text-sm text-muted">

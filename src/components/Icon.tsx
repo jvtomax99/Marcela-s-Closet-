@@ -49,11 +49,12 @@ const STICKERS: Record<'hanger' | 'looks' | 'vinyl', ReactNode> = {
   ),
 }
 
-const LINES: Record<'plus' | 'close' | 'arrow' | 'play', ReactNode> = {
+const LINES: Record<'plus' | 'close' | 'arrow' | 'play' | 'check', ReactNode> = {
   plus: <path d="M12 5v14M5 12h14" />,
   play: <path d="M8.5 5.5v13l10-6.5z" strokeLinejoin="round" />,
   close: <path d="M6 6l12 12M18 6 6 18" />,
   arrow: <path d="M5 12h14m-5-5 5 5-5 5" />,
+  check: <path d="m5 12.5 4.5 4.5L19 7.5" strokeLinejoin="round" />,
 }
 
 export type IconName = keyof typeof STICKERS | keyof typeof LINES | 'heart'

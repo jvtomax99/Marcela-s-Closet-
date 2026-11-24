@@ -1,4 +1,4 @@
-import type { Day, Garment, Outfit, Season, Suggestion, Wear } from '../types'
+import type { Day, FitNote, Garment, Outfit, Season, Suggestion, Wear } from '../types'
 import { suggestOutfits } from './suggest'
 
 /** How many of the best looks take turns as Today's look: one a day, a week's worth. */
@@ -37,19 +37,32 @@ export interface TodayMemory {
 }
 
 /** The best looks for today's season (any season if none fits), scored as of this morning. */
-function candidates(closet: Garment[], history: Outfit[], wears: Wear[], today: Day, limit: number): Suggestion[] {
+function candidates(
+  closet: Garment[],
+  history: Outfit[],
+  wears: Wear[],
+  today: Day,
+  limit: number,
+  onMe: FitNote[],
+): Suggestion[] {
   // What she wore before today: logging today doesn't reshuffle anything.
   const worn = { wears: wears.filter((wear) => wear.date < today), today }
-  const looks = suggestOutfits(closet, { season: seasonOf(today) }, history, limit, worn)
-  return looks.length > 0 ? looks : suggestOutfits(closet, {}, history, limit, worn)
+  const looks = suggestOutfits(closet, { season: seasonOf(today) }, history, limit, worn, onMe)
+  return looks.length > 0 ? looks : suggestOutfits(closet, {}, history, limit, worn, onMe)
 }
 
 /**
  * The looks that take turns as Today's look, in today's order. The best few rotate by day,
  * so the pick changes tomorrow even if nothing else does.
  */
-export function todaysLooks(closet: Garment[], history: Outfit[], wears: Wear[], today: Day): Suggestion[] {
-  return inTurn(candidates(closet, history, wears, today, TODAY_CHOICES), today)
+export function todaysLooks(
+  closet: Garment[],
+  history: Outfit[],
+  wears: Wear[],
+  today: Day,
+  onMe: FitNote[] = [],
+): Suggestion[] {
+  return inTurn(candidates(closet, history, wears, today, TODAY_CHOICES, onMe), today)
 }
 
 /** The first few looks, starting from a different one each day. */
@@ -71,6 +84,7 @@ export function todaysPick(
   wears: Wear[],
   today: Day,
   memory: TodayMemory | null,
+  onMe: FitNote[] = [],
 ): { look: Suggestion | undefined; memory: TodayMemory; choices: number } {
   const fresh: TodayMemory =
     memory?.day === today
@@ -79,7 +93,7 @@ export function todaysPick(
 
   // One run of the engine: the best few take turns, the longer list lets today's pick stay.
   // (The engine picks greedily, so the first few of a long list are the same as a short one.)
-  const pool = candidates(closet, history, wears, today, KEEP_WITHIN)
+  const pool = candidates(closet, history, wears, today, KEEP_WITHIN, onMe)
   const turn = inTurn(pool, today)
   if (turn.length === 0) return { look: undefined, memory: fresh, choices: 0 }
 

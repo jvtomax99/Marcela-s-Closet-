@@ -1,7 +1,8 @@
 import { forwardRef } from 'react'
 import { motion } from 'framer-motion'
-import type { ClothingItem } from '../types'
+import type { ClothingItem, OnMePhoto } from '../types'
 import { Icon } from './Icon'
+import { OnYouButton } from './OnYou'
 import { OutfitCollage } from './OutfitCollage'
 import { TrackLabel } from './TrackLabel'
 
@@ -13,11 +14,14 @@ interface LookCardProps {
   onToggleSave: () => void
   onHide: () => void
   onWore: () => void
+  /** Photos of her wearing this look's base, newest first. */
+  onYou?: OnMePhoto[]
+  byId?: Map<string, ClothingItem>
 }
 
 /** forwardRef lets the list animate a card out when it is hidden. */
 export const LookCard = forwardRef<HTMLElement, LookCardProps>(function LookCard(
-  { number, items, why, saved, onToggleSave, onHide, onWore },
+  { number, items, why, saved, onToggleSave, onHide, onWore, onYou = [], byId },
   ref,
 ) {
   return (
@@ -37,6 +41,7 @@ export const LookCard = forwardRef<HTMLElement, LookCardProps>(function LookCard
       <div className="mt-4 px-1.5">
         <p className="font-serif text-[1.375rem] leading-snug text-balance">{why}</p>
         <p className="mt-2 text-xs leading-relaxed text-muted">{items.map((item) => item.name).join(' · ')}</p>
+        {byId && <OnYouButton photos={onYou} byId={byId} className="mt-3" />}
       </div>
       <div className="mt-4 flex flex-wrap items-center gap-2 px-0.5 pb-0.5">
         <button

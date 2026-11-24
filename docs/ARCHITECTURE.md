@@ -46,25 +46,29 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
     picking outfits.
   - `today.ts`: Today's look: the season from the month (northern
     hemisphere) and the 7 best looks for it, taking turns by day.
-  - `index.ts`: what the rest of the app may use; `engine.test.ts`: 66
+  - `fit.ts`: what her "On me" photos taught: pieces marked "Not on me",
+    bases (top and bottom, or dress) marked "Fits me" or "the combination"
+    is off; the newest judged photo decides (`buildFit`, `baseSignature`).
+  - `index.ts`: what the rest of the app may use; `engine.test.ts`: 77
     tests.
 - `src/db/`: storage.
   - `index.ts`: the Dexie database and every read and write.
   - `backup.ts`: Back up / Restore to a `.json` file.
   - `db.test.ts`, `backup.test.ts`, `upgrade.test.ts` (a version-1
-    closet opens intact): 14 tests (with `fake-indexeddb`).
+    closet opens intact), `upgrade-v2.test.ts` (a version-2 closet opens
+    intact): 17 tests (with `fake-indexeddb`).
 - `src/lib/`: `labels.ts` (all the words shown for options, the backup reminder's words (`BACKUP_LABELS`), Today's look's words (`TODAY_LABELS`), the guide's words (`GUIDE_LABELS`), plus the
   greeting's name, the daily Cali sayings, `DICHOS`, the intro's words, and the shared `capitalize` and `joinWithAnd` text helpers, which the engine uses too), `intro.ts` (when and how the
   intro plays; `intro.test.ts`, 4 tests), `music.ts` (the sound itself: the intro piece once, pause, stop, the guide's fade), `spotify.ts` (her Spotify playlist link: reading what she pastes, keeping it; `spotify.test.ts`, 4 tests), `update.ts` (spotting a new
   version; `update.test.ts`, 3 tests), `image.ts`
   (framing and shrinking photos: `cropPlan`, `preparePhoto`; `image.test.ts`, 5 tests), `photoColor.ts` (reads a photo's main color on the
-  phone; `photoColor.test.ts`, 4 tests), `id.ts`, `useRoute.ts` (the `#/` routing), `useToday.ts` (today's date, kept current past midnight), `backupReminder.ts` (when a backup is due and the last-backup date; `backupReminder.test.ts`, 5 tests).
+  phone; `photoColor.test.ts`, 4 tests), `id.ts`, `useRoute.ts` (the `#/` routing), `useToday.ts` (today's date, kept current past midnight), `onMe.ts` (matches her "On me" photos to looks by their base), `backupReminder.ts` (when a backup is due and the last-backup date; `backupReminder.test.ts`, 5 tests).
 - `src/components/`: building blocks: `OutfitCollage` (the moodboard), `TodaysLook` (the big card at the top of Looks, and `useTodaysPick`, which holds today's pick and "Another"),
-  `LookCard`, `ItemForm` (with `PhotoFramer`, the full-screen "Frame it" crop and zoom, react-easy-crop), `ItemPhoto`, `PieceCard` (a piece in a grid,
+  `LookCard`, `OnMeForm` (a photo of her: frame, tag pieces, verdict, or add a missing piece from the photo), `OnYou` (`OnYouButton`, the small "On you" print under a look or on a piece, and `OnMeViewer`, the photo full screen), `ItemForm` (with `PhotoFramer`, the full-screen "Frame it" crop and zoom, react-easy-crop), `ItemPhoto`, `PieceCard` (a piece in a grid,
   with its one-tap favorite heart; used by the Closet and the Lookbook's
   Pieces tab), `Sheet`, `Navigation`, `Chips`,
   `ColorPicker`, `StarRating`, `PageHeader`, `EmptyState`,
-  `BackupControls` (also `backUpCloset`, shared with the reminder), `BackupReminder` (the "No backup yet" note at the top of the Closet, and on Looks under Today's look), `Icon` (the sticker icons and three line icons), `WornToast` (logs a look as worn, with the
+  `BackupControls` (also `backUpCloset`, shared with the reminder), `BackupReminder` (the "No backup yet" note at the top of the Closet, and on Looks under Today's look), `Icon` (the sticker icons and five line icons), `WornToast` (logs a look as worn, with the
   change-day and undo bar), `Intro` (the wardrobe intro screen), `MusicButton` (pause / play for the music during the intro), `MusicPlayer` (the record in the masthead with its "Your music" card: paste her Spotify link once, then "Listen on Spotify"), `TrackLabel` (a look's number on a round record label), `GuideButton` (the play button in the masthead, shown twice for phones and laptops, and `GuideSheet`, the one "How it works" sheet with the video and the Español / English switch, rendered once by `Navigation`), `UpdateBar` (checks for a new
   version and reloads, or offers Update while a form is open).
 - `src/views/`: the three pages: `ClosetView`, `LooksView`,
@@ -88,8 +92,8 @@ Nothing leaves the device. There is no account, database server or
 analytics.
 
 - **The closet** is the browser's IndexedDB database `closet` (Dexie,
-  `version(1)` for pieces and looks, `version(2)` added what she wore),
-  three tables:
+  `version(1)` for pieces and looks, `version(2)` added what she wore,
+  `version(3)` added her "On me" photos), four tables:
   - `items` (indexed by `id`, `category`, `createdAt`): one row per piece.
     `id`, `name`, `category`, `colors` (first is the main), `pattern`,
     `fabric`, `formality` 1 to 5, `seasons`, `occasions`, `tags`,
@@ -104,8 +108,15 @@ analytics.
     `YYYY-MM-DD` day on her phone, `itemIds` the pieces. All entries on
     one day add up to that day's outfit (a look logged with "Wore it",
     or pieces logged one by one).
+  - `onMe` (indexed by `id`, `createdAt`): photos of her wearing looks.
+    `photo` (framed 3:4, at most 1200 px), `itemIds` (the closet pieces
+    she has on), `verdict` (`fits`, `off` or null), `offItemIds` and
+    `offCombo` (what's off, on "Not on me"). Kept apart from `wears`: a
+    photo never counts as worn unless she switched on "I'm wearing it
+    today", which adds a normal `wears` entry.
   - Deleting a piece deletes every look that used it and takes it out of
-    the days she wore it (a day left empty goes), in one step.
+    the days she wore it (a day left empty goes) and out of her photos'
+    tags (the photo stays), in one step.
 - **Today's look** (`engine/today.ts`, `todaysPick`): the best looks for
   today's season (any season if none fits), scored with what she wore
   before today, so logging today doesn't reshuffle them. The first 7 take
@@ -116,15 +127,16 @@ analytics.
   keeps the date current in an app left open overnight.
   Once anything is logged for today, the card shows those pieces instead.
   The plain list below leaves out today's pick unless a filter is on.
-- **Suggestions** are worked out fresh from `items`, `outfits` and
-  `wears` each time Looks opens: the engine builds every valid
-  combination, scores it (ratings, favorites, hidden looks and what she
-  wore recently or not for a month shift scores), and shows the best 12
+- **Suggestions** are worked out fresh from `items`, `outfits`, `wears`
+  and `onMe` each time Looks opens: the engine builds every valid
+  combination, scores it (ratings, favorites, hidden looks, what she
+  wore recently or not for a month, and her "On me" verdicts shift
+  scores), and shows the best 12
   at a time, with a small penalty for reusing a piece so the list stays
   varied. The same closet always gives the same looks.
-- **Backup file**: `{ app: "closet", version: 1, items, outfits, wears }`
-  (`wears` since Phase 2; a file without it restores as before, and an
-  older copy of the app ignores it), each
+- **Backup file**: `{ app: "closet", version: 1, items, outfits, wears, onMe }`
+  (`wears` since Phase 2, `onMe` since the "On me" photos; a file without
+  them restores as before, and an older copy of the app ignores them), each
   photo inside as base64 text. Restore merges: a piece or look in both is replaced by the
   backup's copy.
 - **Pages**: `#/looks` (the default, with Today's look on top), `#/closet`, `#/lookbook`. Refresh

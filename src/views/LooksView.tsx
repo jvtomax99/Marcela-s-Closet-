@@ -19,6 +19,7 @@ import {
   SEASON_LABELS,
   TODAY_LABELS,
 } from '../lib/labels'
+import { photosByBase, photosOfLook } from '../lib/onMe'
 import { goTo } from '../lib/useRoute'
 import { useToday } from '../lib/useToday'
 import {
@@ -27,6 +28,7 @@ import {
   type ClothingItem,
   type Formality,
   type Occasion,
+  type OnMePhoto,
   type Outfit,
   type Season,
   type SuggestionFilters,
@@ -40,6 +42,7 @@ interface LooksViewProps {
   items: ClothingItem[]
   outfits: Outfit[]
   wears: Wear[]
+  onMe: OnMePhoto[]
   filters: SuggestionFilters
   onFilters: (filters: SuggestionFilters) => void
 }
@@ -82,7 +85,7 @@ function missingPieces(items: ClothingItem[]): string | null {
   return joinWithAnd(missing)
 }
 
-export function LooksView({ items, outfits, wears, filters, onFilters }: LooksViewProps) {
+export function LooksView({ items, outfits, wears, onMe, filters, onFilters }: LooksViewProps) {
   const [limit, setLimit] = useState(PAGE_SIZE)
   const [picking, setPicking] = useState(false)
   const closePicker = useCallback(() => setPicking(false), [])
@@ -100,12 +103,13 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
   // is next to the look she just logged. It re-sorts when the bar closes.
   const settled = useMemo(() => wears.filter((wear) => wear.id !== pendingId), [wears, pendingId])
   const suggested = useMemo(
-    () => suggestOutfits(items, active, outfits, limit, { wears: settled, today }),
-    [items, active, outfits, limit, settled, today],
+    () => suggestOutfits(items, active, outfits, limit, { wears: settled, today }, onMe),
+    [items, active, outfits, limit, settled, today, onMe],
   )
+  const byBase = useMemo(() => photosByBase(onMe, byId), [onMe, byId])
   // Scored as the list is (without a log the Worn bar is still offering to move), so neither
   // jumps while the bar shows.
-  const todays = useTodaysPick(items, outfits, settled, today)
+  const todays = useTodaysPick(items, outfits, settled, today, onMe)
   // What she logged today, any way: Today's look then shows that instead of a pick.
   const wearingToday = useMemo(() => {
     const ids = new Set(wears.filter((wear) => wear.date === today).flatMap((wear) => wear.itemIds))
@@ -158,10 +162,11 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
           today={today}
           onAnother={todays.another}
           onWore={logLook}
+          onYou={photosOfLook(todaysLook.items, byBase)}
         />
       )}
 
-      {!missing && <BackupReminder className="mx-auto mt-9 max-w-5xl" items={items} outfits={outfits} wears={wears} />}
+      {!missing && <BackupReminder className="mx-auto mt-9 max-w-5xl" items={items} outfits={outfits} wears={wears} onMe={onMe} />}
 
       <div className="pb-10 sm:pb-14">
         <h2 className="mt-9 max-w-4xl font-serif text-headline font-light">
@@ -302,6 +307,8 @@ export function LooksView({ items, outfits, wears, filters, onFilters }: LooksVi
                     }
                     onHide={() => hideLook(itemIds)}
                     onWore={() => logLook(itemIds)}
+                    onYou={photosOfLook(look.items, byBase)}
+                    byId={byId}
                   />
                 )
               })}

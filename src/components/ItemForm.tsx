@@ -26,12 +26,14 @@ import {
   type Formality,
   type Occasion,
   type Pattern,
+  type OnMePhoto,
   type Season,
   type Wear,
 } from '../types'
 import { Field, PickMany, PickOne } from './Chips'
 import { ColorPicker } from './ColorPicker'
 import { Icon } from './Icon'
+import { OnYouButton } from './OnYou'
 import { PhotoFramer } from './PhotoFramer'
 import { dayLabel } from './WornToast'
 
@@ -55,6 +57,12 @@ interface ItemFormProps {
   /** Hands up each photo she picks, so the next piece can be framed from it too. */
   onOriginal?: (photo: Blob) => void
   onStyle?: (id: string) => void
+  /** Called with the piece's id once it is saved (adding a piece from a photo of her tags it). */
+  onSaved?: (id: string) => void
+  /** Photos of her wearing this piece, newest first. */
+  onYou?: OnMePhoto[]
+  /** Every piece by id, to name the pieces in those photos. */
+  byId?: Map<string, ClothingItem>
 }
 
 /** "Worn 4 times, last Nov 12", and a one-tap "Wore it today" that can be taken back. */
@@ -82,7 +90,19 @@ function WornLine({ itemId, wears }: { itemId: string; wears: Wear[] }) {
   )
 }
 
-export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnother, samePhoto, onOriginal, onStyle }: ItemFormProps) {
+export function ItemForm({
+  item,
+  looksUsing = 0,
+  wears = [],
+  onDone,
+  onAddAnother,
+  samePhoto,
+  onOriginal,
+  onStyle,
+  onSaved,
+  onYou = [],
+  byId,
+}: ItemFormProps) {
   const [photo, setPhoto] = useState<Blob | null>(item?.photo ?? null)
   const [name, setName] = useState(item?.name ?? '')
   const [category, setCategory] = useState<Category | null>(item?.category ?? null)
@@ -168,8 +188,9 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
     savingNow.current = true
     setSaving(true)
 
+    const id = item?.id ?? newId()
     await saveItem({
-      id: item?.id ?? newId(),
+      id,
       name: name.trim() || autoName || CATEGORY_LABELS[category],
       category,
       colors,
@@ -183,6 +204,7 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
       photo,
       createdAt: item?.createdAt ?? Date.now(),
     })
+    onSaved?.(id)
     if (another && onAddAnother) onAddAnother()
     else onDone()
   }
@@ -214,7 +236,7 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
             </span>
           )}
           {photo && (
-            <span className="absolute right-3 bottom-3 rounded-full bg-mat/90 px-3.5 py-2 text-eyebrow uppercase shadow-print">
+            <span className="absolute right-3 bottom-3 rounded-full bg-canvas/90 px-3.5 py-2 text-eyebrow text-ink uppercase shadow-print">
               Change
             </span>
           )}
@@ -234,7 +256,7 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
             type="button"
             disabled={preparing}
             onClick={() => setFraming(original ?? photo)}
-            className="absolute bottom-3 left-3 rounded-full bg-mat/90 px-3.5 py-2 text-eyebrow uppercase shadow-print"
+            className="absolute bottom-3 left-3 rounded-full bg-canvas/90 px-3.5 py-2 text-eyebrow text-ink uppercase shadow-print"
           >
             {FRAME_LABELS.reframe}
           </button>
@@ -255,6 +277,7 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
       )}
 
       {item && <WornLine itemId={item.id} wears={wears} />}
+      {item && byId && onYou.length > 0 && <OnYouButton photos={onYou} byId={byId} className="mt-4" />}
 
       <Field label="Category">
         <PickOne options={CATEGORIES} labels={CATEGORY_LABELS} value={category} onChange={setCategory} />

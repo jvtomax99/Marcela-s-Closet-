@@ -1,6 +1,7 @@
-import type { Category, Day, Garment, Outfit, Suggestion, SuggestionFilters, Wear } from '../types'
+import type { Category, Day, FitNote, Garment, Outfit, Suggestion, SuggestionFilters, Wear } from '../types'
+import { buildFit } from './fit'
 import { CORE_CATEGORIES, itemMatchesFilters, outfitAllowed, outfitMatchesFilters, pairCompatible } from './rules'
-import { buildTaste, outfitSignature, scoreOutfit, whyItWorks, type Taste, type WearContext } from './score'
+import { buildTaste, outfitSignature, scoreOutfit, whyItWorks, type FitContext, type Taste, type WearContext } from './score'
 import { buildWearHistory } from './wear'
 
 /** How many of the best outfits get optional layers added. Keeps big closets fast. */
@@ -54,15 +55,16 @@ function addBest(
   taste: Taste,
   filters: SuggestionFilters,
   wear?: WearContext,
+  fit?: FitContext,
 ): Garment[] {
-  const current = scoreOutfit(items, taste, wear).score
+  const current = scoreOutfit(items, taste, wear, fit).score
   let best: { items: Garment[]; score: number } | null = null
 
   for (const option of options) {
     if (items.includes(option)) continue
     const next = [...items, option]
     if (!outfitAllowed(next) || !outfitMatchesFilters(next, filters)) continue
-    const score = scoreOutfit(next, taste, wear).score
+    const score = scoreOutfit(next, taste, wear, fit).score
     if (score >= current - FINISHING_TOLERANCE && (!best || score > best.score)) {
       best = { items: next, score }
     }
@@ -76,14 +78,15 @@ function finish(
   taste: Taste,
   filters: SuggestionFilters,
   wear?: WearContext,
+  fit?: FitContext,
 ): Garment[] {
   const optional = (category: Category) => pool.filter((item) => item.category === category).sort(byId)
   let items = core
 
-  if (wantsOuterwear(items, filters)) items = addBest(items, optional('outerwear'), taste, filters, wear)
-  items = addBest(items, optional('bag'), taste, filters, wear)
+  if (wantsOuterwear(items, filters)) items = addBest(items, optional('outerwear'), taste, filters, wear, fit)
+  items = addBest(items, optional('bag'), taste, filters, wear, fit)
   for (let i = 0; i < MAX_ACCESSORIES; i++) {
-    items = addBest(items, optional('accessory'), taste, filters, wear)
+    items = addBest(items, optional('accessory'), taste, filters, wear, fit)
   }
   return items
 }
@@ -116,6 +119,7 @@ function pickVaried(candidates: Candidate[], limit: number): Candidate[] {
  * The suggestion engine. Same closet + same filters = same answer, so results stay explainable.
  * It only ever combines the items it is given.
  * `worn` is what she logged and today's date: recent pieces and looks drop, forgotten ones rise.
+ * `onMe` is her photos wearing looks: "Not on me" pushes down, "Fits me" lifts.
  */
 export function suggestOutfits(
   closet: Garment[],
@@ -123,6 +127,7 @@ export function suggestOutfits(
   history: Outfit[] = [],
   limit = 12,
   worn?: { wears: Wear[]; today: Day },
+  onMe: FitNote[] = [],
 ): Suggestion[] {
   const anchor = filters.anchorId ? closet.find((item) => item.id === filters.anchorId) : undefined
   if (filters.anchorId && !anchor) return []
@@ -135,6 +140,8 @@ export function suggestOutfits(
     today: worn.today,
     exemptId: anchor?.id,
   }
+  const fit: FitContext | undefined =
+    onMe.length > 0 ? { memory: buildFit(onMe, closet), exemptId: anchor?.id } : undefined
   const hidden = new Set(history.filter((look) => look.status === 'hidden').map((look) => look.signature))
 
   const anchorIsOptional = anchor !== undefined && !CORE_CATEGORIES.includes(anchor.category)
@@ -145,24 +152,24 @@ export function suggestOutfits(
     .filter((items) => outfitAllowed(items) && outfitMatchesFilters(items, filters))
     // Each look's signature is built once here, not inside every comparison of the sort: with a
     // big closet that is over 100,000 looks, and rebuilding it took most of the time.
-    .map((items) => ({ items, score: scoreOutfit(items, taste, wear).score, signature: signatureOf(items) }))
+    .map((items) => ({ items, score: scoreOutfit(items, taste, wear, fit).score, signature: signatureOf(items) }))
     .sort((a, b) => b.score - a.score || a.signature.localeCompare(b.signature))
     .slice(0, MAX_FINISHED)
 
   const seen = new Set<string>()
   const finished: Candidate[] = []
   for (const core of cores) {
-    const items = finish(core.items, pool, taste, filters, wear)
+    const items = finish(core.items, pool, taste, filters, wear, fit)
     const signature = signatureOf(items)
     if (seen.has(signature) || hidden.has(signature)) continue
     seen.add(signature)
-    finished.push({ items, score: scoreOutfit(items, taste, wear).score })
+    finished.push({ items, score: scoreOutfit(items, taste, wear, fit).score })
   }
 
   return pickVaried(finished, limit).map(({ items, score }) => ({
     signature: signatureOf(items),
     items,
     score,
-    why: whyItWorks(scoreOutfit(items, taste, wear)),
+    why: whyItWorks(scoreOutfit(items, taste, wear, fit)),
   }))
 }

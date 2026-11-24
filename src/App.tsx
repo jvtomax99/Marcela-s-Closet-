@@ -17,6 +17,7 @@ export function App() {
   const items = useLiveQuery(() => db.items.orderBy('createdAt').reverse().toArray())
   const outfits = useLiveQuery(() => db.outfits.toArray())
   const wears = useLiveQuery(() => db.wears.toArray())
+  const onMe = useLiveQuery(() => db.onMe.toArray())
   const [filters, setFilters] = useState<SuggestionFilters>({})
   // The wardrobe intro plays over the app on every launch; the closet loads underneath meanwhile.
   const [intro, setIntro] = useState(() => shouldShowIntro(window.location.search))
@@ -30,7 +31,7 @@ export function App() {
     <MotionConfig reducedMotion="user">
       <div className="min-h-dvh pt-[env(safe-area-inset-top)]">
         <Navigation route={route} />
-        {items && outfits && wears && (
+        {items && outfits && wears && onMe && (
           <AnimatePresence mode="wait" initial={false}>
             <motion.main
               key={route}
@@ -40,11 +41,11 @@ export function App() {
               transition={{ duration: 0.22, ease: 'easeOut' }}
               className="mx-auto max-w-6xl px-4 pb-36 sm:px-8 md:pb-20"
             >
-              {route === 'closet' && <ClosetView items={items} outfits={outfits} wears={wears} onStyle={styleAround} />}
+              {route === 'closet' && <ClosetView items={items} outfits={outfits} wears={wears} onMe={onMe} onStyle={styleAround} />}
               {route === 'looks' && (
-                <LooksView items={items} outfits={outfits} wears={wears} filters={filters} onFilters={setFilters} />
+                <LooksView items={items} outfits={outfits} wears={wears} onMe={onMe} filters={filters} onFilters={setFilters} />
               )}
-              {route === 'lookbook' && <LookbookView items={items} outfits={outfits} wears={wears} onStyle={styleAround} />}
+              {route === 'lookbook' && <LookbookView items={items} outfits={outfits} wears={wears} onMe={onMe} onStyle={styleAround} />}
             </motion.main>
           </AnimatePresence>
         )}

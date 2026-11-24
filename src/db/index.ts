@@ -1,13 +1,14 @@
 import Dexie, { type Table } from 'dexie'
 import { outfitSignature } from '../engine'
 import { newId } from '../lib/id'
-import type { ClothingItem, Day, Outfit, Wear } from '../types'
+import type { ClothingItem, Day, OnMePhoto, Outfit, Wear } from '../types'
 
 /** The closet lives in this browser's own database (IndexedDB), photos included. */
 class ClosetDatabase extends Dexie {
   items!: Table<ClothingItem, string>
   outfits!: Table<Outfit, string>
   wears!: Table<Wear, string>
+  onMe!: Table<OnMePhoto, string>
 
   constructor() {
     super('closet')
@@ -19,6 +20,10 @@ class ClosetDatabase extends Dexie {
     this.version(2).stores({
       wears: 'id, date',
     })
+    // Version 3 only adds the photos of her wearing looks; nothing before it changes.
+    this.version(3).stores({
+      onMe: 'id, createdAt',
+    })
   }
 }
 
@@ -29,15 +34,26 @@ export const setFavorite = (id: string, favorite: boolean) => db.items.update(id
 
 /**
  * Removes a piece and every look that needed it, so no look points at a missing photo.
- * Days she wore it keep the other pieces; a day left empty goes.
+ * Days she wore it keep the other pieces; a day left empty goes. Photos of her wearing it
+ * stay, with the piece untagged.
  */
 export function deleteItem(id: string) {
-  return db.transaction('rw', [db.items, db.outfits, db.wears], async () => {
+  return db.transaction('rw', [db.items, db.outfits, db.wears, db.onMe], async () => {
     await db.outfits.filter((outfit) => outfit.itemIds.includes(id)).delete()
     await removeFromWears(id, db.wears.filter((wear) => wear.itemIds.includes(id)).toArray())
+    for (const photo of await db.onMe.filter((each) => each.itemIds.includes(id)).toArray()) {
+      await db.onMe.update(photo.id, {
+        itemIds: photo.itemIds.filter((other) => other !== id),
+        offItemIds: photo.offItemIds.filter((other) => other !== id),
+      })
+    }
     await db.items.delete(id)
   })
 }
+
+/** Saves a photo of her wearing a look, new or edited. */
+export const saveOnMe = (photo: OnMePhoto) => db.onMe.put(photo)
+export const deleteOnMe = (id: string) => db.onMe.delete(id)
 
 async function removeFromWears(id: string, entries: Promise<Wear[]>) {
   for (const wear of await entries) {
