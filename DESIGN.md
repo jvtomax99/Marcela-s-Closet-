@@ -134,7 +134,7 @@ Asked for because the details looked too plain. All values above.
 - **Today's look** is a sleeve with a record (`.record`: grooves, a sheen,
   a hibiscus label, a cream spindle hole) sliding out: 176 px peeking
   above the card's top right on phones, 352 px out of its right side on
-  laptops. It turns (`.spinning`, 6 s a turn) while the music plays. The
+  laptops. It turns (`.spinning`, 6 s a turn) while the intro's music plays. The
   kicker reads "Side A · Today's look · date" where it fits on one line
   (from `sm`).
 - **Keys:** every pill button is a hi-fi key (`.key`): a glossy face, a
@@ -145,13 +145,9 @@ Asked for because the details looked too plain. All values above.
 - **Deck:** the phone tab bar is dark in both modes (`.deck`), with cream
   words and icon outlines; the current page is lit by a 24 by 3 px
   hibiscus light with a glow, sliding between tabs (spring 420/36).
-- **Radio ticker:** a dark band (`.deck`) across the full width under the
-  masthead, 10 px semibold small caps with wide spacing: "Now playing ●
-  title ♪ Up next ● title ♪" while the music plays, "Closet radio ●" and
-  the four titles while it's quiet. Labels at 60% cream, titles full
-  cream, marks in mango. It slides (40 s a loop) only while the music
-  plays, and stands still for reduced motion. On phones it replaces the
-  month under "Closet".
+- **Masthead on phones:** the month in 10 px small caps under "Closet",
+  over a hairline rule (`border-line`), as before the radio ticker (the
+  ticker left with the four songs, 2026-11-24).
 - **The saying** sits behind a 72 px semibold italic hibiscus quote mark,
   without quotation marks around the text.
 
@@ -273,16 +269,20 @@ line in small sans and "Update" as an eyebrow link. No new values.
   type) for "Open with sound"; an eyebrow text link for "Open quietly";
   Skip as a muted eyebrow link top right; a round mute button while the
   music plays.
-- Music after the intro (Jose, 2026-11-21, playlist 2026-11-23): after
-  "Open with sound" the songs carry on in the app at half volume. In the
-  masthead, top right on phones and after the links on wide screens, a
-  44 px round key holds a small record (`MusicPlayer`) that turns while
-  the music plays. A tap opens a white card under it (`rounded-card`,
-  `shadow-card`, 19 rem wide): a 48 px record, "Now playing · 2 of 4" as
-  a hibiscus eyebrow, the title in italic serif at `text-xl`, then pause
-  / play (dark key) and next (key) on the right. It shows even after
-  "Open quietly". During the intro the round pause button
-  (`MusicButton`) stays as it was, now a key.
+- Music after the intro (Jose, 2026-11-21; Spotify 2026-11-24): after
+  "Open with sound" the intro's piece finishes in the app at half volume,
+  then it is quiet. In the masthead, top right on phones and after the
+  links on wide screens, a 44 px round key holds a small record
+  (`MusicPlayer`) that turns only while that piece plays. A tap opens a
+  white card under it (`rounded-card`, `shadow-card`, 19 rem wide): a 48
+  px record and "Your music" in italic serif at `text-xl` with a muted
+  line under it. The first time, an eyebrow label, a text box with a
+  hairline under it (`border-line`, `accent` when focused), a muted how-to
+  line (hibiscus when the link is wrong) and a dark Save key. Once saved,
+  a full-width dark key "Listen on Spotify" with a play triangle, and a
+  muted underlined "Change playlist" under it. No Spotify logo: Jose's
+  asset rules keep real logos out (`docs/assets.md`). During the intro
+  the round pause button (`MusicButton`) stays as it was.
 - Motion: words fade and rise in (0.5 s, the app's ease), buttons 0.15 s
   later; everything fades out on tap; the whole screen fades into the app
   in 0.6 s; the music fades out over 1.2 s.

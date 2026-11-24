@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import type { Route } from '../lib/useRoute'
 import { Icon, type IconName } from './Icon'
 import { GuideButton, GuideSheet } from './GuideButton'
-import { MusicPlayer, RadioTicker } from './MusicPlayer'
+import { MusicPlayer } from './MusicPlayer'
 
 const LINKS: { route: Route; label: string; icon: IconName }[] = [
   { route: 'closet', label: 'Closet', icon: 'hanger' },
@@ -21,15 +21,16 @@ export function Navigation({ route }: { route: Route }) {
     <>
       <GuideSheet open={guide} onClose={() => setGuide(false)} />
       <header className="relative mx-auto max-w-6xl px-4 sm:px-8">
-        {/* The music: a record top right on phones (Jose, 2026-11-23). */}
+        {/* The music: a record top right on phones (Jose, 2026-11-23); it opens her Spotify playlist. */}
         <MusicPlayer className="absolute top-3 right-4 sm:right-8 md:hidden" />
         {/* The video guide: top left on phones, opposite the music. */}
         <GuideButton onOpen={openGuide} className="absolute top-3 left-4 sm:left-8 md:hidden" />
-        <div className="grid grid-cols-1 items-center gap-1 pt-5 pb-4 text-center md:grid-cols-[1fr_auto_1fr] md:pt-7 md:pb-5">
+        <div className="grid grid-cols-1 items-center gap-1 border-b border-line pt-5 pb-3 text-center md:grid-cols-[1fr_auto_1fr] md:pt-7 md:pb-4">
           <p className="hidden text-eyebrow text-muted uppercase md:block md:text-left">The {EDITION} edit</p>
           <a href="#/closet" className="font-serif text-[2rem] leading-none tracking-tight italic md:text-[2.5rem]">
             Closet
           </a>
+          <p className="text-[0.625rem] tracking-[0.24em] text-muted uppercase md:hidden">{EDITION}</p>
           <nav aria-label="Main" className="hidden justify-end gap-8 md:flex">
             {LINKS.map((link) => {
               const active = link.route === route
@@ -58,7 +59,6 @@ export function Navigation({ route }: { route: Route }) {
           </nav>
         </div>
       </header>
-      <RadioTicker />
 
       {/* Phone: a floating capsule under the thumb, with a pill behind the current page (after Interpreter Hub). */}
       <nav

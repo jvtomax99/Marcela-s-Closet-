@@ -80,7 +80,7 @@ export function Intro({ onDone }: { onDone: () => void }) {
     if (phaseRef.current === 'leaving') return
     phaseRef.current = 'leaving'
     setPhase('leaving')
-    // The music keeps looping in the app, softer (Jose, 2026-11-21).
+    // The intro's piece finishes in the app, softer; then it is quiet (Jose, 2026-11-24).
     setMusicVolume(APP_VOLUME, 1.2)
     onDone()
   }, [onDone])

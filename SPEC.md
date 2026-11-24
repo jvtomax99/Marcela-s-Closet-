@@ -128,32 +128,36 @@ in her language and accent, no YouTube or account.
   playing by itself on first launch, the app's words in Spanish,
   re-recording by itself.
 
-### Music playlist (Jose, 2026-11-23)
-The intro's 12 seconds no longer loop for ever. "Open with sound" plays
-the intro piece once, then four instrumental songs take turns at half
-volume, about six minutes before they come round again: Salsa en
-Juanchito, Bolero de San Antonio, Marimba del Pacífico and Boogaloo en la
-Sexta (90 s each, Eleven Music; Spanish titles on purpose, like the
-sayings). A new visit starts on the song after the last one she heard.
-The masthead's music button is now a small record that turns while the
-music plays; a tap shows "Now playing · 2 of 4", the title, pause / play
-and next. It shows even after "Open quietly", so one more tap starts the
-music. A dark ticker under the masthead shows what's playing and what's
-next (or the station's songs while it's quiet), sliding only while the
-music plays. The music still fades for the video guide. Offline, a song
-she has heard once plays from the saved copy; one she hasn't is skipped.
-Compared with Spotify and Apple Music (a player bar above the tabs on
-every screen, about 70 px over the content) and Calm (background sound
-with only a mute): the player lives in the masthead, so nothing covers
-her outfits, and the song's name is one tap away. No account.
-- Done when: on her iPhone, "Open with sound" plays the intro piece and
-  then a song with no gap or jump; the record turns and its card names
-  the song; Next changes it; Pause stops it and the record stands still;
-  after "Open quietly" the record shows and Play starts the music; the
-  next launch starts on the following song; the guide still quiets it.
-- Not in v1: choosing or reordering songs, shuffle, a volume slider,
-  lyrics, playing with the phone locked or the app in the background,
-  more than four songs.
+### Your music: her own Spotify playlist (Jose, 2026-11-24)
+Marce's feedback after using the app: the four instrumental songs didn't
+feel caleñas, and she wants music she picks herself without the app
+holding songs with copyright. So the app's only sound is the intro's 12 s
+piece, once, after "Open with sound"; then it is quiet. The masthead's
+record (it turns only while that piece plays) opens a "Your music" card.
+The first time, she pastes her Spotify playlist link (in Spotify: the
+playlist, ⋯, Share, Copy link); after that the card has "Listen on
+Spotify", which opens her playlist, and "Change playlist". She changes the
+songs in Spotify whenever she likes; the app needs no update. The link
+stays on her phone (`localStorage`), never in the repo or backups. The
+intro asks iPhone to mix its sound with other apps, so it doesn't stop
+her Spotify (on silent, the intro is silent). The four songs, the "Now
+playing" card and the radio ticker are gone (built 2026-11-23); the
+offline copy drops any song it kept.
+Compared with Spotify's own guidance: a plain `open.spotify.com` link
+(a `spotify:` link makes iPhone ask "Open in Spotify?" first) and its
+approved words "Listen on Spotify". An embedded Spotify player was ruled
+out: without her Spotify login, as inside the home-screen app, it plays
+only previews of 30 s or less. No Spotify logo, by Jose's asset rules.
+- Done when: in her iPhone home-screen app, the record opens the card;
+  she pastes her playlist link once; "Listen on Spotify" opens her
+  playlist; after a relaunch the link is still there; "Open with sound"
+  plays the doors' music and then stops; with Spotify playing, opening
+  Closet with sound doesn't stop Spotify.
+- Only her iPhone can show: whether the link jumps straight into the
+  Spotify app or through a Safari page first, and the mixing.
+- Not in v1: a player inside Closet, showing what Spotify plays, Apple
+  Music or YouTube Music, several playlists, the link in backups (on a
+  new device she pastes it again).
 
 ### Lookbook
 Save a look, name it and rate it 1 to 5 stars; hide looks she doesn't
@@ -319,7 +323,7 @@ Runway, music with ElevenLabs (`CREDITS.md`).
   flat-lay).
 - Spanish version of the app.
 - For wear tracking: a calendar page, cost per wear (no prices are
-  stored), outfit selfies, planning outfits ahead, a stats dashboard,
+  stored), outfit selfies (moved to planned, Jose 2026-11-24), planning outfits ahead, a stats dashboard,
   reminders.
 - AI styling (an AI describing or ranking looks), and only ever on top of
   the rules.
@@ -424,4 +428,21 @@ Runway, music with ElevenLabs (`CREDITS.md`).
     2026-11-23).
   - [ ] Heard on her iPhone (only a phone can prove the sound and the
     silent switch).
+- [ ] Your music: her own Spotify playlist (Marce's feedback, Jose
+  approved the plan 2026-11-24; the four songs, ticker and Now playing
+  card removed).
+  - [x] Built and checked: tests, typecheck and build pass; in Chromium:
+    a wrong link is turned down, a share link is saved clean and kept
+    after a reload, "Change playlist" works, the intro piece turns the
+    record and then stops, the worker drops old songs from its own copy
+    and nothing else, no console errors; screenshots at 390 px light and
+    dark and 1440 px. Video guides re-recorded without the ticker, from
+    the Nov 22 narration takes (no new credits): Spanish 4.64 MB,
+    English 4.33 MB.
+  - [ ] On her iPhone: the link opens Spotify, and the intro doesn't
+    stop her Spotify.
+- [ ] Crop and zoom when adding a piece (Marce's feedback, Jose approved
+  the plan 2026-11-24): next, in its own pull request.
+- [ ] Photos of her wearing looks, with "fits me / doesn't" (Marce's
+  feedback; Jose: now, after crop): a full plan first.
 - [ ] Phase next: to decide with Jose.

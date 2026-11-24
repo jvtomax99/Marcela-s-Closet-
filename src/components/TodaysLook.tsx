@@ -84,7 +84,7 @@ export function TodaysLook({ look, wearing, byId, saved, savedCount, choices, to
 
   return (
     <section aria-label={TODAY_LABELS.kicker} className="relative mx-auto mt-12 max-w-5xl sm:mt-14">
-      {/* A record sliding out of the sleeve: above the card on phones, out of its side on laptops. It turns with the music. */}
+      {/* A record sliding out of the sleeve: above the card on phones, out of its side on laptops. It turns while the intro's music plays. */}
       <div
         aria-hidden="true"
         className={`record absolute -top-9 right-5 size-44 md:top-1/2 md:-right-14 md:size-[22rem] md:-translate-y-1/2 ${

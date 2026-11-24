@@ -1,23 +1,26 @@
-import { Fragment, useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { MUSIC_LABELS } from '../lib/labels'
-import { nextMusic, toggleMusic, useMusic, useSong } from '../lib/music'
-import { SONGS, nextSong } from '../lib/playlist'
-
-const titleOf = (song: number | null) => (song === null ? MUSIC_LABELS.station : SONGS[song].title)
+import { stopMusic, useMusic } from '../lib/music'
+import { parseSpotifyLink, readSpotifyLink, saveSpotifyLink } from '../lib/spotify'
 
 /**
- * The record in the masthead (Jose, 2026-11-23): it turns while the music plays, and a tap
- * shows what's playing with play / pause and next. It shows even after "Open quietly", so
- * she can start the music with a tap.
+ * The record in the masthead (Jose, 2026-11-23; Spotify 2026-11-24). A tap shows a small card:
+ * the first time, a box for her Spotify playlist link; after that, "Listen on Spotify", which
+ * opens her playlist in the Spotify app. The record turns only while the intro's piece plays.
  */
 export function MusicPlayer({ className = '' }: { className?: string }) {
   const music = useMusic()
-  const song = useSong()
   const [open, setOpen] = useState(false)
+  const [link, setLink] = useState(readSpotifyLink)
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState('')
+  const [problem, setProblem] = useState<string | null>(null)
   const box = useRef<HTMLDivElement>(null)
   const button = useRef<HTMLButtonElement>(null)
   const cardId = useId()
+  const inputId = useId()
+  const hintId = useId()
 
   useEffect(() => {
     if (!open) return
@@ -36,111 +39,128 @@ export function MusicPlayer({ className = '' }: { className?: string }) {
     }
   }, [open])
 
-  const playing = music === 'on'
-  const title = titleOf(song)
-  const place =
-    song === null
-      ? `${MUSIC_LABELS.station} · ${MUSIC_LABELS.songCount(SONGS.length)}`
-      : `${playing ? MUSIC_LABELS.nowPlaying : MUSIC_LABELS.station} · ${MUSIC_LABELS.of(song + 1, SONGS.length)}`
+  const toggle = () => {
+    setOpen((value) => !value)
+    setEditing(false)
+    setProblem(null)
+    setDraft('')
+  }
+
+  const save = (event: React.FormEvent) => {
+    event.preventDefault()
+    const clean = parseSpotifyLink(draft)
+    if (!clean) return setProblem(MUSIC_LABELS.notSpotify)
+    if (!saveSpotifyLink(clean)) return setProblem(MUSIC_LABELS.notKept)
+    setLink(clean)
+    setEditing(false)
+    setProblem(null)
+    setDraft('')
+  }
+
+  const asking = editing || !link
 
   return (
     <div ref={box} className={`z-50 ${className}`}>
       <button
         type="button"
-        aria-label={`${MUSIC_LABELS.open}: ${title}`}
+        aria-label={MUSIC_LABELS.open}
         aria-expanded={open}
         aria-controls={cardId}
         ref={button}
-        onClick={() => setOpen((value) => !value)}
+        onClick={toggle}
         className="key grid h-11 w-11 place-items-center rounded-full"
       >
-        <span aria-hidden="true" className={`record block size-7 ${playing ? 'spinning' : ''}`} />
+        <span aria-hidden="true" className={`record block size-7 ${music === 'on' ? 'spinning' : ''}`} />
       </button>
       <AnimatePresence>
         {open && (
           <motion.div
             id={cardId}
             role="group"
-            aria-label={MUSIC_LABELS.open}
+            aria-label={MUSIC_LABELS.title}
             initial={{ opacity: 0, y: -6, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.97 }}
             transition={{ duration: 0.22, ease: 'easeOut' }}
-            className="absolute top-full right-0 mt-2 w-[min(19rem,calc(100vw-2rem))] origin-top-right rounded-card bg-surface p-3 text-left shadow-card"
+            className="absolute top-full right-0 mt-2 w-[min(19rem,calc(100vw-2rem))] origin-top-right rounded-card bg-surface p-4 text-left shadow-card"
           >
             <div className="flex items-center gap-3">
-              <span aria-hidden="true" className={`record size-12 shrink-0 ${playing ? 'spinning' : ''}`} />
+              <span aria-hidden="true" className={`record size-12 shrink-0 ${music === 'on' ? 'spinning' : ''}`} />
               <div className="min-w-0 flex-1">
-                <p className="text-[0.625rem] font-semibold tracking-[0.18em] text-accent uppercase">{place}</p>
-                <p lang="es" className="mt-1 font-serif text-xl leading-tight text-balance italic">
-                  {title}
-                </p>
+                <p className="font-serif text-xl leading-tight italic">{MUSIC_LABELS.title}</p>
+                <p className="mt-1 text-sm leading-snug text-muted">{MUSIC_LABELS.intro}</p>
               </div>
             </div>
-            <div className="mt-3 flex justify-end gap-2">
-              <button
-                type="button"
-                aria-label={playing ? MUSIC_LABELS.pause : MUSIC_LABELS.play}
-                onClick={toggleMusic}
-                className="key-ink grid size-11 place-items-center rounded-full"
-              >
-                <svg viewBox="0 0 24 24" className="size-[1.125rem]" fill="currentColor" aria-hidden="true">
-                  {playing ? <path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" /> : <path d="M8 5.5v13l10.5-6.5z" />}
-                </svg>
-              </button>
-              <button
-                type="button"
-                aria-label={MUSIC_LABELS.next}
-                onClick={nextMusic}
-                className="key grid size-11 place-items-center rounded-full"
-              >
-                <svg viewBox="0 0 24 24" className="size-[1.125rem]" fill="currentColor" aria-hidden="true">
-                  <path d="M6 6v12l8.5-6zM16 6h2v12h-2z" />
-                </svg>
-              </button>
-            </div>
+
+            {asking ? (
+              <form onSubmit={save} noValidate className="mt-4">
+                <label htmlFor={inputId} className="text-eyebrow text-muted uppercase">
+                  {MUSIC_LABELS.paste}
+                </label>
+                <input
+                  id={inputId}
+                  type="url"
+                  inputMode="url"
+                  autoComplete="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  value={draft}
+                  onChange={(event) => {
+                    setDraft(event.target.value)
+                    setProblem(null)
+                  }}
+                  placeholder={MUSIC_LABELS.placeholder}
+                  aria-describedby={hintId}
+                  aria-invalid={problem ? true : undefined}
+                  className="mt-1 w-full border-b border-line bg-transparent py-2 text-base outline-none placeholder:text-muted/60 focus:border-accent"
+                />
+                <p id={hintId} className={`mt-2 text-sm leading-snug ${problem ? 'text-accent' : 'text-muted'}`} role={problem ? 'alert' : undefined}>
+                  {problem ?? MUSIC_LABELS.howTo}
+                </p>
+                <div className="mt-3 flex justify-end gap-2">
+                  {link && (
+                    <button type="button" onClick={() => setEditing(false)} className="key rounded-full px-4 py-2.5 text-sm">
+                      {MUSIC_LABELS.cancel}
+                    </button>
+                  )}
+                  <button type="submit" className="key-ink rounded-full px-5 py-2.5 text-sm font-semibold">
+                    {MUSIC_LABELS.save}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="mt-4 flex flex-col items-stretch gap-2">
+                <a
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => {
+                    stopMusic()
+                    setOpen(false)
+                  }}
+                  className="key-ink flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"
+                >
+                  <svg viewBox="0 0 24 24" className="size-[1.125rem]" fill="currentColor" aria-hidden="true">
+                    <path d="M8 5.5v13l10.5-6.5z" />
+                  </svg>
+                  {MUSIC_LABELS.listen}
+                  <span className="sr-only">{MUSIC_LABELS.newWindow}</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditing(true)
+                    setDraft('')
+                  }}
+                  className="self-center py-2 text-sm text-muted underline underline-offset-4 hover:text-ink"
+                >
+                  {MUSIC_LABELS.change}
+                </button>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
-  )
-}
-
-/**
- * The dark band under the masthead, like a radio's display: what's playing and what's next,
- * or the station's songs while it's quiet. It slides only while the music plays.
- */
-export function RadioTicker() {
-  const music = useMusic()
-  const song = useSong()
-  const playing = music === 'on' && song !== null
-  const items = playing
-    ? [
-        { label: true, text: MUSIC_LABELS.nowPlaying },
-        { label: false, text: SONGS[song].title },
-        { label: true, text: MUSIC_LABELS.upNext },
-        { label: false, text: SONGS[nextSong(song)].title },
-      ]
-    : [{ label: true, text: MUSIC_LABELS.station }, ...SONGS.map((item) => ({ label: false, text: item.title }))]
-  // Two equal halves, each wider than a laptop screen, so the slide loops without a jump.
-  const half = [...items, ...items, ...items]
-
-  return (
-    <div aria-hidden="true" className="deck overflow-hidden py-2.5 text-[0.625rem] font-semibold tracking-[0.24em] uppercase">
-      <div className={`flex w-max ${playing ? 'ticker-run' : ''}`}>
-        {[0, 1].map((copy) => (
-          <span key={copy} className="flex shrink-0 items-center whitespace-nowrap">
-            {half.map((item, index) => (
-              <Fragment key={index}>
-                <span lang={item.label ? undefined : 'es'} className={`px-3 ${item.label ? 'text-on-deck/60' : ''}`}>
-                  {item.text}
-                </span>
-                <span className="text-mango">{item.label ? '●' : '♪'}</span>
-              </Fragment>
-            ))}
-          </span>
-        ))}
-      </div>
     </div>
   )
 }

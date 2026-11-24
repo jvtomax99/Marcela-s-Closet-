@@ -42,10 +42,12 @@ Jose (`SPEC.md`, Later).
   iPhone the home-screen app all keep separate closets. Moving the site to
   a new address, or changing the hosting, gives her an empty app there:
   warn Jose first, and plan the Back up / Restore step with her.
-- **Music.** `public/music/` holds the four playlist songs (Eleven
-  Music, `CREDITS.md`); `src/lib/playlist.ts` lists them. A new song
-  needs both an `.m4a` and a `.webm`, a fade at the end and about
-  -14.5 LUFS, like the others. The music only ever starts from a tap.
+- **Music.** The app's only sound is the intro's 12 s piece
+  (`public/intro/`), once, from a tap. Her songs are her own Spotify
+  playlist: the masthead's record opens the link she pasted
+  (`src/lib/spotify.ts`, kept in `localStorage`, never in the repo).
+  The four Eleven Music songs left on 2026-11-24 (Marce: they didn't
+  feel caleñas); don't put songs back in the app.
 - **Offline worker.** `public/sw.js` keeps a copy of the app (internet
   first, the copy when there's none or after 4 s on a weak signal; the
   versioned `assets/` files straight from the copy) in the cache

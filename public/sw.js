@@ -4,7 +4,7 @@
 // The closet itself is never here: it lives in the device's database.
 //
 // The app shares its address (jvtomax99.github.io) with other apps, so this worker only
-// handles requests inside its own folder and only ever opens or reads its own cache.
+// handles requests inside its own folder and only ever opens, reads or tidies its own cache.
 const SCOPE = self.registration.scope
 const CACHE = `closet-app:${new URL(SCOPE).pathname}`
 // How long the internet gets before the saved copy answers.
@@ -13,7 +13,20 @@ const SLOW = 'slow'
 const FAILED = 'failed'
 
 self.addEventListener('install', () => self.skipWaiting())
-self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()))
+self.addEventListener('activate', (event) => event.waitUntil(Promise.all([self.clients.claim(), dropOldSongs()])))
+
+// The four playlist songs (music/, 2026-11-23) left the app on 2026-11-24 for her own Spotify
+// playlist: take any she heard out of this app's own copy, about 1.1 MB each.
+async function dropOldSongs() {
+  try {
+    const cache = await caches.open(CACHE)
+    const songs = `${new URL(SCOPE).pathname}music/`
+    const keys = await cache.keys()
+    await Promise.all(keys.filter((key) => new URL(key.url).pathname.startsWith(songs)).map((key) => cache.delete(key)))
+  } catch {
+    // Nothing to tidy.
+  }
+}
 
 self.addEventListener('fetch', (event) => {
   const { request } = event

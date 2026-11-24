@@ -39,7 +39,7 @@
   --key-ink-face: linear-gradient(#3b2630, #22141b);
   --key-ink-edge: #1a0f14;
   --key-ink-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18), 0 4px 10px -3px rgb(43 16 30 / 0.5);
-  /* The deck: the tab bar and the ticker, dark in both modes, with cream words on it. */
+  /* The deck: the tab bar, dark in both modes, with cream words on it. */
   --deck: linear-gradient(#34222b, #1f1218);
   --on-deck: #fbf3ea;
   --deck-shadow: 0 14px 30px -10px rgb(43 16 30 / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.12);
@@ -258,7 +258,7 @@ select {
     box-shadow: 0 0 6px var(--mango);
   }
 
-  /* The deck: the tab bar and the ticker. */
+  /* The deck: the tab bar. */
   .deck {
     background: var(--deck);
     color: var(--on-deck);
@@ -291,7 +291,7 @@ select {
   }
 }
 
-/* A record turns while the music plays; it stands still when paused or for reduced motion. */
+/* A record turns while the intro's music plays; it stands still otherwise or for reduced motion. */
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -302,20 +302,8 @@ select {
   animation: spin 6s linear infinite;
 }
 
-/* The ticker under the masthead slides along while the music plays. */
-@keyframes ticker {
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-.ticker-run {
-  animation: ticker 40s linear infinite;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .spinning,
-  .ticker-run {
+  .spinning {
     animation: none;
   }
 }
