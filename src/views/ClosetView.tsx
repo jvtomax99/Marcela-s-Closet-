@@ -26,7 +26,12 @@ type Shelf = Category | 'all' | 'forgotten'
 export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) {
   const [category, setCategory] = useState<Shelf>('all')
   const [editing, setEditing] = useState<Editing>(null)
-  const close = useCallback(() => setEditing(null), [])
+  /** The full-size photo she picked last while adding pieces, for "Same photo, next piece". In memory only. */
+  const [lastPhoto, setLastPhoto] = useState<Blob | null>(null)
+  const close = useCallback(() => {
+    setEditing(null)
+    setLastPhoto(null)
+  }, [])
 
   const present = CATEGORIES.filter((option) => items.some((item) => item.category === option))
   const forgotten = forgottenPieces(items, wears, toDay(Date.now()))
@@ -135,6 +140,8 @@ export function ClosetView({ items, outfits, wears, onStyle }: ClosetViewProps) 
                 : 0
             }
             wears={wears}
+            samePhoto={editing.kind === 'new' && editing.added > 0 ? lastPhoto : null}
+            onOriginal={setLastPhoto}
             onDone={close}
             onAddAnother={() => {
               setEditing((current) => ({ kind: 'new', added: current?.kind === 'new' ? current.added + 1 : 1 }))

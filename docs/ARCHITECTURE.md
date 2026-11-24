@@ -57,10 +57,10 @@ for storage, Vitest for tests. No server code. About 2,900 lines in `src/`.
   greeting's name, the daily Cali sayings, `DICHOS`, the intro's words, and the shared `capitalize` and `joinWithAnd` text helpers, which the engine uses too), `intro.ts` (when and how the
   intro plays; `intro.test.ts`, 4 tests), `music.ts` (the sound itself: the intro piece once, pause, stop, the guide's fade), `spotify.ts` (her Spotify playlist link: reading what she pastes, keeping it; `spotify.test.ts`, 4 tests), `update.ts` (spotting a new
   version; `update.test.ts`, 3 tests), `image.ts`
-  (photo shrinking), `photoColor.ts` (reads a photo's main color on the
+  (framing and shrinking photos: `cropPlan`, `preparePhoto`; `image.test.ts`, 5 tests), `photoColor.ts` (reads a photo's main color on the
   phone; `photoColor.test.ts`, 4 tests), `id.ts`, `useRoute.ts` (the `#/` routing), `useToday.ts` (today's date, kept current past midnight), `backupReminder.ts` (when a backup is due and the last-backup date; `backupReminder.test.ts`, 5 tests).
 - `src/components/`: building blocks: `OutfitCollage` (the moodboard), `TodaysLook` (the big card at the top of Looks, and `useTodaysPick`, which holds today's pick and "Another"),
-  `LookCard`, `ItemForm`, `ItemPhoto`, `PieceCard` (a piece in a grid,
+  `LookCard`, `ItemForm` (with `PhotoFramer`, the full-screen "Frame it" crop and zoom, react-easy-crop), `ItemPhoto`, `PieceCard` (a piece in a grid,
   with its one-tap favorite heart; used by the Closet and the Lookbook's
   Pieces tab), `Sheet`, `Navigation`, `Chips`,
   `ColorPicker`, `StarRating`, `PageHeader`, `EmptyState`,
@@ -93,7 +93,8 @@ analytics.
   - `items` (indexed by `id`, `category`, `createdAt`): one row per piece.
     `id`, `name`, `category`, `colors` (first is the main), `pattern`,
     `fabric`, `formality` 1 to 5, `seasons`, `occasions`, `tags`,
-    `favorite`, `photo` (the image file itself, at most 1200 px),
+    `favorite`, `photo` (the image file itself: the part she framed, cut
+    from the original, at most 1200 px),
     `createdAt`.
   - `outfits` (indexed by `id`, unique `signature`, `status`,
     `createdAt`): saved and hidden looks. `signature` is the piece ids

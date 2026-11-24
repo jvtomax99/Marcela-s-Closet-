@@ -2,11 +2,12 @@ import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { deleteItem, saveItem, unwearPiece, wearPiece } from '../db'
 import { toDay, wearStats } from '../engine'
 import { newId } from '../lib/id'
-import { photoUrl, preparePhoto } from '../lib/image'
+import { photoUrl, preparePhoto, type CropArea } from '../lib/image'
 import { colorFromPhoto as readPhotoColor } from '../lib/photoColor'
 import {
   capitalize,
   CATEGORY_LABELS,
+  FRAME_LABELS,
   FORMALITY_LABELS,
   OCCASION_LABELS,
   PATTERN_LABELS,
@@ -31,6 +32,7 @@ import {
 import { Field, PickMany, PickOne } from './Chips'
 import { ColorPicker } from './ColorPicker'
 import { Icon } from './Icon'
+import { PhotoFramer } from './PhotoFramer'
 import { dayLabel } from './WornToast'
 
 const FORMALITIES = [1, 2, 3, 4, 5] as const
@@ -48,6 +50,10 @@ interface ItemFormProps {
   onDone: () => void
   /** New pieces only: saves, then starts a fresh form for the next photo. */
   onAddAnother?: () => void
+  /** The full-size photo the last piece was framed from, offered as "Same photo, next piece". */
+  samePhoto?: Blob | null
+  /** Hands up each photo she picks, so the next piece can be framed from it too. */
+  onOriginal?: (photo: Blob) => void
   onStyle?: (id: string) => void
 }
 
@@ -76,7 +82,7 @@ function WornLine({ itemId, wears }: { itemId: string; wears: Wear[] }) {
   )
 }
 
-export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnother, onStyle }: ItemFormProps) {
+export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnother, samePhoto, onOriginal, onStyle }: ItemFormProps) {
   const [photo, setPhoto] = useState<Blob | null>(item?.photo ?? null)
   const [name, setName] = useState(item?.name ?? '')
   const [category, setCategory] = useState<Category | null>(item?.category ?? null)
@@ -91,6 +97,10 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
   const [message, setMessage] = useState('')
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [preparing, setPreparing] = useState(false)
+  /** The photo in the framer right now: a new pick, the same photo again, or this piece's own. */
+  const [framing, setFraming] = useState<Blob | null>(null)
+  /** The full-size photo picked in this form, so "Frame" can still zoom back out. Not saved. */
+  const [original, setOriginal] = useState<Blob | null>(null)
   /** True while the colors are the app's guess from the photo, not her choice. */
   const [colorFromPhoto, setColorFromPhoto] = useState(false)
   /** Set the moment she taps a color herself; a photo guess never overrides that. */
@@ -99,12 +109,24 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
   const savingNow = useRef(false)
   const autoName = category && colors[0] ? `${capitalize(colors[0])} ${CATEGORY_LABELS[category].toLowerCase()}` : null
 
-  const pickPhoto = async (event: ChangeEvent<HTMLInputElement>) => {
+  const pickPhoto = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
+    // Lets her pick the same photo again later (the browser skips a change to the same file).
+    event.target.value = ''
     if (!file) return
+    onOriginal?.(file)
+    setOriginal(file)
+    setFraming(file)
+  }
+
+  /** She tapped "Use this": cut the framed part from the photo, then read its color. */
+  const useFramed = async (area: CropArea) => {
+    const source = framing
+    setFraming(null)
+    if (!source) return
     setPreparing(true)
     try {
-      const prepared = await preparePhoto(file)
+      const prepared = await preparePhoto(source, area)
       setPhoto(prepared)
       setMessage('')
       // Guess the main color, unless she already chose colors herself.
@@ -160,26 +182,56 @@ export function ItemForm({ item, looksUsing = 0, wears = [], onDone, onAddAnothe
 
   return (
     <form onSubmit={submit} noValidate>
-      <label className="relative block aspect-[3/4] w-full cursor-pointer overflow-hidden bg-sand">
-        {photo ? (
-          <img
-            src={photoUrl(item?.id ?? 'draft', photo)}
-            alt="This piece"
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <span className="m-3 flex h-[calc(100%-1.5rem)] flex-col items-center justify-center gap-3 border border-dashed border-muted/40 font-serif text-2xl text-muted italic">
-            <Icon name="plus" className="size-7" />
-            {preparing ? 'Preparing your photo…' : 'Add a photo'}
-          </span>
-        )}
+      {framing && <PhotoFramer source={framing} onDone={useFramed} onCancel={() => setFraming(null)} />}
+      <div className="relative">
+        <label className="relative block aspect-[3/4] w-full cursor-pointer overflow-hidden bg-sand">
+          {photo ? (
+            <img
+              src={photoUrl(item?.id ?? 'draft', photo)}
+              alt="This piece"
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <span className="m-3 flex h-[calc(100%-1.5rem)] flex-col items-center justify-center gap-3 border border-dashed border-muted/40 font-serif text-2xl text-muted italic">
+              <Icon name="plus" className="size-7" />
+              {preparing ? FRAME_LABELS.preparing : 'Add a photo'}
+            </span>
+          )}
+          {photo && (
+            <span className="absolute right-3 bottom-3 rounded-full bg-mat/90 px-3.5 py-2 text-eyebrow uppercase shadow-print">
+              Change
+            </span>
+          )}
+          <input type="file" accept="image/*" onChange={pickPhoto} className="sr-only" aria-label="Photo" />
+        </label>
         {photo && (
-          <span className="absolute right-3 bottom-3 rounded-full bg-mat/90 px-3.5 py-2 text-eyebrow uppercase shadow-print">
-            Change
-          </span>
+          // Outside the label, so it doesn't open the photo picker. Re-frames the photo: the
+          // original she picked in this form if there is one, otherwise the saved copy.
+          <button
+            type="button"
+            onClick={() => setFraming(original ?? photo)}
+            className="absolute bottom-3 left-3 rounded-full bg-mat/90 px-3.5 py-2 text-eyebrow uppercase shadow-print"
+          >
+            {FRAME_LABELS.reframe}
+          </button>
         )}
-        <input type="file" accept="image/*" onChange={pickPhoto} className="sr-only" aria-label="Photo" />
-      </label>
+      </div>
+      {!photo && samePhoto && (
+        <div className="mt-3 text-center">
+          <button
+            type="button"
+            disabled={preparing}
+            onClick={() => {
+              setOriginal(samePhoto)
+              setFraming(samePhoto)
+            }}
+            className="key w-full rounded-full py-3.5 text-eyebrow uppercase disabled:opacity-50"
+          >
+            {FRAME_LABELS.samePhoto}
+          </button>
+          <p className="mt-2 text-sm text-muted">{FRAME_LABELS.samePhotoHint}</p>
+        </div>
+      )}
 
       {item && <WornLine itemId={item.id} wears={wears} />}
 

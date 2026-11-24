@@ -151,6 +151,21 @@ Asked for because the details looked too plain. All values above.
 - **The saying** sits behind a 72 px semibold italic hibiscus quote mark,
   without quotation marks around the text.
 
+## Frame it (`src/components/PhotoFramer.tsx`, 2026-11-24)
+
+Full screen over the piece's form, on the dark deck (`.deck`, cream
+words): "Frame it" in italic serif at 1.75 rem and a 14 px hint at 70%
+cream on top; the photo in the middle, 16 px in from the sides, behind
+a 3:4 frame with a 2 px cream border and 6 px corners, the photo outside
+the frame dimmed to 62% plum; at the bottom a Zoom slider (eyebrow label,
+hibiscus thumb through `accent-color`) and two keys, Cancel (`.key`) and
+the wider "Use this" (`.key-ink`). A frame zoomed out past the photo is
+filled with the light `--sand` (`#f3e4d8`), whatever the phone's mode,
+since it becomes part of the stored photo. On the form, "Frame" is a
+small cream pill (`bg-mat/90`, eyebrow type) bottom left of the photo,
+opposite "Change"; "Same photo, next piece" is a full-width `.key` under
+the empty photo with a muted line under it. No new tokens.
+
 ## Outfit collage (`src/components/OutfitCollage.tsx`)
 
 - A 4:5 board in `--board` with grain and a soft inner shadow.
